@@ -63,3 +63,16 @@ LOSE_TITLE,Stuck!,Sıkıştın!
 LOSE_TEXT,No moves left.,Hamle hakkın bitti.
 LOSE_RETRY,Try Again,Tekrar Dene
 ROAD_EXIT,EXIT,ÇIKIŞ
+HINT_DEADLOCK,No way out now. Tap Retry!,Artık çıkış yolu yok. Tekrar'a dokun!
+MECH_CARGO_TITLE,Loaded trucks,Yüklü araçlar
+MECH_CARGO_1,A crate and a short arrow mean a heavy load: the first tap moves it only one cell.,Kasa ve kısa ok ağır yük demek: ilk dokunuşta sadece bir kare ilerler.
+MECH_CARGO_2,"Tap again to drive it out. Sometimes that one step makes room for others!",Çıkması için bir kez daha dokun. Bazen o tek adım başkalarına yer açar!
+MECH_TURN_TITLE,Turning cars,Dönen araçlar
+MECH_TURN_1,A curved arrow means the car turns first: the first tap swings it 90°.,Kıvrık ok aracın önce döneceğini gösterir: ilk dokunuşta 90° döner.
+MECH_TURN_2,"Its nose needs a free cell to turn into. Then tap again to drive.",Burnunun döneceği kare boş olmalı. Sonra sürmek için tekrar dokun.
+MECH_LOCK_TITLE,Locked cars,Kilitli araçlar
+MECH_LOCK_1,A car with a padlock won't move until the key car of the same color has left.,Asma kilitli araç aynı renkteki anahtarlı araç çıkmadan kıpırdamaz.
+MECH_LOCK_2,Tapping a locked car costs nothing.,Kilitli araca dokunmak hak yemez.
+MECH_GATE_TITLE,Gates,Bariyerler
+MECH_GATE_1,A colored barrier blocks the road.,Renkli bir bariyer yolu kapatır.
+MECH_GATE_2,It opens when the key car of the same color leaves.,Aynı renkteki anahtarlı araç çıkınca açılır.

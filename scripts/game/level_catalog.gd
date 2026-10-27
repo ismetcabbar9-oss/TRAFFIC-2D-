@@ -7,6 +7,8 @@ const WORLDS_PATH := "res://data/worlds.json"
 
 static var _worlds: Array = []
 static var _paths := {} ## world index -> PackedStringArray
+## Dev tools only: every level loads this file instead.
+static var override_path := ""
 
 
 static func worlds() -> Array:
@@ -42,4 +44,6 @@ static func paths(world_index: int) -> PackedStringArray:
 
 
 static func path(world_index: int, level_index: int) -> String:
+	if override_path != "":
+		return override_path
 	return paths(world_index)[level_index]

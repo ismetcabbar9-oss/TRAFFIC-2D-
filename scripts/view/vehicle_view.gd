@@ -9,6 +9,8 @@ const SIDE_GAP := 0.28 ## free space left beside the car inside its cell
 const END_GAP := 0.45 ## free space left between bumpers inside the slot
 
 const ARROW_SCENE := preload("res://scenes/direction_arrow.tscn")
+const CRATE_MODEL := "res://assets/models/props/box.glb"
+const CRATE_FOOTPRINT := 0.715 ## crate model width at scale 1
 
 @export var exit_acceleration := 45.0 ## m/s²
 @export var exit_max_speed := 24.0 ## m/s
@@ -56,6 +58,10 @@ var _drive_time := 0.0
 var _next_puff := 0.0
 var _skids: Array[MeshInstance3D] = []
 var _last_forward := Vector3.ZERO
+var _roof := 0.0
+var _crate: Node3D ## cargo marker on the roof
+var _badge: FlatIcon ## padlock (locked) or key (key holder) above the roof
+var _frame: FlatIcon ## group-colored outline on the ground
 
 
 static func exiting_count() -> int:
@@ -88,9 +94,11 @@ func setup(board: BoardView, p_state: VehicleState, effects_root: Node3D) -> voi
 			if part is GeometryInstance3D:
 				part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var roof := _fit_model(cell_size)
+	_roof = roof
 	_add_contact_shadow(cell_size)
 	_add_arrow(cell_size, roof)
 	_add_pick_body(roof)
+	_add_mechanic_markers(cell_size)
 
 	rotation.y = GridDir.to_yaw(dir)
 	_home = board.cell_to_world(footprint_center())
@@ -167,6 +175,8 @@ func play_exit() -> void:
 	_kill_tween()
 	_arrow.clear_hint()
 	_arrow.visible = false
+	if _frame:
+		_frame.visible = false
 	_pick_body.queue_free()
 	_route = _board.exit_route(position, dir)
 	_route_pos = 0.0
@@ -313,6 +323,10 @@ func _fit_model(cell_size: float) -> float:
 
 func _add_arrow(cell_size: float, roof: float) -> void:
 	_arrow = ARROW_SCENE.instantiate()
+	if state.cargo:
+		_arrow.kind = DirectionArrow.Kind.STEP
+	elif state.turn != 0:
+		_arrow.kind = DirectionArrow.Kind.TURN_CW if state.turn > 0 else DirectionArrow.Kind.TURN_CCW
 	_arrow.position.y = roof + 0.04
 	_arrow.scale = Vector3.ONE * cell_size * 0.5
 	_body.add_child(_arrow)
@@ -379,3 +393,129 @@ static func _model_aabb(node: Node, xf: Transform3D) -> AABB:
 			result = a if not has else result.merge(a)
 			has = true
 	return result
+
+
+# --- World mechanics ------------------------------------------------------------
+
+## Crate for cargo; padlock or key plus a ground frame in the group color.
+func _add_mechanic_markers(cell_size: float) -> void:
+	if state.cargo:
+		_crate = (load(CRATE_MODEL) as PackedScene).instantiate()
+		_crate.scale = Vector3.ONE * cell_size * 0.4 / CRATE_FOOTPRINT
+		_crate.position = Vector3(0.0, _roof - 0.02, -half_length * 0.52)
+		_crate.rotation.y = 0.15
+		_body.add_child(_crate)
+	var group := state.lock if state.lock >= 0 else state.key
+	if group < 0:
+		return
+	var color := MechanicStyle.group_color(group)
+	if state.lock >= 0:
+		_badge = FlatIcon.create(FlatIcon.padlock_shapes(), color, 0.07, FlatIcon.padlock_details())
+	else:
+		_badge = FlatIcon.create(FlatIcon.key_shapes(), color)
+	# Behind the arrow, floating a little above the roof.
+	_badge.scale = Vector3.ONE * cell_size * 0.46
+	_badge.position = Vector3(0.0, _roof + 0.25, -half_length * 0.72)
+	_body.add_child(_badge)
+	var bob := _badge.create_tween().set_loops()
+	bob.tween_property(_badge, "position:y", _roof + 0.38, 0.8).set_trans(Tween.TRANS_SINE)
+	bob.tween_property(_badge, "position:y", _roof + 0.25, 0.8).set_trans(Tween.TRANS_SINE)
+	var area := Vector2(cell_size - 0.12, cell_size * length - 0.12)
+	_frame = FlatIcon.create(FlatIcon.frame_shapes(area, 0.08), Color(color, 0.85), 0.025)
+	_frame.position.y = 0.012
+	add_child(_frame)
+
+
+## Cargo: drives one cell forward to its new footprint and drops the crate.
+func play_advance() -> void:
+	_kill_tween()
+	_arrow.kind = DirectionArrow.Kind.STRAIGHT
+	var target := _board.cell_to_world(footprint_center())
+	_tween = create_tween()
+	_tween.tween_property(self, "position", target, 0.32).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	_tween.tween_callback(_squash.bind(Vector3(1.04, 0.94, 0.95), 0.07, 0.35))
+	_home = target
+	_squash(Vector3(0.96, 1.05, 1.06), 0.08, 0.3)
+	if _crate:
+		var crate := _crate
+		_crate = null
+		var t := crate.create_tween()
+		t.tween_property(crate, "position:y", crate.position.y + 0.6, 0.18).set_ease(Tween.EASE_OUT)
+		t.parallel().tween_property(crate, "rotation:y", crate.rotation.y + 1.2, 0.3)
+		t.tween_property(crate, "scale", Vector3.ONE * 0.01, 0.18).set_ease(Tween.EASE_IN)
+		t.tween_callback(crate.queue_free)
+
+
+## Turn: swings 90 degrees around the rear cell onto its new footprint.
+func play_turn() -> void:
+	_kill_tween()
+	_arrow.kind = DirectionArrow.Kind.STRAIGHT
+	var pivot := _board.cell_to_world(Vector2(state.tail()))
+	var start_pos := position
+	var start_yaw := rotation.y
+	var delta := wrapf(GridDir.to_yaw(dir) - start_yaw, -PI, PI)
+	_home = _board.cell_to_world(footprint_center())
+	_tween = create_tween()
+	_tween.tween_method(func(t: float):
+		position = pivot + (start_pos - pivot).rotated(Vector3.UP, delta * t)
+		rotation.y = start_yaw + delta * t, 0.0, 1.0, 0.38) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	_tween.tween_callback(func():
+		position = _home
+		rotation.y = GridDir.to_yaw(dir))
+
+
+## Turn blocked: swings partway, calls `on_impact`, then swings back.
+func play_turn_crash(on_impact: Callable) -> void:
+	_kill_tween()
+	position = _home
+	rotation.y = GridDir.to_yaw(dir)
+	var pivot := _board.cell_to_world(Vector2(state.tail()))
+	var start_yaw := rotation.y
+	var swing := -state.turn * PI * 0.5 * 0.28
+	var swing_to := func(t: float):
+		position = pivot + (_home - pivot).rotated(Vector3.UP, swing * t)
+		rotation.y = start_yaw + swing * t
+	_tween = create_tween()
+	_tween.tween_method(swing_to, 0.0, 1.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_callback(on_impact)
+	_tween.tween_callback(_squash.bind(Vector3(1.06, 0.9, 0.92), 0.09, 0.45))
+	_tween.tween_method(swing_to, 1.0, 0.0, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Tapped while locked: a short shake and a rattle of the padlock.
+func play_locked() -> void:
+	if _nudge_tween:
+		_nudge_tween.kill()
+	_body.rotation.y = 0.0
+	_nudge_tween = create_tween()
+	for a in [0.07, -0.06, 0.04, 0.0]:
+		_nudge_tween.tween_property(_body, "rotation:y", a, 0.06)
+	if _badge:
+		var t := _badge.create_tween()
+		t.tween_property(_badge, "scale", _badge.scale * 1.35, 0.08)
+		t.tween_property(_badge, "scale", _badge.scale, 0.25).set_trans(Tween.TRANS_BACK)
+
+
+## The key car has left: the padlock springs open and fades away.
+func unlock() -> void:
+	if _badge == null:
+		return
+	var badge := _badge
+	_badge = null
+	var open := FlatIcon.create(FlatIcon.padlock_shapes(true), MechanicStyle.group_color(state.lock), 0.07, FlatIcon.padlock_details())
+	open.transform = badge.transform
+	_body.add_child(open)
+	badge.queue_free()
+	var t := open.create_tween()
+	t.tween_property(open, "scale", open.scale * 1.4, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.parallel().tween_property(open, "position:y", open.position.y + 0.5, 0.5)
+	t.tween_property(open, "scale", Vector3.ONE * 0.01, 0.2).set_ease(Tween.EASE_IN)
+	t.tween_callback(open.queue_free)
+	if _frame:
+		var frame := _frame
+		_frame = null
+		var f := frame.create_tween()
+		f.tween_property(frame, "scale", Vector3(1.15, 1.0, 1.08), 0.25)
+		f.parallel().tween_property(frame, "transparency", 1.0, 0.25)
+		f.tween_callback(frame.queue_free)

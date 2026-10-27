@@ -25,6 +25,9 @@ const SOUNDS := {
 	"ui_click": ["res://assets/audio/sfx/ui_click.ogg"],
 	"combo": ["res://assets/audio/sfx/combo.ogg"],
 	"celebrate": ["res://assets/audio/sfx/celebrate.ogg"],
+	"lock_rattle": ["res://assets/audio/sfx/lock_rattle.ogg"],
+	"unlock": ["res://assets/audio/sfx/unlock.ogg"],
+	"gate_open": ["res://assets/audio/sfx/gate_open.ogg"],
 	"win": ["res://assets/audio/music/win.ogg"],
 	"lose": ["res://assets/audio/music/lose.ogg"],
 }

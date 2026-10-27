@@ -16,6 +16,7 @@ var levels := {} ## "world:level" -> {stars, time (s, -1 = unknown), combo}
 var inventory := {} ## rescue name -> count (used from phase 3)
 var ad_free := false ## lifetime ad-free purchase (phase 4)
 var tutorial_seen := false
+var tips_seen: Array = [] ## mechanic tip cards already shown
 
 var sound_on := true
 var music_on := true
@@ -104,6 +105,12 @@ func mark_tutorial_seen() -> void:
 	save()
 
 
+func mark_tip_seen(tip: String) -> void:
+	if not tip in tips_seen:
+		tips_seen.append(tip)
+		save()
+
+
 # --- Settings ------------------------------------------------------------------
 
 func set_sound(on: bool) -> void:
@@ -164,6 +171,7 @@ func save() -> void:
 		"inventory": inventory,
 		"ad_free": ad_free,
 		"tutorial": tutorial_seen,
+		"tips": tips_seen,
 		"settings": {
 			"sound": sound_on, "music": music_on, "vibration": vibration_on,
 			"speed": speed_level, "language": language,
@@ -194,6 +202,7 @@ func _load() -> void:
 	inventory = data.get("inventory", {})
 	ad_free = bool(data.get("ad_free", false))
 	tutorial_seen = bool(data.get("tutorial", false))
+	tips_seen = data.get("tips", [])
 	var s: Dictionary = data.get("settings", {})
 	sound_on = bool(s.get("sound", true))
 	music_on = bool(s.get("music", true))

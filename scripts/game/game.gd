@@ -83,6 +83,9 @@ func load_level(index: int) -> void:
 	_level_start = _clock
 	session.vehicle_exited.connect(_on_vehicle_exited)
 	session.vehicle_crashed.connect(_on_vehicle_crashed)
+	session.vehicle_advanced.connect(_on_vehicle_advanced)
+	session.vehicle_turned.connect(_on_vehicle_turned)
+	session.vehicle_locked.connect(_on_vehicle_locked)
 	session.mistakes_changed.connect(func(left: int): hud.set_mistakes(left, level.mistakes))
 	session.won.connect(_on_won)
 	session.lost.connect(_on_lost)
@@ -102,7 +105,7 @@ func load_level(index: int) -> void:
 	for e in level.obstacles:
 		var obstacle := ObstacleView.new()
 		pieces.add_child(obstacle)
-		obstacle.setup(board, e.type, e.cell)
+		obstacle.setup(board, e.type, e.cell, e.get("group", -1))
 		obstacle_views[e.cell] = obstacle
 	# Each level is a little later in the day: morning light to sunset.
 	var hour := TimeOfDay.hour_for_level(level_index, LevelCatalog.level_count(world_index))
@@ -117,9 +120,30 @@ func load_level(index: int) -> void:
 
 	hud.hide_result()
 	_clear_hint()
+	_show_mechanic_tip(level)
 	hud.set_level_title(tr("LEVEL_N") % (level_index + 1))
 	hud.set_time_of_day(TimeOfDay.label(hour))
 	hud.set_mistakes(session.mistakes_left, level.mistakes)
+
+
+## The first level with a new mechanic explains it once.
+func _show_mechanic_tip(level: LevelData) -> void:
+	var tip := ""
+	for e in level.vehicles:
+		if e.get("cargo", false):
+			tip = "CARGO"
+		elif e.get("turn", 0) != 0:
+			tip = "TURN"
+		elif e.get("lock", -1) >= 0:
+			tip = "LOCK"
+	for e in level.obstacles:
+		if e.type == "gate":
+			tip = "GATE"
+	if tip == "" or tip in Progress.tips_seen:
+		return
+	Progress.mark_tip_seen(tip)
+	_tutorial_open = true
+	hud.show_tutorial("MECH_%s_TITLE" % tip, ["MECH_%s_1" % tip, "MECH_%s_2" % tip])
 
 
 func _notification(what: int) -> void:
@@ -181,13 +205,64 @@ func _pick_vehicle(screen_pos: Vector2) -> int:
 	return occupant if occupant >= 0 else -1
 
 
-func _on_vehicle_exited(id: int, _result: BoardState.MoveResult) -> void:
+func _on_vehicle_exited(id: int, result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
 	vehicle_views.erase(id)
 	view.play_exit()
 	_play_launch_sounds(view.type)
 	Haptics.pulse(12, 0.4)
 	_count_combo(view)
+	if view.state.key >= 0:
+		_open_group(view.state.key, result.opened)
+
+
+## The key car of `group` has left: its locked cars and gates open.
+func _open_group(group: int, gate_cells: Array[Vector2i]) -> void:
+	var opened := false
+	for other in vehicle_views.values():
+		if (other as VehicleView).state.lock == group:
+			other.unlock()
+			opened = true
+	for c in gate_cells:
+		var gate: ObstacleView = obstacle_views.get(c)
+		obstacle_views.erase(c)
+		if gate:
+			gate.open()
+	if not gate_cells.is_empty():
+		Sfx.play("gate_open", -4.0, 1.0, 0.05)
+	if opened or not gate_cells.is_empty():
+		get_tree().create_timer(0.1).timeout.connect(func(): Sfx.play("unlock", -2.0, 1.0, 0.05))
+
+
+## Cargo pulled forward one cell.
+func _on_vehicle_advanced(id: int, _result: BoardState.MoveResult) -> void:
+	var view: VehicleView = vehicle_views[id]
+	view.play_advance()
+	Sfx.play(VehicleCatalog.engine_sound(view.type), -9.0, VehicleCatalog.pitch(view.type) * 0.9, 0.04)
+	Haptics.pulse(10, 0.3)
+	_check_deadlock()
+
+
+func _on_vehicle_turned(id: int, _result: BoardState.MoveResult) -> void:
+	var view: VehicleView = vehicle_views[id]
+	view.play_turn()
+	Sfx.play("tire_squeal", -9.0, 1.15, 0.05)
+	Haptics.pulse(10, 0.3)
+	_check_deadlock()
+
+
+func _on_vehicle_locked(id: int) -> void:
+	vehicle_views[id].play_locked()
+	Sfx.play("lock_rattle", -3.0, 1.0, 0.05)
+	Haptics.pulse(20, 0.5)
+
+
+## A pull-forward or turn can box cars in for good; say so instead of letting
+## the player tap around a board that can no longer be cleared.
+func _check_deadlock() -> void:
+	if session.is_deadlocked():
+		hud.show_hint(tr("HINT_DEADLOCK"))
+		hud.pulse_retry()
 
 
 ## Quick successive exits build a combo: a pop-up over the car and a chime
@@ -220,6 +295,9 @@ func _on_vehicle_crashed(id: int, result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
 	var target: Node3D = obstacle_views.get(result.contact_cell) if result.blocker < 0 \
 		else vehicle_views.get(result.blocker)
+	if result.turning:
+		view.play_turn_crash(_on_crash_impact.bind(view, target, result.blocker))
+		return
 	var cell_size := board.theme.cell_size
 	# From the car's center to the blocker's edge, minus the car's own half length.
 	var gap := view.length * cell_size * 0.5 + result.steps * cell_size - view.half_length

@@ -24,6 +24,8 @@ var _hint_label: Label
 var _last_level := false
 var _root: Control
 var _badge: Label
+var _retry_button: Button
+var _retry_pulse: Tween
 var _star_row: HBoxContainer
 var _stars: Array[StarIcon] = []
 var _stats: VBoxContainer
@@ -154,8 +156,9 @@ func show_combo(count: int, at: Vector2) -> void:
 	t.chain().tween_callback(label.queue_free)
 
 
-## One-time "how to play" card; emits `tutorial_closed` when dismissed.
-func show_tutorial() -> void:
+## Tip card ("how to play", or a world's new mechanic); emits
+## `tutorial_closed` when dismissed.
+func show_tutorial(title_key := "TUT_TITLE", line_keys: Array = ["TUT_1", "TUT_2", "TUT_3", "TUT_4"]) -> void:
 	var dim := ColorRect.new()
 	dim.color = Color(0.1, 0.12, 0.2, 0.55)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -170,11 +173,11 @@ func show_tutorial() -> void:
 	box.add_theme_constant_override("separation", 16)
 	panel.add_child(box)
 	var title := Label.new()
-	title.text = tr("TUT_TITLE")
+	title.text = tr(title_key)
 	title.add_theme_font_size_override("font_size", 52)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
-	for line in ["TUT_1", "TUT_2", "TUT_3", "TUT_4"]:
+	for line in line_keys:
 		var l := Label.new()
 		l.text = tr(line)
 		l.add_theme_font_size_override("font_size", 28)
@@ -210,6 +213,20 @@ func hide_hint() -> void:
 
 func hide_result() -> void:
 	_overlay.visible = false
+	if _retry_pulse:
+		_retry_pulse.kill()
+		_retry_pulse = null
+		_retry_button.scale = Vector2.ONE
+
+
+## Draws the eye to Retry (the board can no longer be cleared).
+func pulse_retry() -> void:
+	if _retry_pulse:
+		return
+	_retry_button.pivot_offset = _retry_button.size * 0.5
+	_retry_pulse = _retry_button.create_tween().set_loops()
+	_retry_pulse.tween_property(_retry_button, "scale", Vector2.ONE * 1.15, 0.4).set_trans(Tween.TRANS_SINE)
+	_retry_pulse.tween_property(_retry_button, "scale", Vector2.ONE, 0.4).set_trans(Tween.TRANS_SINE)
 
 
 func _show_result() -> void:
@@ -264,7 +281,8 @@ func _build_top_bar(root: Control) -> void:
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(_title)
-	bar.add_child(_small_button(tr("HUD_RETRY"), restart_requested.emit))
+	_retry_button = _small_button(tr("HUD_RETRY"), restart_requested.emit)
+	bar.add_child(_retry_button)
 
 	var meter_row := HBoxContainer.new()
 	meter_row.alignment = BoxContainer.ALIGNMENT_CENTER

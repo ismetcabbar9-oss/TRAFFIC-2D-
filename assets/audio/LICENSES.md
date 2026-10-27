@@ -22,3 +22,5 @@ All audio is CC0 1.0 (public domain dedication); edited (trimmed, mixed, normali
 | music/menu_theme.ogg | OpenGameArt "Happy Clappy Loop" by owlishmedia (https://opengameart.org/content/happy-clappy-loop) |
 | music/game_theme.ogg | OpenGameArt "Apple Cider" by Zane Little Music (https://opengameart.org/content/apple-cider) |
 | sfx/combo.ogg, sfx/celebrate.ogg | Kenney "Interface Sounds" (glass_001, confirmation_001), CC0 |
+| sfx/lock_rattle.ogg, sfx/unlock.ogg | Kenney "RPG Audio" (metalLatch, metalClick), CC0 |
+| sfx/gate_open.ogg | Kenney "Interface Sounds" (maximize_006), CC0 |
