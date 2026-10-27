@@ -4,9 +4,15 @@ config_version=5
 
 [application]
 
-config/name="Traffic 2D"
+config/name="Traffic Escape"
 run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
+config/quit_on_go_back=false
+config/icon="res://assets/icon.png"
+boot_splash/bg_color=Color(0.749, 0.890, 0.949, 1)
+boot_splash/show_image=true
+boot_splash/image="res://assets/icon.png"
+boot_splash/fullsize=false
 
 [autoload]
 

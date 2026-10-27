@@ -12,6 +12,7 @@ func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	if args.size() > 0:
 		out_dir = args[0]
+	await process_frame # let autoloads load the save file first
 	root.get_node("Progress").current_level = 0
 	game = load("res://scenes/game.tscn").instantiate()
 	root.add_child(game)

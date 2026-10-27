@@ -16,6 +16,8 @@ var _result_text: Label
 var _primary: Button
 var _secondary: Button
 var _won := false
+var _hint: PanelContainer
+var _hint_label: Label
 var _last_level := false
 
 
@@ -26,6 +28,7 @@ func _ready() -> void:
 	root.theme = UiStyle.make_theme()
 	add_child(root)
 	_build_top_bar(root)
+	_build_hint(root)
 	_build_result(root)
 
 
@@ -61,6 +64,19 @@ func show_lose() -> void:
 	_show_result()
 
 
+func show_hint(text: String) -> void:
+	_hint_label.text = text
+	if _hint.visible:
+		return
+	_hint.visible = true
+	_hint.modulate.a = 0.0
+	create_tween().tween_property(_hint, "modulate:a", 1.0, 0.3)
+
+
+func hide_hint() -> void:
+	_hint.visible = false
+
+
 func hide_result() -> void:
 	_overlay.visible = false
 
@@ -80,9 +96,10 @@ func _show_result() -> void:
 func _build_top_bar(root: Control) -> void:
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	for side in ["left", "right"]:
-		margin.add_theme_constant_override("margin_" + side, 28)
-	margin.add_theme_constant_override("margin_top", 24)
+	var insets: Vector4 = get_node("/root/ScreenFit").safe_insets()
+	margin.add_theme_constant_override("margin_left", 28 + int(insets.x))
+	margin.add_theme_constant_override("margin_right", 28 + int(insets.z))
+	margin.add_theme_constant_override("margin_top", 24 + int(insets.y))
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(margin)
 
@@ -124,6 +141,35 @@ func _small_button(text: String, action: Callable) -> Button:
 	b.pressed.connect(_click)
 	b.pressed.connect(action)
 	return b
+
+
+func _build_hint(root: Control) -> void:
+	var anchor := MarginContainer.new()
+	anchor.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	anchor.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	var insets: Vector4 = get_node("/root/ScreenFit").safe_insets()
+	anchor.add_theme_constant_override("margin_bottom", 40 + int(insets.w))
+	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(anchor)
+	var center := CenterContainer.new()
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	anchor.add_child(center)
+	_hint = PanelContainer.new()
+	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var box := StyleBoxFlat.new()
+	box.bg_color = Color(0.17, 0.19, 0.28, 0.85)
+	box.set_corner_radius_all(24)
+	box.content_margin_left = 28
+	box.content_margin_right = 28
+	box.content_margin_top = 10
+	box.content_margin_bottom = 12
+	_hint.add_theme_stylebox_override("panel", box)
+	_hint.visible = false
+	center.add_child(_hint)
+	_hint_label = Label.new()
+	_hint_label.add_theme_color_override("font_color", Color.WHITE)
+	_hint_label.add_theme_font_size_override("font_size", 30)
+	_hint.add_child(_hint_label)
 
 
 func _build_result(root: Control) -> void:

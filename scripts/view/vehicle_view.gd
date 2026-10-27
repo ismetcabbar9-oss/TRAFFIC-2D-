@@ -43,8 +43,10 @@ var _pick_body: StaticBody3D
 var _home := Vector3.ZERO
 var _tween: Tween
 var _nudge_tween: Tween
+var _hint_tween: Tween
 var _squash_tween: Tween
 var _wheels: Array[Node3D] = []
+var _arrow_base_scale := Vector3.ONE
 
 var _route: Curve3D
 var _route_pos := 0.0
@@ -123,6 +125,19 @@ func play_crash(distance: float, on_impact: Callable) -> void:
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
+## Bounces the roof arrow to point the player at this car (tutorial hint).
+func set_hint(on: bool) -> void:
+	if _hint_tween:
+		_hint_tween.kill()
+		_hint_tween = null
+	var base := _arrow_base_scale
+	_arrow.scale = base
+	if on:
+		_hint_tween = create_tween().set_loops()
+		_hint_tween.tween_property(_arrow, "scale", base * 1.45, 0.35).set_trans(Tween.TRANS_SINE)
+		_hint_tween.tween_property(_arrow, "scale", base, 0.35).set_trans(Tween.TRANS_SINE)
+
+
 ## Small knock when something bumps into this car.
 func nudge(push: Vector3) -> void:
 	if _nudge_tween:
@@ -138,6 +153,7 @@ func nudge(push: Vector3) -> void:
 ## Leaves the lot along the board's exit route and frees itself off screen.
 func play_exit() -> void:
 	_kill_tween()
+	set_hint(false)
 	_arrow.visible = false
 	_pick_body.queue_free()
 	_route = _board.exit_route(position, dir)
@@ -285,7 +301,8 @@ func _fit_model(cell_size: float) -> float:
 func _add_arrow(cell_size: float, roof: float) -> void:
 	_arrow = ARROW_SCENE.instantiate()
 	_arrow.position.y = roof + 0.04
-	_arrow.scale = Vector3.ONE * cell_size * 0.5
+	_arrow_base_scale = Vector3.ONE * cell_size * 0.5
+	_arrow.scale = _arrow_base_scale
 	_body.add_child(_arrow)
 
 

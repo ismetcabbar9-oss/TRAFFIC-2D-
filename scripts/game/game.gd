@@ -8,11 +8,15 @@ const MENU_SCENE := "res://scenes/menu.tscn"
 @export var max_exit_wait := 3.0 ## never wait longer than this for cars to leave
 @export var lose_delay := 0.6 ## seconds between the final crash and the lose panel
 @export_range(0.0, 1.0) var horn_chance := 0.65 ## chance a bumped car honks back
+@export var hint_levels := 1 ## the first N levels show a hint when the player waits
+@export var hint_delay := 2.5 ## idle seconds before the hint appears
 
 var session: GameSession
 var level_index := 0
 var vehicle_views := {} ## vehicle id -> VehicleView
 var obstacle_views := {} ## cell -> ObstacleView
+var _idle := 0.0
+var _hinted_id := -1
 
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
@@ -22,10 +26,20 @@ var obstacle_views := {} ## cell -> ObstacleView
 
 
 func _ready() -> void:
+	_adapt_lighting()
 	hud.restart_requested.connect(func(): load_level(level_index))
 	hud.next_requested.connect(func(): load_level(level_index + 1))
 	hud.menu_requested.connect(func(): get_tree().change_scene_to_file(MENU_SCENE))
 	load_level(Progress.current_level)
+
+
+## Devices without Vulkan fall back to the Compatibility renderer, which lights
+## in a different color space and looks washed out with the same values.
+func _adapt_lighting() -> void:
+	if RenderingServer.get_current_rendering_method() != "gl_compatibility":
+		return
+	($Sun as DirectionalLight3D).light_energy *= 0.45
+	($WorldEnvironment as WorldEnvironment).environment.ambient_light_energy *= 0.5
 
 
 func load_level(index: int) -> void:
@@ -66,17 +80,45 @@ func load_level(index: int) -> void:
 	camera.frame_board(board.view_half_extents())
 
 	hud.hide_result()
+	_clear_hint()
 	hud.set_level_title(level.name)
 	hud.set_mistakes(session.mistakes_left, level.mistakes)
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST: # Android back button
+		get_tree().change_scene_to_file(MENU_SCENE)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	# Mouse clicks arrive as touches too (pointing/emulate_touch_from_mouse).
-	if event is InputEventScreenTouch and event.pressed and event.index == 0:
+	# Every finger counts, so two quick taps with two fingers both register.
+	if event is InputEventScreenTouch and event.pressed:
 		var id := _pick_vehicle(event.position)
 		if id >= 0 and session != null:
+			_clear_hint()
 			session.tap(id)
 			get_viewport().set_input_as_handled()
+
+
+func _process(delta: float) -> void:
+	if level_index >= hint_levels or session == null or session.state != GameSession.State.PLAYING:
+		return
+	_idle += delta
+	if _idle >= hint_delay and _hinted_id < 0:
+		var free := session.board.free_vehicles()
+		if not free.is_empty() and vehicle_views.has(free[0]):
+			_hinted_id = free[0]
+			vehicle_views[_hinted_id].set_hint(true)
+			hud.show_hint("Yolu açık bir arabaya dokun!")
+
+
+func _clear_hint() -> void:
+	_idle = 0.0
+	if _hinted_id >= 0 and vehicle_views.has(_hinted_id):
+		vehicle_views[_hinted_id].set_hint(false)
+	_hinted_id = -1
+	hud.hide_hint()
 
 
 ## Vehicle under a screen position, or -1.

@@ -6,12 +6,28 @@ const GAME_SCENE := "res://scenes/game.tscn"
 var _grid: GridContainer
 var _sound: Button
 var _vibration: Button
+var _column: VBoxContainer
+var _title: Label
 
 
 func _ready() -> void:
 	theme = UiStyle.make_theme()
 	_build()
 	_refresh()
+	get_viewport().size_changed.connect(_fit_layout)
+	_fit_layout()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		get_tree().quit()
+
+
+## Tighter spacing on short (landscape phone) screens.
+func _fit_layout() -> void:
+	var short := get_viewport_rect().size.y < 800.0
+	_column.add_theme_constant_override("separation", 14 if short else 26)
+	_title.add_theme_font_size_override("font_size", 60 if short else 78)
 
 
 func _build() -> void:
@@ -33,15 +49,14 @@ func _build() -> void:
 	add_child(center)
 	var column := VBoxContainer.new()
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
-	column.add_theme_constant_override("separation", 26)
 	center.add_child(column)
+	_column = column
 
-	var title := Label.new()
-	title.text = "Traffic Escape"
-	title.add_theme_font_size_override("font_size", 78)
-	title.add_theme_font_override("font", UiStyle.font(800))
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(title)
+	_title = Label.new()
+	_title.text = "Traffic Escape"
+	_title.add_theme_font_override("font", UiStyle.font(800))
+	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(_title)
 	var subtitle := Label.new()
 	subtitle.text = "Doğru sırayla otoparkı boşalt!"
 	subtitle.add_theme_font_size_override("font_size", 28)
