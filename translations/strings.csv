@@ -78,3 +78,23 @@ MECH_GATE_1,A colored barrier blocks the road.,Renkli bir bariyer yolu kapatır.
 MECH_GATE_2,It opens when the key car of the same color leaves.,Aynı renkteki anahtarlı araç çıkınca açılır.
 LEVEL_HARD,Hard,Zor
 TOD_NIGHT,Night,Gece
+RESCUE_HINT,Hint,İpucu
+RESCUE_UNDO,Undo,Geri al
+RESCUE_CRANE,Crane,Vinç
+RESCUE_HINT_DESC,Lights up the car to tap next.,Sıradaki doğru aracı parlatır.
+RESCUE_UNDO_DESC,"Takes back your last crash (you get the move back), or a pull-forward or turn.","Son çarpışmanı geri alır (hakkın geri gelir), ya da son ilerleme veya dönüşü."
+RESCUE_CRANE_DESC,Lifts any car straight out of the lot.,Herhangi bir aracı otoparktan havadan çıkarır.
+OFFER_COINS,Use %d coins,%d jeton kullan
+OFFER_NO_COINS,Need %d coins,%d jeton gerekli
+OFFER_AD,Watch an ad,Reklam izle
+OFFER_CANCEL,Not now,Şimdi değil
+CONTINUE_AD,+%d moves · watch an ad,+%d hak · reklam izle
+CONTINUE_COINS,+%d moves · %d coins,+%d hak · %d jeton
+WIN_DOUBLE,Double coins · watch an ad,Jetonları 2 katına çıkar · reklam
+HINT_GLOWING,Tap the glowing car!,Parlayan araca dokun!
+HINT_CRANE,Tap a car to lift it out,Çıkarmak istediğin araca dokun
+HINT_DEADLOCK_UNDO,"No way out. Try Undo, or Retry.","Çıkış yolu yok. Geri al'ı ya da Tekrar'ı dene."
+CRANE_GIFT_TITLE,A gift: the crane!,Hediye: vinç!
+CRANE_GIFT_1,"Stuck? The crane lifts any car straight out of the lot.","Sıkıştın mı? Vinç herhangi bir aracı havadan çıkarır."
+CRANE_GIFT_2,Here is one for free. Find it in the bar at the bottom.,Bir tanesi bizden. Alttaki çubukta duruyor.
+AD_PLACEHOLDER,Ad (test),Reklam (test)

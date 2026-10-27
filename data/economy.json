@@ -4,5 +4,10 @@
   "combo_coins_per_step": 2,
   "combo_coins_max": 10,
   "hard_level_multiplier": 2,
-  "stars_by_mistakes_used": [3, 2, 1]
+  "stars_by_mistakes_used": [3, 2, 1],
+  "rescue_prices": {"hint": 30, "undo": 50, "crane": 120, "continue": 100},
+  "free_hints_per_day": 3,
+  "ad_limits_per_day": {"total": 15, "hint": 5, "crane": 2, "continue": 5, "double_coins": 5, "daily_gift": 1},
+  "continue_moves": 2,
+  "crane_gift_level": [0, 5]
 }

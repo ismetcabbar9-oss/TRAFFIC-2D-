@@ -20,6 +20,7 @@ Sfx="*res://scripts/audio/sfx.gd"
 Progress="*res://scripts/game/progress.gd"
 ScreenFit="*res://scripts/ui/screen_fit.gd"
 Transition="*res://scripts/ui/transition.gd"
+AdManager="*res://scripts/game/ad_manager.gd"
 
 [display]
 

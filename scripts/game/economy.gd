@@ -28,3 +28,8 @@ static func level_coins(stars: int, best_combo: int, hard: bool) -> int:
 	if hard:
 		coins *= int(value("hard_level_multiplier"))
 	return coins
+
+
+## Coin price of a rescue ("hint", "undo", "crane", "continue").
+static func price(rescue: String) -> int:
+	return int(value("rescue_prices")[rescue])

@@ -13,7 +13,11 @@ signal coins_changed(total: int)
 
 var coins := 0
 var levels := {} ## "world:level" -> {stars, time (s, -1 = unknown), combo}
-var inventory := {} ## rescue name -> count (used from phase 3)
+var inventory := {} ## rescue name ("hint", "undo", "crane") -> count owned
+## Counters that reset every day: {"day": "YYYY-MM-DD", "free_hints": used,
+## "ads": {placement: count, "total": count}}.
+var daily := {}
+var flags := {} ## one-time events, e.g. "crane_gift"
 var ad_free := false ## lifetime ad-free purchase (phase 4)
 var tutorial_seen := false
 var tips_seen: Array = [] ## mechanic tip cards already shown
@@ -94,6 +98,74 @@ func record_win(world: int, level: int, stars: int, time: float, combo: int, har
 	return {"coins": earned, "best_time": old_time >= 0.0 and time < old_time}
 
 
+## Takes `amount` coins if the player has them.
+func spend_coins(amount: int) -> bool:
+	if coins < amount:
+		return false
+	add_coins(-amount)
+	return true
+
+
+func item_count(item: String) -> int:
+	return int(inventory.get(item, 0))
+
+
+func add_item(item: String, amount := 1) -> void:
+	inventory[item] = item_count(item) + amount
+	save()
+
+
+## Uses one owned rescue; false if none is left.
+func use_item(item: String) -> bool:
+	if item_count(item) <= 0:
+		return false
+	inventory[item] = item_count(item) - 1
+	save()
+	return true
+
+
+func free_hints_left() -> int:
+	return maxi(int(Economy.value("free_hints_per_day")) - int(_today().get("free_hints", 0)), 0)
+
+
+func use_free_hint() -> bool:
+	if free_hints_left() <= 0:
+		return false
+	var today := _today()
+	today["free_hints"] = int(today.get("free_hints", 0)) + 1
+	save()
+	return true
+
+
+## Rewarded ads watched today for `placement` (and in total).
+func ads_watched(placement: String) -> int:
+	return int(_today().get("ads", {}).get(placement, 0))
+
+
+func count_ad(placement: String) -> void:
+	var ads: Dictionary = _today().get_or_add("ads", {})
+	ads[placement] = int(ads.get(placement, 0)) + 1
+	ads["total"] = int(ads.get("total", 0)) + 1
+	save()
+
+
+func flag(name: String) -> bool:
+	return bool(flags.get(name, false))
+
+
+func set_flag(name: String) -> void:
+	flags[name] = true
+	save()
+
+
+## Today's counters, starting fresh on a new day.
+func _today() -> Dictionary:
+	var day := Time.get_date_string_from_system()
+	if daily.get("day", "") != day:
+		daily = {"day": day}
+	return daily
+
+
 func add_coins(amount: int) -> void:
 	coins = maxi(coins + amount, 0)
 	coins_changed.emit(coins)
@@ -169,6 +241,8 @@ func save() -> void:
 		"coins": coins,
 		"levels": levels,
 		"inventory": inventory,
+		"daily": daily,
+		"flags": flags,
 		"ad_free": ad_free,
 		"tutorial": tutorial_seen,
 		"tips": tips_seen,
@@ -200,6 +274,8 @@ func _load() -> void:
 	coins = int(data.get("coins", 0))
 	levels = data.get("levels", {})
 	inventory = data.get("inventory", {})
+	daily = data.get("daily", {})
+	flags = data.get("flags", {})
 	ad_free = bool(data.get("ad_free", false))
 	tutorial_seen = bool(data.get("tutorial", false))
 	tips_seen = data.get("tips", [])

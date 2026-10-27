@@ -55,6 +55,15 @@ func flash_hint() -> void:
 	_hint_tween.tween_method(_set_hint, 0.15, 0.0, 0.35)
 
 
+## Paid hint: keeps glowing (gently pulsing) until the car is tapped.
+func hold_hint() -> void:
+	if _hint_tween:
+		_hint_tween.kill()
+	_hint_tween = create_tween().set_loops()
+	_hint_tween.tween_method(_set_hint, 0.55, 1.0, 0.35).set_trans(Tween.TRANS_SINE)
+	_hint_tween.tween_method(_set_hint, 1.0, 0.55, 0.35).set_trans(Tween.TRANS_SINE)
+
+
 func clear_hint() -> void:
 	if _hint_tween:
 		_hint_tween.kill()

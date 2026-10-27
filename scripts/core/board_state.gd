@@ -146,6 +146,14 @@ func apply(id: int, result: MoveResult) -> void:
 			_set_cells(v, id)
 
 
+## Puts a vehicle back as it was before a pull-forward or turn (undo).
+func restore_vehicle(previous: VehicleState) -> void:
+	_set_cells(vehicles[previous.id], EMPTY)
+	var v := previous.duplicate()
+	vehicles[v.id] = v
+	_set_cells(v, v.id)
+
+
 ## Removes a vehicle that has driven out of the lot and opens the gates it
 ## holds the key to. Returns the opened gate cells.
 func remove_vehicle(id: int) -> Array[Vector2i]:

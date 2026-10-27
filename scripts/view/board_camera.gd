@@ -8,7 +8,7 @@ extends Camera3D
 ## Screen fraction reserved for the HUD at the top and kept free at the bottom.
 @export var top_reserve := 0.12
 @export var top_reserve_landscape := 0.18
-@export var bottom_reserve := 0.06
+@export var bottom_reserve := 0.13 ## rescue bar
 
 @export var shake_decay := 2.2 ## trauma lost per second
 @export var shake_max_offset := 0.35 ## world units at full trauma

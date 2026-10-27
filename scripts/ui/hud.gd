@@ -1,13 +1,17 @@
 class_name Hud
 extends CanvasLayer
-## In-game interface: top bar (menu, level, wrong moves left, restart), combo
-## pop-ups, the first-time tutorial card and the win / lose result panel with
-## its confetti celebration.
+## In-game interface: top bar (menu, level, wrong moves left, restart), the
+## rescue bar at the bottom (coins, hint, undo, crane), combo pop-ups, tip
+## cards, rescue offers and the win / lose result panel with its confetti.
 
 signal restart_requested
 signal next_requested
 signal menu_requested
 signal tutorial_closed
+signal rescue_pressed(kind: String) ## "hint", "undo" or "crane"
+signal offer_accepted(kind: String, with_ad: bool) ## pay for a rescue
+signal continue_requested(with_ad: bool) ## +2 moves after losing
+signal double_coins_requested
 
 var _title: Label
 var _time_label: Label
@@ -33,6 +37,12 @@ var _time_value: Label
 var _record_tag: Label
 var _combo_value: Label
 var _coin_value: Label
+var _rescue_buttons := {} ## kind -> RescueButton
+var _coin_label: Label
+var _continue_ad: Button
+var _continue_coins: Button
+var _double_button: Button
+var _earned := 0
 
 
 func _ready() -> void:
@@ -43,6 +53,7 @@ func _ready() -> void:
 	add_child(root)
 	_root = root
 	_build_top_bar(root)
+	_build_rescue_bar(root)
 	_build_hint(root)
 	_build_result(root)
 
@@ -88,6 +99,11 @@ func show_win(result: Dictionary) -> void:
 	_primary.text = tr("HUD_MENU") if _last_level else tr("WIN_NEXT")
 	_secondary.visible = not _last_level
 	_primary.theme_type_variation = "GoodButton"
+	_earned = result.coins
+	_double_button.visible = result.get("double_ok", false)
+	_double_button.disabled = false
+	_continue_ad.visible = false
+	_continue_coins.visible = false
 	for star in _stars:
 		star.filled = false
 		star.scale = Vector2.ONE
@@ -95,8 +111,17 @@ func show_win(result: Dictionary) -> void:
 	_reveal(result.stars, result.coins)
 
 
-func show_lose() -> void:
+## `offer`: {moves, price, can_afford, ad_ok}; empty when continuing is not
+## possible (e.g. the board is boxed in).
+func show_lose(offer: Dictionary = {}) -> void:
 	_won = false
+	_double_button.visible = false
+	_continue_ad.visible = offer.get("ad_ok", false)
+	_continue_coins.visible = not offer.is_empty()
+	if not offer.is_empty():
+		_continue_ad.text = tr("CONTINUE_AD") % offer.moves
+		_continue_coins.text = tr("CONTINUE_COINS") % [offer.moves, offer.price]
+		_continue_coins.disabled = not offer.can_afford
 	_result_title.text = tr("LOSE_TITLE")
 	_result_title.add_theme_color_override("font_color", UiStyle.DANGER)
 	_result_text.visible = true
@@ -131,6 +156,157 @@ func _reveal(stars: int, coins: int) -> void:
 		_coin_value.pivot_offset = _coin_value.size * 0.5
 		_coin_value.scale = Vector2.ONE * 1.3
 		_coin_value.create_tween().tween_property(_coin_value, "scale", Vector2.ONE, 0.2))
+
+
+## The rewarded ad for double coins finished: show the new total.
+func coins_doubled() -> void:
+	_double_button.disabled = true
+	_earned *= 2
+	_coin_value.text = "+%d" % _earned
+	_coin_value.pivot_offset = _coin_value.size * 0.5
+	_coin_value.scale = Vector2.ONE * 1.5
+	_coin_value.create_tween().tween_property(_coin_value, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK)
+	Sfx.play("combo", -4.0, 1.5, 0.0)
+
+
+# --- Rescue bar --------------------------------------------------------------------
+
+func set_coins(amount: int) -> void:
+	_coin_label.text = str(amount)
+
+
+## Badge shows `badge` (count, or coin price if `is_price`).
+func set_rescue(kind: String, badge: String, is_price: bool, enabled := true) -> void:
+	var b: RescueButton = _rescue_buttons[kind]
+	b.set_badge(badge, is_price)
+	b.disabled = not enabled
+
+
+func set_crane_active(on: bool) -> void:
+	(_rescue_buttons["crane"] as RescueButton).active = on
+
+
+## Asks how to pay for a rescue: coins (if affordable) or a rewarded ad.
+func show_offer(kind: String, price: int, can_afford: bool, ad_ok: bool) -> void:
+	var dim := ColorRect.new()
+	dim.color = Color(0.1, 0.12, 0.2, 0.55)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(500, 0)
+	center.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 16)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = tr("RESCUE_" + kind.to_upper())
+	title.add_theme_font_size_override("font_size", 50)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var text := Label.new()
+	text.text = tr("RESCUE_%s_DESC" % kind.to_upper())
+	text.add_theme_font_size_override("font_size", 28)
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	text.custom_minimum_size.x = 440
+	box.add_child(text)
+	var close := func():
+		var t := dim.create_tween()
+		t.tween_property(dim, "modulate:a", 0.0, 0.15)
+		t.tween_callback(dim.queue_free)
+	var pay := Button.new()
+	pay.text = tr("OFFER_COINS") % price if can_afford else tr("OFFER_NO_COINS") % price
+	pay.disabled = not can_afford
+	pay.pressed.connect(func():
+		_click()
+		close.call()
+		offer_accepted.emit(kind, false))
+	box.add_child(pay)
+	if ad_ok:
+		var ad := Button.new()
+		ad.text = tr("OFFER_AD")
+		ad.theme_type_variation = "GoodButton"
+		ad.pressed.connect(func():
+			_click()
+			close.call()
+			offer_accepted.emit(kind, true))
+		box.add_child(ad)
+	var cancel := Button.new()
+	cancel.text = tr("OFFER_CANCEL")
+	cancel.theme_type_variation = "IconButton"
+	cancel.pressed.connect(func():
+		_click()
+		close.call())
+	box.add_child(cancel)
+	dim.modulate.a = 0.0
+	dim.create_tween().tween_property(dim, "modulate:a", 1.0, 0.2)
+
+
+func _build_rescue_bar(root: Control) -> void:
+	var backdrop := TextureRect.new()
+	var fade := Gradient.new()
+	fade.set_color(0, Color(1, 1, 1, 0.0))
+	fade.set_color(1, Color(1, 1, 1, 0.75))
+	var tex := GradientTexture2D.new()
+	tex.gradient = fade
+	tex.fill_from = Vector2(0, 0)
+	tex.fill_to = Vector2(0, 0.6)
+	backdrop.texture = tex
+	backdrop.stretch_mode = TextureRect.STRETCH_SCALE
+	backdrop.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	var insets: Vector4 = get_node("/root/ScreenFit").safe_insets()
+	backdrop.offset_top = -190 - insets.w
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(backdrop)
+
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	margin.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	margin.add_theme_constant_override("margin_left", 28 + int(insets.x))
+	margin.add_theme_constant_override("margin_right", 28 + int(insets.z))
+	margin.add_theme_constant_override("margin_bottom", 22 + int(insets.w))
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(margin)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 18)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_child(row)
+
+	var pill := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color.WHITE
+	style.set_corner_radius_all(30)
+	style.content_margin_left = 12
+	style.content_margin_right = 20
+	style.content_margin_top = 6
+	style.content_margin_bottom = 6
+	pill.add_theme_stylebox_override("panel", style)
+	pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(pill)
+	var coins := HBoxContainer.new()
+	coins.add_theme_constant_override("separation", 8)
+	pill.add_child(coins)
+	coins.add_child(CoinIcon.new(32))
+	_coin_label = Label.new()
+	_coin_label.add_theme_font_size_override("font_size", 28)
+	_coin_label.add_theme_color_override("font_color", UiStyle.INK)
+	coins.add_child(_coin_label)
+
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(spacer)
+	for kind in ["hint", "undo", "crane"]:
+		var b := RescueButton.new(kind)
+		b.pressed.connect(func():
+			_click()
+			rescue_pressed.emit(kind))
+		_rescue_buttons[kind] = b
+		row.add_child(b)
 
 
 static func _format_time(seconds: float) -> String:
@@ -322,7 +498,7 @@ func _build_hint(root: Control) -> void:
 	anchor.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	anchor.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	var insets: Vector4 = get_node("/root/ScreenFit").safe_insets()
-	anchor.add_theme_constant_override("margin_bottom", 40 + int(insets.w))
+	anchor.add_theme_constant_override("margin_bottom", 175 + int(insets.w)) # above the rescue bar
 	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(anchor)
 	var center := CenterContainer.new()
@@ -413,6 +589,24 @@ func _build_result(root: Control) -> void:
 	var buttons := VBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 14)
 	box.add_child(buttons)
+	_double_button = Button.new()
+	_double_button.text = tr("WIN_DOUBLE")
+	_double_button.pressed.connect(func():
+		_click()
+		_double_button.disabled = true
+		double_coins_requested.emit())
+	buttons.add_child(_double_button)
+	_continue_ad = Button.new()
+	_continue_ad.theme_type_variation = "GoodButton"
+	_continue_ad.pressed.connect(func():
+		_click()
+		continue_requested.emit(true))
+	buttons.add_child(_continue_ad)
+	_continue_coins = Button.new()
+	_continue_coins.pressed.connect(func():
+		_click()
+		continue_requested.emit(false))
+	buttons.add_child(_continue_coins)
 	_primary = Button.new()
 	_primary.pressed.connect(_on_primary)
 	buttons.add_child(_primary)

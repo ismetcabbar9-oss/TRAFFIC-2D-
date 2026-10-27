@@ -31,6 +31,9 @@ var _clock := 0.0 ## game time in seconds (follows pauses and time scale)
 var _last_exit_time := -100.0
 var _tutorial_open := false
 var _ambient_scale := 1.0
+var _crane_mode := false ## next tapped car is lifted out
+var _held_hint := -1 ## car glowing from a paid hint
+var _earned := 0 ## coins from the last win (for "double coins")
 
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
@@ -45,6 +48,16 @@ func _ready() -> void:
 	hud.restart_requested.connect(func(): Transition.cover(load_level.bind(level_index)))
 	hud.next_requested.connect(func(): Transition.cover(load_level.bind(level_index + 1)))
 	hud.menu_requested.connect(_to_menu)
+	hud.rescue_pressed.connect(_on_rescue)
+	hud.offer_accepted.connect(_on_offer_accepted)
+	hud.continue_requested.connect(_on_continue)
+	hud.double_coins_requested.connect(func():
+		AdManager.show_rewarded("double_coins", func():
+			Progress.add_coins(_earned)
+			hud.coins_doubled()))
+	Progress.coins_changed.connect(func(total: int):
+		hud.set_coins(total)
+		_refresh_rescues())
 	hud.tutorial_closed.connect(func():
 		_tutorial_open = false
 		Progress.mark_tutorial_seen()
@@ -85,6 +98,9 @@ func load_level(index: int) -> void:
 	session.vehicle_advanced.connect(_on_vehicle_advanced)
 	session.vehicle_turned.connect(_on_vehicle_turned)
 	session.vehicle_locked.connect(_on_vehicle_locked)
+	session.vehicle_lifted.connect(_on_vehicle_lifted)
+	session.vehicle_restored.connect(_on_vehicle_restored)
+	session.mistakes_changed.connect(func(_left: int): _refresh_rescues())
 	session.mistakes_changed.connect(func(left: int): hud.set_mistakes(left, level.mistakes))
 	session.won.connect(_on_won)
 	session.lost.connect(_on_lost)
@@ -129,7 +145,12 @@ func load_level(index: int) -> void:
 
 	hud.hide_result()
 	_clear_hint()
+	_set_crane_mode(false)
+	_held_hint = -1
+	hud.set_coins(Progress.coins)
+	_refresh_rescues()
 	_show_mechanic_tip(level)
+	_maybe_gift_crane()
 	var title := tr("LEVEL_N") % (level_index + 1)
 	if level.hard:
 		title += "  ·  " + tr("LEVEL_HARD")
@@ -170,7 +191,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		var id := _pick_vehicle(event.position)
 		if id >= 0 and session != null:
 			_clear_hint()
-			session.tap(id)
+			_release_held_hint()
+			if _crane_mode:
+				_set_crane_mode(false)
+				if session.state == GameSession.State.PLAYING and Progress.use_item("crane"):
+					session.lift(id)
+			else:
+				session.tap(id)
+			_refresh_rescues()
 			get_viewport().set_input_as_handled()
 
 
@@ -342,7 +370,8 @@ func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
 
 func _on_won() -> void:
 	var played := session
-	var mistakes_used := session.level.mistakes - session.mistakes_left
+	_set_crane_mode(false)
+	var mistakes_used := session.crashes
 	var stars := Economy.stars_for(mistakes_used)
 	var time := _clock - _level_start
 	var record := Progress.record_win(world_index, level_index, stars, time, _best_combo, session.level.hard)
@@ -350,7 +379,9 @@ func _on_won() -> void:
 		"stars": stars, "time": time, "combo": _best_combo, "coins": record.coins,
 		"best_time": record.best_time, "perfect": mistakes_used == 0,
 		"last_level": not Progress.has_next_level(world_index, level_index),
+		"double_ok": record.coins > 0 and AdManager.rewarded_available("double_coins"),
 	}
+	_earned = record.coins
 	var waited := 0.0
 	while VehicleView.exiting_count() > 0 and waited < max_exit_wait:
 		await get_tree().process_frame
@@ -368,7 +399,156 @@ func _on_lost() -> void:
 	if played == session and session.state == GameSession.State.LOST:
 		Sfx.duck_music(2.0)
 		Sfx.play("lose", -2.0, 1.0, 0.0)
-		hud.show_lose()
+		hud.show_lose(_continue_offer())
+
+
+# --- Rescues -------------------------------------------------------------------------
+
+## Updates the rescue bar badges: owned count, free hints, else the price.
+func _refresh_rescues() -> void:
+	if session == null:
+		return
+	var hints := Progress.item_count("hint") + Progress.free_hints_left()
+	_set_badge("hint", hints)
+	_set_badge("undo", Progress.item_count("undo"), session.can_undo())
+	_set_badge("crane", Progress.item_count("crane"))
+
+
+func _set_badge(kind: String, owned: int, enabled := true) -> void:
+	if owned > 0:
+		hud.set_rescue(kind, str(owned), false, enabled)
+	else:
+		hud.set_rescue(kind, str(Economy.price(kind)), true, enabled)
+
+
+func _on_rescue(kind: String) -> void:
+	if session == null or session.state != GameSession.State.PLAYING or _tutorial_open:
+		return
+	match kind:
+		"hint":
+			if Progress.use_item("hint") or Progress.use_free_hint():
+				_give_hint()
+			else:
+				_offer("hint")
+		"undo":
+			if not session.can_undo():
+				return
+			if Progress.use_item("undo"):
+				_undo()
+			else:
+				_offer("undo")
+		"crane":
+			if _crane_mode:
+				_set_crane_mode(false)
+			elif Progress.item_count("crane") > 0:
+				_set_crane_mode(true)
+			else:
+				_offer("crane")
+	_refresh_rescues()
+
+
+func _offer(kind: String) -> void:
+	var price := Economy.price(kind)
+	var ad_ok := kind != "undo" and AdManager.rewarded_available(kind)
+	hud.show_offer(kind, price, Progress.coins >= price, ad_ok)
+
+
+## Paid with coins or an ad: the rescue goes into the inventory and is used.
+func _on_offer_accepted(kind: String, with_ad: bool) -> void:
+	var grant := func():
+		Progress.add_item(kind)
+		_on_rescue(kind)
+	if with_ad:
+		AdManager.show_rewarded(kind, grant)
+	elif Progress.spend_coins(Economy.price(kind)):
+		grant.call()
+
+
+## Lights up the next car of a winning line until it is tapped.
+func _give_hint() -> void:
+	var id := LevelSolver.next_tap(session.board)
+	if id < 0:
+		hud.show_hint(tr("HINT_DEADLOCK_UNDO"))
+		return
+	_release_held_hint()
+	_held_hint = id
+	vehicle_views[id].hold_hint()
+	hud.show_hint(tr("HINT_GLOWING"))
+	Sfx.play("combo", -8.0, 1.3, 0.0)
+
+
+func _release_held_hint() -> void:
+	if vehicle_views.has(_held_hint):
+		vehicle_views[_held_hint].clear_hint()
+	_held_hint = -1
+
+
+func _undo() -> void:
+	var was := session.undo()
+	if was < 0:
+		Progress.add_item("undo") # nothing to take back: keep it
+		return
+	Sfx.play("ui_click", -2.0, 0.8, 0.0)
+	hud.hide_hint()
+	if was == BoardState.Action.CRASH:
+		hud.hide_result() # a lost level resumes
+
+
+func _set_crane_mode(on: bool) -> void:
+	_crane_mode = on
+	hud.set_crane_active(on)
+	if on:
+		hud.show_hint(tr("HINT_CRANE"))
+	else:
+		hud.hide_hint()
+
+
+## The first time the player reaches the gift level, a free crane and a tip.
+func _maybe_gift_crane() -> void:
+	var at: Array = Economy.value("crane_gift_level")
+	if world_index != int(at[0]) or level_index != int(at[1]) or Progress.flag("crane_gift"):
+		return
+	Progress.set_flag("crane_gift")
+	Progress.add_item("crane")
+	_refresh_rescues()
+	if not _tutorial_open:
+		_tutorial_open = true
+		hud.show_tutorial("CRANE_GIFT_TITLE", ["CRANE_GIFT_1", "CRANE_GIFT_2"])
+
+
+func _continue_offer() -> Dictionary:
+	if session.is_deadlocked_ignoring_moves():
+		return {}
+	var price := Economy.price("continue")
+	return {"moves": int(Economy.value("continue_moves")), "price": price,
+		"can_afford": Progress.coins >= price, "ad_ok": AdManager.rewarded_available("continue")}
+
+
+func _on_continue(with_ad: bool) -> void:
+	var resume := func():
+		session.add_mistakes(int(Economy.value("continue_moves")))
+		hud.hide_result()
+		_refresh_rescues()
+	if with_ad:
+		AdManager.show_rewarded("continue", resume)
+	elif Progress.spend_coins(Economy.price("continue")):
+		resume.call()
+
+
+func _on_vehicle_lifted(id: int, result: BoardState.MoveResult) -> void:
+	var view: VehicleView = vehicle_views[id]
+	vehicle_views.erase(id)
+	view.play_lift()
+	Sfx.play("unlock", -4.0, 0.7, 0.0)
+	Haptics.pulse(25, 0.5)
+	if view.state.key >= 0:
+		_open_group(view.state.key, result.opened)
+
+
+func _on_vehicle_restored(id: int) -> void:
+	var view: VehicleView = vehicle_views[id]
+	view.state = session.board.vehicles[id]
+	view.play_restore()
 
 
 func _to_menu() -> void:

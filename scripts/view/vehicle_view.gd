@@ -64,6 +64,7 @@ var _roof := 0.0
 var _crate: Node3D ## cargo marker on the roof
 var _badge: FlatIcon ## padlock (locked) or key (key holder) above the roof
 var _frame: FlatIcon ## group-colored outline on the ground
+var _hint_ring: FlatIcon ## paid hint marker
 
 
 static func exiting_count() -> int:
@@ -162,6 +163,87 @@ func flash_hint() -> void:
 	_arrow.flash_hint()
 
 
+## Paid hint: the arrow glows and a pulsing frame rings the car until
+## cleared; the car hops once.
+func hold_hint() -> void:
+	_arrow.hold_hint()
+	_squash(Vector3(0.95, 1.12, 0.95), 0.1, 0.5)
+	if _hint_ring == null:
+		var cell_size := _board.theme.cell_size
+		var area := Vector2(cell_size + 0.15, cell_size * length + 0.15)
+		_hint_ring = FlatIcon.create(FlatIcon.frame_shapes(area, 0.16), Color(1.0, 0.8, 0.22), 0.03)
+		_hint_ring.position.y = 0.02
+		add_child(_hint_ring)
+		var t := _hint_ring.create_tween().set_loops()
+		t.tween_property(_hint_ring, "scale", Vector3(1.08, 1.0, 1.05), 0.35).set_trans(Tween.TRANS_SINE)
+		t.tween_property(_hint_ring, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_SINE)
+
+
+func clear_hint() -> void:
+	_arrow.clear_hint()
+	if _hint_ring:
+		_hint_ring.queue_free()
+		_hint_ring = null
+
+
+## Undo of a pull-forward or turn: glides back to the (restored) state.
+func play_restore() -> void:
+	_kill_tween()
+	_arrow.kind = _arrow_kind()
+	if state.cargo and _crate == null:
+		_add_crate(_board.theme.cell_size)
+	var target := _board.cell_to_world(footprint_center())
+	var yaw := GridDir.to_yaw(dir)
+	var start_yaw := rotation.y
+	var delta := wrapf(yaw - start_yaw, -PI, PI)
+	_home = target
+	_tween = create_tween()
+	_tween.tween_method(func(t: float): rotation.y = start_yaw + delta * t, 0.0, 1.0, 0.3)
+	_tween.parallel().tween_property(self, "position", target, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+
+
+## Crane rescue: a hook comes down, the car swings up and away.
+func play_lift() -> void:
+	_kill_tween()
+	clear_hint()
+	_arrow.visible = false
+	if _frame:
+		_frame.visible = false
+	_pick_body.queue_free()
+	var hook := Node3D.new()
+	var cable := MeshInstance3D.new()
+	var cable_mesh := CylinderMesh.new()
+	cable_mesh.top_radius = 0.03
+	cable_mesh.bottom_radius = 0.03
+	cable_mesh.height = 14.0
+	cable.mesh = cable_mesh
+	cable.position.y = 7.0
+	var steel := StandardMaterial3D.new()
+	steel.albedo_color = Color("3d4452")
+	cable.material_override = steel
+	hook.add_child(cable)
+	var block := MeshInstance3D.new()
+	var block_mesh := BoxMesh.new()
+	block_mesh.size = Vector3(0.35, 0.3, 0.35)
+	block.mesh = block_mesh
+	var yellow := StandardMaterial3D.new()
+	yellow.albedo_color = Color("ffc93c")
+	block.material_override = yellow
+	hook.add_child(block)
+	add_child(hook)
+	var roof := _roof + 0.15
+	hook.position.y = roof + 10.0
+	_tween = create_tween()
+	_tween.tween_property(hook, "position:y", roof, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tween.tween_callback(_squash.bind(Vector3(1.05, 0.92, 1.05), 0.06, 0.3))
+	_tween.tween_interval(0.12)
+	_tween.tween_property(self, "position:y", position.y + 9.0, 0.7).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.parallel().tween_property(self, "rotation:y", rotation.y + 0.8, 0.7)
+	_tween.tween_callback(func():
+		exit_finished.emit()
+		queue_free())
+
+
 ## Small knock when something bumps into this car.
 func nudge(push: Vector3) -> void:
 	if _nudge_tween:
@@ -177,7 +259,7 @@ func nudge(push: Vector3) -> void:
 ## Leaves the lot along the board's exit route and frees itself off screen.
 func play_exit() -> void:
 	_kill_tween()
-	_arrow.clear_hint()
+	clear_hint()
 	_arrow.visible = false
 	if _frame:
 		_frame.visible = false
@@ -327,10 +409,7 @@ func _fit_model(cell_size: float) -> float:
 
 func _add_arrow(cell_size: float, roof: float) -> void:
 	_arrow = ARROW_SCENE.instantiate()
-	if state.cargo:
-		_arrow.kind = DirectionArrow.Kind.STEP
-	elif state.turn != 0:
-		_arrow.kind = DirectionArrow.Kind.TURN_CW if state.turn > 0 else DirectionArrow.Kind.TURN_CCW
+	_arrow.kind = _arrow_kind()
 	_arrow.position.y = roof + 0.04
 	_arrow.scale = Vector3.ONE * cell_size * 0.5
 	_body.add_child(_arrow)
@@ -401,14 +480,26 @@ static func _model_aabb(node: Node, xf: Transform3D) -> AABB:
 
 # --- World mechanics ------------------------------------------------------------
 
+func _arrow_kind() -> DirectionArrow.Kind:
+	if state.cargo:
+		return DirectionArrow.Kind.STEP
+	if state.turn != 0:
+		return DirectionArrow.Kind.TURN_CW if state.turn > 0 else DirectionArrow.Kind.TURN_CCW
+	return DirectionArrow.Kind.STRAIGHT
+
+
+func _add_crate(cell_size: float) -> void:
+	_crate = (load(CRATE_MODEL) as PackedScene).instantiate()
+	_crate.scale = Vector3.ONE * cell_size * 0.4 / CRATE_FOOTPRINT
+	_crate.position = Vector3(0.0, _roof - 0.02, -half_length * 0.52)
+	_crate.rotation.y = 0.15
+	_body.add_child(_crate)
+
+
 ## Crate for cargo; padlock or key plus a ground frame in the group color.
 func _add_mechanic_markers(cell_size: float) -> void:
 	if state.cargo:
-		_crate = (load(CRATE_MODEL) as PackedScene).instantiate()
-		_crate.scale = Vector3.ONE * cell_size * 0.4 / CRATE_FOOTPRINT
-		_crate.position = Vector3(0.0, _roof - 0.02, -half_length * 0.52)
-		_crate.rotation.y = 0.15
-		_body.add_child(_crate)
+		_add_crate(cell_size)
 	var group := state.lock if state.lock >= 0 else state.key
 	if group < 0:
 		return
