@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
+[ext_resource type="Script" path="res://scripts/view/board_view.gd" id="2_board"]
+[ext_resource type="Script" path="res://scripts/view/board_camera.gd" id="3_camera"]
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 1
+background_color = Color(0.749, 0.890, 0.949, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.85, 0.9, 1, 1)
+ambient_light_energy = 0.5
+tonemap_mode = 0
+
+[node name="Game" type="Node3D"]
+script = ExtResource("1_game")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.819152, 0.48642, -0.303949, 0, 0.529919, 0.848048, 0.573576, -0.69468, 0.434084, 0, 10, 0)
+light_energy = 1.0
+light_color = Color(1, 0.97, 0.92, 1)
+shadow_enabled = true
+shadow_opacity = 0.6
+shadow_blur = 1.5
+directional_shadow_max_distance = 60.0
+
+[node name="Board" type="Node3D" parent="."]
+script = ExtResource("2_board")
+
+[node name="Vehicles" type="Node3D" parent="."]
+
+[node name="Camera" type="Camera3D" parent="."]
+fov = 32.0
+script = ExtResource("3_camera")
