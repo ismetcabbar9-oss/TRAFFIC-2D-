@@ -1,0 +1,117 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 3,
+   "dir": "down",
+   "turn": "ccw"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 6,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 1,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 4,
+   "dir": "down",
+   "turn": "cw"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 0,
+   "dir": "right",
+   "turn": "cw"
+  },
+  {
+   "type": "taxi",
+   "col": 5,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 2,
+   "dir": "down"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 4,
+   "row": 2
+  }
+ ],
+ "name": "Level 10",
+ "hard": true
+}

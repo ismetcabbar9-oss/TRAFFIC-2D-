@@ -76,3 +76,4 @@ MECH_LOCK_2,Tapping a locked car costs nothing.,Kilitli araca dokunmak hak yemez
 MECH_GATE_TITLE,Gates,Bariyerler
 MECH_GATE_1,A colored barrier blocks the road.,Renkli bir bariyer yolu kapatır.
 MECH_GATE_2,It opens when the key car of the same color leaves.,Aynı renkteki anahtarlı araç çıkınca açılır.
+LEVEL_HARD,Hard,Zor

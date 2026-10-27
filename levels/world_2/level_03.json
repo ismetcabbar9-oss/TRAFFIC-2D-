@@ -1,0 +1,60 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 0,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 2,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 3,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 0,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 2,
+   "dir": "down"
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 3"
+}

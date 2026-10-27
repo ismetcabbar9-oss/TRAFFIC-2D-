@@ -7,6 +7,7 @@ const WORLDS_PATH := "res://data/worlds.json"
 
 static var _worlds: Array = []
 static var _paths := {} ## world index -> PackedStringArray
+static var _hard := {} ## level path -> bool
 ## Dev tools only: every level loads this file instead.
 static var override_path := ""
 
@@ -47,3 +48,12 @@ static func path(world_index: int, level_index: int) -> String:
 	if override_path != "":
 		return override_path
 	return paths(world_index)[level_index]
+
+
+## Hard levels pay more and carry a badge.
+static func is_hard(world_index: int, level_index: int) -> bool:
+	var file := path(world_index, level_index)
+	if not _hard.has(file):
+		var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(file))
+		_hard[file] = data is Dictionary and bool(data.get("hard", false))
+	return _hard[file]

@@ -1,0 +1,127 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 1,
+   "dir": "down",
+   "key": 1
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 2,
+   "dir": "down",
+   "key": 3
+  },
+  {
+   "type": "ambulance",
+   "col": 5,
+   "row": 4,
+   "dir": "up",
+   "key": 2
+  },
+  {
+   "type": "delivery",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 0,
+   "dir": "down",
+   "key": 0
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 5,
+   "row": 0,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 4
+  },
+  {
+   "type": "gate",
+   "col": 2,
+   "row": 2,
+   "group": 0
+  },
+  {
+   "type": "gate",
+   "col": 3,
+   "row": 5,
+   "group": 1
+  },
+  {
+   "type": "gate",
+   "col": 3,
+   "row": 1,
+   "group": 2
+  },
+  {
+   "type": "gate",
+   "col": 2,
+   "row": 4,
+   "group": 3
+  }
+ ],
+ "name": "Level 6"
+}

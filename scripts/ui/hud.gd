@@ -47,8 +47,13 @@ func _ready() -> void:
 	_build_result(root)
 
 
-func set_level_title(text: String) -> void:
+## Hard levels show their title in red.
+func set_level_title(text: String, hard := false) -> void:
 	_title.text = text
+	if hard:
+		_title.add_theme_color_override("font_color", UiStyle.DANGER)
+	else:
+		_title.remove_theme_color_override("font_color")
 
 
 func set_time_of_day(text: String) -> void:

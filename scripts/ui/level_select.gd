@@ -244,7 +244,8 @@ func _build_world() -> void:
 		var tile := LevelTile.new()
 		tile.custom_minimum_size = Vector2(112, 124)
 		grid.add_child(tile)
-		tile.setup(i, not Progress.is_level_unlocked(_world, i), Progress.level_stars(_world, i))
+		tile.setup(i, not Progress.is_level_unlocked(_world, i), Progress.level_stars(_world, i),
+				LevelCatalog.is_hard(_world, i))
 		tile.pressed.connect(_open_level.bind(_world, i))
 		if i == next and Progress.level_stars(_world, i) == 0:
 			_pulse(tile)

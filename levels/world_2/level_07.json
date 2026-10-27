@@ -1,0 +1,66 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "van",
+   "col": 3,
+   "row": 2,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 0,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 3,
+   "dir": "left",
+   "cargo": true
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 7"
+}

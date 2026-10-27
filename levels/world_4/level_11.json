@@ -1,0 +1,118 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan",
+   "col": 1,
+   "row": 2,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 3,
+   "row": 1,
+   "dir": "up",
+   "lock": 1
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 4,
+   "dir": "up",
+   "lock": 1
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 1,
+   "dir": "up",
+   "key": 0
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 6,
+   "dir": "left",
+   "lock": 0
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 6,
+   "dir": "left",
+   "key": 1
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 3,
+   "dir": "left",
+   "lock": 0
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 4,
+   "row": 3
+  }
+ ],
+ "name": "Level 11"
+}

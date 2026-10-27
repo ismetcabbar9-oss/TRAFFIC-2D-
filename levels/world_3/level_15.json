@@ -1,0 +1,108 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 3,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 3,
+   "dir": "down",
+   "turn": "ccw"
+  },
+  {
+   "type": "suv",
+   "col": 5,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 5,
+   "dir": "right",
+   "turn": "cw"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 3,
+   "dir": "right",
+   "turn": "cw"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 6,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 1
+  }
+ ],
+ "name": "Level 15"
+}

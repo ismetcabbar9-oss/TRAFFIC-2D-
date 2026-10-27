@@ -1,0 +1,102 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan",
+   "col": 1,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "firetruck",
+   "col": 4,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 2,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 6,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 6,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 1,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 1,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 15"
+}

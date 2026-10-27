@@ -1,0 +1,60 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 1,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 2,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 4,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 3,
+   "dir": "down"
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 4"
+}

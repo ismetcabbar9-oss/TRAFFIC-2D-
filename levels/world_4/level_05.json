@@ -1,0 +1,62 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 2,
+   "dir": "right",
+   "lock": 0
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 2,
+   "dir": "down",
+   "key": 0
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 1,
+   "dir": "right",
+   "key": 1
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 3,
+   "dir": "left",
+   "lock": 1
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 1,
+   "dir": "right",
+   "lock": 0
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 5"
+}

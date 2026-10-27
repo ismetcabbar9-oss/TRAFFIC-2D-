@@ -1,0 +1,115 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "ambulance",
+   "col": 1,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 1,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 5,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "pickup",
+   "col": 5,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 4,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 5,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 0,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 6,
+   "dir": "right"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 3
+  }
+ ],
+ "name": "Level 12"
+}

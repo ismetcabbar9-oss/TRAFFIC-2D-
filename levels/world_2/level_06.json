@@ -1,0 +1,60 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "police",
+   "col": 4,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 3,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 3,
+   "row": 0,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 0,
+   "dir": "right",
+   "cargo": true
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 6"
+}

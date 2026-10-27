@@ -1,0 +1,116 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "delivery",
+   "col": 2,
+   "row": 1,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "delivery",
+   "col": 2,
+   "row": 3,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 4,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "delivery",
+   "col": 2,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 5,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "sedan",
+   "col": 5,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 1,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 1,
+   "row": 3
+  }
+ ],
+ "name": "Level 10",
+ "hard": true
+}

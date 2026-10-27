@@ -1,0 +1,162 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 6,
+   "row": 5,
+   "dir": "down",
+   "lock": 1
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "ambulance",
+   "col": 2,
+   "row": 1,
+   "dir": "left",
+   "key": 0
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 3,
+   "dir": "up",
+   "turn": "ccw"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 7,
+   "dir": "right",
+   "turn": "ccw"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "ambulance",
+   "col": 2,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 4,
+   "row": 5,
+   "dir": "right",
+   "lock": 1
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 1,
+   "dir": "up",
+   "key": 1
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 6,
+   "dir": "right",
+   "lock": 0
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 5,
+   "row": 1,
+   "dir": "left",
+   "lock": 0
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 2,
+   "dir": "right"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 2,
+   "row": 2
+  }
+ ],
+ "name": "Level 20",
+ "hard": true
+}

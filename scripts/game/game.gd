@@ -121,7 +121,10 @@ func load_level(index: int) -> void:
 	hud.hide_result()
 	_clear_hint()
 	_show_mechanic_tip(level)
-	hud.set_level_title(tr("LEVEL_N") % (level_index + 1))
+	var title := tr("LEVEL_N") % (level_index + 1)
+	if level.hard:
+		title += "  ·  " + tr("LEVEL_HARD")
+	hud.set_level_title(title, level.hard)
 	hud.set_time_of_day(TimeOfDay.label(hour))
 	hud.set_mistakes(session.mistakes_left, level.mistakes)
 

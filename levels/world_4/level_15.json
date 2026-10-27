@@ -1,0 +1,117 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 4,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 5,
+   "dir": "up",
+   "lock": 0
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "firetruck",
+   "col": 0,
+   "row": 0,
+   "dir": "up",
+   "lock": 1
+  },
+  {
+   "type": "taxi",
+   "col": 5,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 4,
+   "dir": "left",
+   "key": 1
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 1,
+   "dir": "up",
+   "lock": 0
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 5,
+   "dir": "right",
+   "lock": 1
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 3,
+   "dir": "right",
+   "key": 0
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 2,
+   "row": 5
+  }
+ ],
+ "name": "Level 15"
+}

@@ -1,0 +1,59 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 2,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 1,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 0,
+   "dir": "right"
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 2"
+}

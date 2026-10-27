@@ -1,0 +1,59 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 3,
+   "dir": "up",
+   "turn": "ccw"
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 0,
+   "dir": "up",
+   "turn": "cw"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 1,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 2,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 2"
+}

@@ -6,12 +6,14 @@ extends Button
 var index := 0
 var locked := false
 var stars := 0
+var hard := false
 
 
-func setup(p_index: int, p_locked: bool, p_stars: int) -> void:
+func setup(p_index: int, p_locked: bool, p_stars: int, p_hard := false) -> void:
 	index = p_index
 	locked = p_locked
 	stars = p_stars
+	hard = p_hard
 	text = "" if locked else str(index + 1)
 	disabled = locked
 	theme_type_variation = "GoodButton" if stars > 0 else ""
@@ -20,6 +22,13 @@ func setup(p_index: int, p_locked: bool, p_stars: int) -> void:
 
 
 func _draw() -> void:
+	if hard:
+		# Red corner tag with a white "!" for hard levels.
+		var r := size.x * 0.16
+		var c := Vector2(size.x - r * 0.55, r * 0.55)
+		draw_circle(c, r, Color("e5484d"))
+		draw_rect(Rect2(c + Vector2(-r * 0.13, -r * 0.6), Vector2(r * 0.26, r * 0.72)), Color.WHITE)
+		draw_circle(c + Vector2(0, r * 0.45), r * 0.15, Color.WHITE)
 	if locked:
 		_draw_lock(size * 0.5 + Vector2(0, -4), size.x * 0.16)
 		return

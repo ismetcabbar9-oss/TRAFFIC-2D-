@@ -1,0 +1,58 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 3,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 2,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 1"
+}

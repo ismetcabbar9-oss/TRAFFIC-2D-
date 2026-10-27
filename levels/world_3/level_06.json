@@ -1,0 +1,78 @@
+{
+ "cols": 5,
+ "rows": 6,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 1,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "police",
+   "col": 1,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 3,
+   "row": 5,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 4,
+   "dir": "down",
+   "turn": "cw"
+  },
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 2,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 6"
+}

@@ -1,93 +1,39 @@
 {
- "cols": 6,
- "rows": 6,
+ "cols": 4,
+ "rows": 4,
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "police",
-   "col": 1,
+   "type": "suv_luxury",
+   "col": 2,
    "row": 1,
-   "dir": "right"
+   "dir": "left"
   },
   {
-   "type": "police",
+   "type": "pickup",
    "col": 3,
-   "row": 3,
+   "row": 2,
    "dir": "down"
   },
   {
    "type": "pickup",
    "col": 2,
    "row": 2,
-   "dir": "right"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 1,
-   "row": 2,
    "dir": "down"
   },
   {
    "type": "hatchback",
    "col": 1,
-   "row": 5,
-   "dir": "right"
-  },
-  {
-   "type": "hatchback",
-   "col": 5,
-   "row": 3,
-   "dir": "down"
-  },
-  {
-   "type": "pickup",
-   "col": 5,
    "row": 0,
    "dir": "down"
   },
   {
-   "type": "delivery",
-   "col": 3,
-   "row": 5,
-   "dir": "right"
-  },
-  {
-   "type": "suv",
-   "col": 4,
-   "row": 2,
-   "dir": "up"
-  },
-  {
-   "type": "taxi",
-   "col": 0,
-   "row": 0,
-   "dir": "down"
-  },
-  {
-   "type": "firetruck",
-   "col": 0,
-   "row": 2,
-   "dir": "down"
-  },
-  {
-   "type": "sedan",
-   "col": 3,
-   "row": 0,
-   "dir": "right"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 3,
-   "row": 1,
-   "dir": "right"
-  }
- ],
- "obstacles": [
-  {
-   "type": "cone",
+   "type": "sedan_sports",
    "col": 2,
-   "row": 4
+   "row": 0,
+   "dir": "right"
   }
  ],
+ "obstacles": [],
  "name": "Level 5"
 }

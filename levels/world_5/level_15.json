@@ -1,0 +1,139 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "van",
+   "col": 5,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 4,
+   "dir": "down",
+   "key": 3
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 5,
+   "dir": "up",
+   "key": 1
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 3,
+   "dir": "right",
+   "key": 0
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 3,
+   "dir": "down",
+   "key": 2
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 1,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 2,
+   "row": 1
+  },
+  {
+   "type": "gate",
+   "col": 1,
+   "row": 1,
+   "group": 0
+  },
+  {
+   "type": "gate",
+   "col": 2,
+   "row": 5,
+   "group": 1
+  },
+  {
+   "type": "gate",
+   "col": 4,
+   "row": 5,
+   "group": 2
+  },
+  {
+   "type": "gate",
+   "col": 3,
+   "row": 3,
+   "group": 3
+  }
+ ],
+ "name": "Level 15"
+}

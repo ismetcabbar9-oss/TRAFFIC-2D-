@@ -1,0 +1,68 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 1,
+   "dir": "down",
+   "lock": 1
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 4,
+   "dir": "left",
+   "key": 0
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 1,
+   "dir": "up",
+   "lock": 0
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 3,
+   "dir": "left",
+   "lock": 0
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 3,
+   "dir": "up",
+   "key": 1
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 3"
+}

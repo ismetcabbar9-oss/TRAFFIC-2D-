@@ -1,0 +1,111 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 4,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "police",
+   "col": 4,
+   "row": 4,
+   "dir": "down",
+   "turn": "ccw"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 3,
+   "dir": "right",
+   "turn": "ccw"
+  },
+  {
+   "type": "firetruck",
+   "col": 5,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 4,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "bus",
+   "col": 0,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 1,
+   "dir": "up",
+   "turn": "cw"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 4,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "police",
+   "col": 1,
+   "row": 1,
+   "dir": "up",
+   "turn": "ccw"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 3,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 5
+  }
+ ],
+ "name": "Level 14"
+}

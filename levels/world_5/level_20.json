@@ -1,0 +1,172 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "ambulance",
+   "col": 2,
+   "row": 0,
+   "dir": "right",
+   "key": 3
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 3,
+   "dir": "left",
+   "key": 0
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 1,
+   "dir": "down",
+   "key": 2
+  },
+  {
+   "type": "bus",
+   "col": 4,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 3,
+   "row": 1,
+   "dir": "left",
+   "lock": 0
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 4,
+   "dir": "left",
+   "key": 1
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 7,
+   "dir": "left",
+   "lock": 0
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 6,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 4
+  },
+  {
+   "type": "gate",
+   "col": 2,
+   "row": 1,
+   "group": 1
+  },
+  {
+   "type": "gate",
+   "col": 5,
+   "row": 4,
+   "group": 2
+  },
+  {
+   "type": "gate",
+   "col": 3,
+   "row": 6,
+   "group": 3
+  }
+ ],
+ "name": "Level 20",
+ "hard": true
+}

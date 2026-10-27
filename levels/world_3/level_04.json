@@ -1,0 +1,66 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 1,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 3,
+   "dir": "down",
+   "turn": "ccw"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 2,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 0,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [],
+ "name": "Level 4"
+}

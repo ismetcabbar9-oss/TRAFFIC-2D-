@@ -1,0 +1,69 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "police",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 3,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 1,
+   "dir": "down"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 2,
+   "row": 3
+  }
+ ],
+ "name": "Level 15"
+}
