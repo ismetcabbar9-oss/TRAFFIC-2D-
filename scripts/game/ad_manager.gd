@@ -22,6 +22,8 @@ func _ready() -> void:
 func rewarded_available(placement: String) -> bool:
 	if _busy:
 		return false
+	if Progress.dev_flag("unlimited_ads"):
+		return true
 	var limits: Dictionary = Economy.value("ad_limits_per_day")
 	if Progress.ads_watched("total") >= int(limits.get("total", 15)):
 		return false

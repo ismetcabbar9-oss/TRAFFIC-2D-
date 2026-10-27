@@ -29,8 +29,9 @@ static func day_before(day: String) -> String:
 
 ## Starts building today's puzzle in the background (or loads the cached one).
 ## Poll `ready()`, then call `start()`.
-static func prepare() -> void:
-	var day := today()
+static func prepare(day := "") -> void:
+	if day == "":
+		day = today()
 	var cache := _cache_path(day)
 	if FileAccess.file_exists(cache):
 		var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(cache))
@@ -76,6 +77,12 @@ static func _build(day: String) -> void:
 	var f := FileAccess.open(_cache_path(day), FileAccess.WRITE)
 	if f:
 		f.store_string(JSON.stringify(_result))
+
+
+## Developer mode: forget today's cached puzzle so the next one is rebuilt.
+static func clear_cache() -> void:
+	_result = {}
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(_cache_path(today())))
 
 
 static func _cache_path(day: String) -> String:

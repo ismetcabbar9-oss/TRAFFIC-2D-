@@ -50,6 +50,7 @@ func _ready() -> void:
 	hud.next_requested.connect(func(): Transition.cover(load_level.bind(level_index + 1)))
 	hud.menu_requested.connect(_to_menu)
 	hud.rescue_pressed.connect(_on_rescue)
+	hud.dev_requested.connect(_show_dev_panel)
 	hud.offer_accepted.connect(_on_offer_accepted)
 	hud.continue_requested.connect(_on_continue)
 	hud.double_coins_requested.connect(func():
@@ -574,6 +575,56 @@ func _on_vehicle_restored(id: int) -> void:
 	var view: VehicleView = vehicle_views[id]
 	view.state = session.board.vehicles[id]
 	view.play_restore()
+
+
+# --- Developer mode ---------------------------------------------------------------
+
+func _show_dev_panel() -> void:
+	var actions := [
+		[tr("DEV_AUTO_SOLVE"), _dev_auto_solve],
+		[tr("DEV_WIN"), _dev_win],
+		[tr("DEV_LOSE"), _dev_lose],
+		[tr("DEV_COINS"), func(): Progress.add_coins(1000)],
+		[tr("DEV_RESCUES"), func():
+			for item in ["hint", "undo", "crane"]:
+				Progress.add_item(item, 5)
+			_refresh_rescues()],
+	]
+	if not Daily.playing:
+		actions.append([tr("DEV_PREV"), func(): Transition.cover(load_level.bind(level_index - 1))])
+		actions.append([tr("DEV_NEXT"), func(): Transition.cover(load_level.bind(level_index + 1))])
+	hud.show_dev_panel(actions)
+
+
+## Plays the solver's winning line, one tap at a time.
+func _dev_auto_solve() -> void:
+	var played := session
+	var report := LevelSolver.solve_board(session.board)
+	if not report.solvable:
+		hud.show_hint(tr("HINT_DEADLOCK_UNDO"))
+		return
+	for id in report.order:
+		if played != session or session.state != GameSession.State.PLAYING:
+			return
+		_clear_hint()
+		session.tap(id)
+		await get_tree().create_timer(0.3).timeout
+
+
+## Lifts every remaining car out at once.
+func _dev_win() -> void:
+	for id in session.board.vehicles.keys():
+		if session.state == GameSession.State.PLAYING:
+			session.lift(id)
+
+
+func _dev_lose() -> void:
+	if session.state != GameSession.State.PLAYING:
+		return
+	session.mistakes_left = 0
+	session.state = GameSession.State.LOST
+	session.mistakes_changed.emit(0)
+	session.lost.emit()
 
 
 ## Toasts every achievement reached since the level began (once each).

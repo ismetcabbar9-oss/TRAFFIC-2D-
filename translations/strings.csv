@@ -178,3 +178,26 @@ ACH_WORLDS_1,Complete a world,Bir dünyayı tamamla
 ACH_WORLDS_3,Complete 3 worlds,3 dünyayı tamamla
 ACH_WORLDS_5,Complete every world,Tüm dünyaları tamamla
 ACH_GARAGE_1,Buy something in the garage,Garajdan bir şey al
+DEV_TITLE,Developer mode,Geliştirici modu
+DEV_NOTE,For testing only. Only in debug builds; store builds never show it. Tap the title 7 times to switch it on or off.,"Sadece test için. Yalnızca geliştirme sürümünde var, mağaza sürümünde görünmez. Açıp kapatmak için başlığa 7 kez dokun."
+DEV_UNLOCK_ALL,Unlock all worlds and levels,Tüm dünya ve bölümleri aç
+DEV_UNLIMITED_ADS,Unlimited ad rewards,Sınırsız reklam ödülü
+DEV_COINS,+1000 coins,+1000 jeton
+DEV_RESCUES,+5 of each rescue,Her kurtarmadan +5
+DEV_ALL_STARS,Give 3 stars to every unplayed level,Oynanmamış tüm bölümlere 3 yıldız ver
+DEV_GIFT,Daily gift: claim again,Günlük hediye: tekrar alınabilsin
+DEV_DAILY,Daily puzzle: play again (new build),Günlük bulmaca: tekrar oyna (yeniden üret)
+DEV_DAILY_RANDOM,Play a daily puzzle of a random day,Rastgele bir günün bulmacasını oyna
+DEV_TIPS,Show tutorial and tip cards again,Eğitim ve ipucu kartlarını yeniden göster
+DEV_FREE_HINTS,Reset today's free hints and ad limits,Bugünkü ücretsiz ipucu ve reklam sınırlarını sıfırla
+DEV_TROPHIES,Trophies: collect again,Başarımlar: ödüller yeniden alınabilsin
+DEV_GARAGE,Empty the garage,Garajı boşalt
+DEV_RESET,Reset all progress,Tüm ilerlemeyi sıfırla
+DEV_RESET_CONFIRM,"Delete levels, stars, coins, items, daily and trophy progress? Settings stay.","Bölümler, yıldızlar, jetonlar, eşyalar, günlük ve başarım ilerlemesi silinsin mi? Ayarlar kalır."
+DEV_OFF,Turn developer mode off,Geliştirici modunu kapat
+DEV_DONE,Done,Tamam
+DEV_AUTO_SOLVE,Solve automatically,Otomatik çöz
+DEV_WIN,Win now,Hemen kazan
+DEV_LOSE,Lose now,Hemen kaybet
+DEV_PREV,Previous level,Önceki bölüm
+DEV_NEXT,Next level,Sonraki bölüm

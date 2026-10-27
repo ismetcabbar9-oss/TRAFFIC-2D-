@@ -12,6 +12,7 @@ signal rescue_pressed(kind: String) ## "hint", "undo" or "crane"
 signal offer_accepted(kind: String, with_ad: bool) ## pay for a rescue
 signal continue_requested(with_ad: bool) ## +2 moves after losing
 signal double_coins_requested
+signal dev_requested ## developer mode panel
 
 var _title: Label
 var _time_label: Label
@@ -169,6 +170,42 @@ func coins_doubled() -> void:
 	_coin_value.scale = Vector2.ONE * 1.5
 	_coin_value.create_tween().tween_property(_coin_value, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK)
 	Sfx.play("combo", -4.0, 1.5, 0.0)
+
+
+## Developer panel: one button per [label, callable]; any choice closes it.
+func show_dev_panel(actions: Array) -> void:
+	var dim := ColorRect.new()
+	dim.color = Color(0.1, 0.12, 0.2, 0.55)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(480, 0)
+	center.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = tr("DEV_TITLE")
+	title.add_theme_font_size_override("font_size", 40)
+	title.add_theme_color_override("font_color", UiStyle.DANGER)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	for entry in actions + [[tr("OFFER_CANCEL"), Callable()]]:
+		var b := Button.new()
+		b.text = entry[0]
+		b.add_theme_font_size_override("font_size", 26)
+		if not (entry[1] as Callable).is_valid():
+			b.theme_type_variation = "IconButton"
+		var action: Callable = entry[1]
+		b.pressed.connect(func():
+			_click()
+			dim.queue_free()
+			if action.is_valid():
+				action.call())
+		box.add_child(b)
 
 
 ## Small banner sliding in under the top bar (e.g. an achievement).
@@ -335,6 +372,18 @@ func _build_rescue_bar(root: Control) -> void:
 	_coin_label.add_theme_font_size_override("font_size", 28)
 	_coin_label.add_theme_color_override("font_color", UiStyle.INK)
 	coins.add_child(_coin_label)
+
+	if Progress.dev_enabled():
+		var dev := Button.new()
+		dev.text = "DEV"
+		dev.theme_type_variation = "IconButton"
+		dev.add_theme_font_size_override("font_size", 22)
+		dev.add_theme_color_override("font_color", UiStyle.DANGER)
+		dev.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		dev.pressed.connect(func():
+			_click()
+			dev_requested.emit())
+		row.add_child(dev)
 
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL

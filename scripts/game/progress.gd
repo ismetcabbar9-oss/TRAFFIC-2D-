@@ -24,6 +24,8 @@ var stats := {} ## lifetime counters: cars, best_combo, cranes, daily_best
 var claimed: Array = [] ## collected achievement ids
 var gift := {} ## daily gift: {"last_day", "index" (0..6) of the last claim}
 var daily_puzzle := {} ## {"last_day", "streak"}
+## Developer mode (debug builds only): {"enabled", "unlock_all", "unlimited_ads"}.
+var dev := {}
 var ad_free := false ## lifetime ad-free purchase (phase 4)
 var tutorial_seen := false
 var tips_seen: Array = [] ## mechanic tip cards already shown
@@ -54,12 +56,15 @@ func level_record(world: int, level: int) -> Dictionary:
 
 
 func is_level_unlocked(world: int, level: int) -> bool:
+	if dev_flag("unlock_all"):
+		return is_world_unlocked(world)
 	return is_world_unlocked(world) and (level == 0 or level_stars(world, level - 1) > 0)
 
 
 func is_world_unlocked(world: int) -> bool:
-	return LevelCatalog.level_count(world) > 0 \
-			and total_stars() >= int(LevelCatalog.world(world).stars_required)
+	if LevelCatalog.level_count(world) == 0:
+		return false
+	return dev_flag("unlock_all") or total_stars() >= int(LevelCatalog.world(world).stars_required)
 
 
 func world_stars(world: int) -> int:
@@ -231,6 +236,49 @@ func record_daily_win() -> Dictionary:
 	return {"coins": coins, "streak": streak}
 
 
+# --- Developer mode ------------------------------------------------------------------
+
+## Developer mode exists only in debug builds (the editor, test exports); a
+## store build never shows it, whatever the save says.
+func dev_available() -> bool:
+	return OS.is_debug_build()
+
+
+func dev_enabled() -> bool:
+	return dev_available() and bool(dev.get("enabled", false))
+
+
+func dev_flag(name: String) -> bool:
+	return dev_enabled() and bool(dev.get(name, false))
+
+
+func set_dev(name: String, on: bool) -> void:
+	dev[name] = on
+	save()
+
+
+## Wipes the player's progress (levels, coins, items, daily, trophies, garage)
+## but keeps settings and the developer switches.
+func reset_progress() -> void:
+	coins = 0
+	levels = {}
+	inventory = {}
+	daily = {}
+	flags = {}
+	owned = []
+	equipped_items = {}
+	stats = {}
+	claimed = []
+	gift = {}
+	daily_puzzle = {}
+	tutorial_seen = false
+	tips_seen = []
+	current_world = 0
+	current_level = 0
+	coins_changed.emit(coins)
+	save()
+
+
 # --- Garage ----------------------------------------------------------------------
 
 func owns(id: String) -> bool:
@@ -355,6 +403,7 @@ func save() -> void:
 		"claimed": claimed,
 		"gift": gift,
 		"daily_puzzle": daily_puzzle,
+		"dev": dev,
 		"ad_free": ad_free,
 		"tutorial": tutorial_seen,
 		"tips": tips_seen,
@@ -395,6 +444,7 @@ func _load() -> void:
 	claimed = data.get("claimed", [])
 	gift = data.get("gift", {})
 	daily_puzzle = data.get("daily_puzzle", {})
+	dev = data.get("dev", {})
 	ad_free = bool(data.get("ad_free", false))
 	tutorial_seen = bool(data.get("tutorial", false))
 	tips_seen = data.get("tips", [])

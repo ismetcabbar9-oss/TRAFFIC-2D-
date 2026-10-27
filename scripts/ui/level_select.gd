@@ -26,6 +26,8 @@ var _world := 0 ## world shown on the world page
 ## Set by the game so leaving a level lands on that world's level grid.
 static var return_to_world := false
 static var _gift_offered := false
+var _title_taps := 0
+var _title_tap_time := 0.0
 
 
 func _ready() -> void:
@@ -40,6 +42,7 @@ func _ready() -> void:
 	_pages["garage"] = _page()
 	_pages["gift"] = _page()
 	_pages["achievements"] = _page()
+	_pages["dev"] = _page()
 	if return_to_world:
 		return_to_world = false
 		_world = Progress.current_world
@@ -59,7 +62,7 @@ func _notification(what: int) -> void:
 			get_tree().quit()
 		else:
 			_click()
-			_show({"credits": "settings", "world": "home"}.get(_current, "home"))
+			_show({"credits": "settings", "dev": "settings", "world": "home"}.get(_current, "home"))
 
 
 # --- Page plumbing -------------------------------------------------------------
@@ -110,6 +113,7 @@ func _show(page: String, animate := true) -> void:
 		"garage": _build_garage()
 		"gift": _build_gift()
 		"achievements": _build_achievements()
+		"dev": _build_dev()
 	for name in _pages:
 		(_pages[name] as Control).get_parent().get_parent().visible = name == page
 	var shown: Control = (_pages[page] as Control).get_parent().get_parent()
@@ -148,6 +152,9 @@ func _build_home() -> void:
 	title.add_theme_font_override("font", UiStyle.font(800))
 	title.add_theme_font_size_override("font_size", 74)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# Seven taps on the title switch developer mode on (debug builds only).
+	title.mouse_filter = Control.MOUSE_FILTER_STOP
+	title.gui_input.connect(_on_title_input)
 	page.add_child(title)
 	var subtitle := Label.new()
 	subtitle.text = tr("MENU_SUBTITLE")
@@ -337,18 +344,23 @@ func _build_settings() -> void:
 		b.disabled = true
 		more.add_child(b)
 	more.add_child(_wide_button(tr("SET_CREDITS"), func(): _show("credits")))
+	if Progress.dev_enabled():
+		more.add_child(_wide_button(tr("DEV_TITLE"), func(): _show("dev")))
 
 
-func _setting_row(rows: VBoxContainer, key: String, value: String, action: Callable) -> void:
+func _setting_row(rows: VBoxContainer, key: String, value: String, action: Callable, page := "settings") -> void:
 	var row := HBoxContainer.new()
 	rows.add_child(row)
 	var label := _label(tr(key), 32, UiStyle.INK)
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.custom_minimum_size.x = 180
 	row.add_child(label)
 	var b := _small_button(value, func():
 		action.call()
-		_show("settings", false))
-	b.custom_minimum_size.x = 230
+		_show(page, false))
+	b.custom_minimum_size.x = 200
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(b)
 
 
@@ -660,6 +672,131 @@ static func _add_dot(button: Control) -> void:
 	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(dot)
 	button.resized.connect(func(): dot.position = Vector2(button.size.x - 16, -4))
+
+
+# --- Developer mode ------------------------------------------------------------------
+
+func _on_title_input(event: InputEvent) -> void:
+	# Touches reach the GUI as emulated mouse clicks, so only clicks count.
+	var click := event as InputEventMouseButton
+	if click == null or not click.pressed or click.button_index != MOUSE_BUTTON_LEFT:
+		return
+	if not Progress.dev_available():
+		return
+	var now := Time.get_ticks_msec() / 1000.0
+	_title_taps = _title_taps + 1 if now - _title_tap_time < 1.5 else 1
+	_title_tap_time = now
+	if _title_taps >= 7:
+		_title_taps = 0
+		Progress.set_dev("enabled", not Progress.dev_enabled())
+		Sfx.play("celebrate", -4.0)
+		_show("dev" if Progress.dev_enabled() else "home")
+
+
+## Developer tools: unlock everything, coins and rescues, resets.
+func _build_dev() -> void:
+	var page: VBoxContainer = _pages["dev"]
+	_clear(page)
+	_page_header(page, "DEV_TITLE", "settings")
+	var note := _label(tr("DEV_NOTE"), 22, UiStyle.INK.lerp(Color.WHITE, 0.3), true)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	page.add_child(note)
+
+	var panel := PanelContainer.new()
+	page.add_child(panel)
+	var rows := VBoxContainer.new()
+	rows.add_theme_constant_override("separation", 14)
+	panel.add_child(rows)
+	for flag in ["unlock_all", "unlimited_ads"]:
+		_setting_row(rows, "DEV_" + flag.to_upper(), tr("ON") if Progress.dev_flag(flag) else tr("OFF"),
+				func(): Progress.set_dev(flag, not Progress.dev_flag(flag)), "dev")
+
+	var actions := [
+		["DEV_COINS", func(): Progress.add_coins(1000)],
+		["DEV_RESCUES", func():
+			for item in ["hint", "undo", "crane"]:
+				Progress.add_item(item, 5)],
+		["DEV_ALL_STARS", func():
+			for w in LevelCatalog.world_count():
+				for l in LevelCatalog.level_count(w):
+					if Progress.level_stars(w, l) == 0:
+						Progress.levels["%d:%d" % [w, l]] = {"stars": 3, "time": -1.0, "combo": 0}
+			Progress.save()],
+		["DEV_GIFT", func():
+			Progress.gift = {}
+			Progress.save()],
+		["DEV_DAILY", func():
+			Progress.daily_puzzle = {}
+			Daily.clear_cache()
+			Progress.save()],
+		["DEV_DAILY_RANDOM", func():
+			Daily.prepare("%d-%02d-%02d" % [2000 + randi() % 50, 1 + randi() % 12, 1 + randi() % 28])
+			while not Daily.is_ready():
+				await get_tree().process_frame
+			Daily.start()
+			Transition.change_scene(GAME_SCENE)],
+		["DEV_TIPS", func():
+			Progress.tutorial_seen = false
+			Progress.tips_seen = []
+			Progress.flags.erase("crane_gift")
+			Progress.save()],
+		["DEV_FREE_HINTS", func():
+			Progress.daily = {}
+			Progress.save()],
+		["DEV_TROPHIES", func():
+			Progress.claimed = []
+			Progress.save()],
+		["DEV_GARAGE", func():
+			Progress.owned = []
+			Progress.equipped_items = {}
+			Progress.save()],
+	]
+	for entry in actions:
+		var key: String = entry[0]
+		var action: Callable = entry[1]
+		page.add_child(_wide_button(tr(key), func():
+			await action.call()
+			_toast(tr("DEV_DONE"))
+			_show("dev", false)))
+	var reset := _wide_button(tr("DEV_RESET"), func(): _confirm_reset())
+	reset.add_theme_color_override("font_color", UiStyle.DANGER)
+	page.add_child(reset)
+	page.add_child(_wide_button(tr("DEV_OFF"), func():
+		Progress.set_dev("enabled", false)
+		_show("settings")))
+
+
+func _confirm_reset() -> void:
+	var dialog := ConfirmationDialog.new()
+	dialog.dialog_text = tr("DEV_RESET_CONFIRM")
+	dialog.ok_button_text = tr("DEV_RESET")
+	dialog.cancel_button_text = tr("OFFER_CANCEL")
+	add_child(dialog)
+	dialog.confirmed.connect(func():
+		Progress.reset_progress()
+		_show("dev", false))
+	dialog.popup_centered()
+
+
+## Short message at the bottom of the screen.
+func _toast(text: String) -> void:
+	var l := _label(text, 28, Color.WHITE)
+	var box := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.17, 0.19, 0.28, 0.9)
+	style.set_corner_radius_all(20)
+	style.set_content_margin_all(14)
+	box.add_theme_stylebox_override("panel", style)
+	box.add_child(l)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(box)
+	await get_tree().process_frame
+	var vp := get_viewport_rect().size
+	box.position = Vector2((vp.x - box.size.x) * 0.5, vp.y - box.size.y - 60.0)
+	var t := box.create_tween()
+	t.tween_interval(1.0)
+	t.tween_property(box, "modulate:a", 0.0, 0.3)
+	t.tween_callback(box.queue_free)
 
 
 # --- Helpers -----------------------------------------------------------------------
