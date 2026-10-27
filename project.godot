@@ -5,12 +5,14 @@ config_version=5
 [application]
 
 config/name="Traffic 2D"
-run/main_scene="res://scenes/game.tscn"
+run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 
 [autoload]
 
 Sfx="*res://scripts/audio/sfx.gd"
+Progress="*res://scripts/game/progress.gd"
+ScreenFit="*res://scripts/ui/screen_fit.gd"
 
 [display]
 

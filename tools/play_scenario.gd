@@ -12,6 +12,7 @@ func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	if args.size() > 0:
 		out_dir = args[0]
+	root.get_node("Progress").current_level = 0
 	game = load("res://scenes/game.tscn").instantiate()
 	root.add_child(game)
 	await _frames(10)
@@ -53,9 +54,15 @@ func _initialize() -> void:
 	await _seconds(2.0)
 	print("state after clearing: ", session.state)
 	await _shot("s5_win")
+	var progress := root.get_node("Progress")
+	print("unlocked after win: ", progress.unlocked, " completed: ", progress.completed.keys())
+	game.hud._on_primary() # "Sonraki Bölüm"
+	await _frames(10)
+	print("level after next: ", game.level_index + 1)
+	await _shot("s5b_next_level")
 
 	# 4. Restart and lose by crashing until no moves are left.
-	game.load_level(game.level_path)
+	game.load_level(game.level_index)
 	await _frames(5)
 	session = game.session
 	blocked = _first_blocked(session)

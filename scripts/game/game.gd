@@ -2,13 +2,15 @@ extends Node3D
 ## Game scene root: loads a level, builds its visuals, turns taps into
 ## GameSession moves and plays the matching animations and HUD updates.
 
-@export_file("*.json") var level_path := "res://levels/demo.json"
+const MENU_SCENE := "res://scenes/menu.tscn"
+
 @export var win_delay := 0.35 ## seconds after the last car has left the screen
 @export var max_exit_wait := 3.0 ## never wait longer than this for cars to leave
 @export var lose_delay := 0.6 ## seconds between the final crash and the lose panel
 @export_range(0.0, 1.0) var horn_chance := 0.65 ## chance a bumped car honks back
 
 var session: GameSession
+var level_index := 0
 var vehicle_views := {} ## vehicle id -> VehicleView
 var obstacle_views := {} ## cell -> ObstacleView
 
@@ -20,12 +22,16 @@ var obstacle_views := {} ## cell -> ObstacleView
 
 
 func _ready() -> void:
-	hud.restart_requested.connect(func(): load_level(level_path))
-	hud.next_requested.connect(func(): load_level(level_path))
-	load_level(level_path)
+	hud.restart_requested.connect(func(): load_level(level_index))
+	hud.next_requested.connect(func(): load_level(level_index + 1))
+	hud.menu_requested.connect(func(): get_tree().change_scene_to_file(MENU_SCENE))
+	load_level(Progress.current_level)
 
 
-func load_level(path: String) -> void:
+func load_level(index: int) -> void:
+	level_index = clampi(index, 0, LevelCatalog.count() - 1)
+	Progress.current_level = level_index
+	var path := LevelCatalog.path(level_index)
 	var level := LevelData.load_file(path)
 	var report := LevelSolver.solve(level)
 	if not report.errors.is_empty():
@@ -131,6 +137,7 @@ func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
 
 func _on_won() -> void:
 	var played := session
+	Progress.complete(level_index)
 	var waited := 0.0
 	while VehicleView.exiting_count() > 0 and waited < max_exit_wait:
 		await get_tree().process_frame
@@ -138,7 +145,7 @@ func _on_won() -> void:
 	await get_tree().create_timer(win_delay).timeout
 	if played == session:
 		Sfx.play("win", -2.0, 1.0, 0.0)
-		hud.show_win()
+		hud.show_win(not Progress.has_next(level_index))
 
 
 func _on_lost() -> void:

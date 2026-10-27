@@ -1,0 +1,134 @@
+{
+ "cols": 7,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "firetruck",
+   "col": 4,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "firetruck",
+   "col": 5,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "firetruck",
+   "col": 6,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "ambulance",
+   "col": 2,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "firetruck",
+   "col": 2,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "garbage",
+   "col": 1,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 5,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 6,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 0,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 1,
+   "row": 2
+  },
+  {
+   "type": "cone",
+   "col": 1,
+   "row": 1
+  }
+ ],
+ "name": "Bölüm 8"
+}

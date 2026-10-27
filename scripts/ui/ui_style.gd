@@ -52,6 +52,11 @@ static func _button_styles(theme: Theme, type: String, color: Color, edge: Color
 	theme.set_stylebox("normal", type, normal)
 	theme.set_stylebox("hover", type, normal)
 	theme.set_stylebox("pressed", type, pressed)
+	var disabled := normal.duplicate() as StyleBoxFlat
+	disabled.bg_color = Color("dfe3ea")
+	disabled.border_color = Color("c3c9d4")
+	theme.set_stylebox("disabled", type, disabled)
+	theme.set_color("font_disabled_color", type, Color("aab1bf"))
 	theme.set_stylebox("focus", type, StyleBoxEmpty.new())
 	theme.set_color("font_color", type, Color.WHITE)
 	theme.set_color("font_hover_color", type, Color.WHITE)

@@ -5,8 +5,9 @@ extends Camera3D
 
 @export_range(0.0, 45.0) var tilt_degrees := 20.0 ## 0 = straight down
 @export var margin := 0.3 ## extra world units around the board
-## Screen fraction reserved for HUD at the top and bottom (portrait/landscape).
+## Screen fraction reserved for the HUD at the top and kept free at the bottom.
 @export var top_reserve := 0.12
+@export var top_reserve_landscape := 0.18
 @export var bottom_reserve := 0.06
 
 @export var shake_decay := 2.2 ## trauma lost per second
@@ -47,7 +48,8 @@ func _refit() -> void:
 		return
 	var aspect := vp.x / vp.y
 	var tilt := deg_to_rad(tilt_degrees)
-	var usable := 1.0 - top_reserve - bottom_reserve
+	var top := top_reserve_landscape if aspect > 1.0 else top_reserve
+	var usable := 1.0 - top - bottom_reserve
 	var tan_v := tan(deg_to_rad(fov) * 0.5)
 	var tan_h := tan_v * aspect
 
@@ -60,6 +62,6 @@ func _refit() -> void:
 	rotation = Vector3(-PI * 0.5 + tilt, 0.0, 0.0)
 	var forward := -global_transform.basis.z
 	# Shift the look-at point so the board sits between the HUD reserves.
-	var shift := (top_reserve - bottom_reserve) * 0.5 * 2.0 * tan_v * dist
+	var shift := (top - bottom_reserve) * 0.5 * 2.0 * tan_v * dist
 	var target := Vector3(0.0, 0.0, -shift * cos(tilt))
 	global_position = target - forward * dist

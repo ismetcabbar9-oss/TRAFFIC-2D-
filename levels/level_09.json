@@ -1,0 +1,152 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "van",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "delivery",
+   "col": 4,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "firetruck",
+   "col": 6,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 5,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "firetruck",
+   "col": 0,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "delivery",
+   "col": 5,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "firetruck",
+   "col": 2,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "garbage",
+   "col": 1,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 6,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 6,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 4,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 1
+  },
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 6
+  }
+ ],
+ "name": "Bölüm 9"
+}

@@ -1,0 +1,81 @@
+{
+ "cols": 6,
+ "rows": 6,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "garbage",
+   "col": 0,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "garbage",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "ambulance",
+   "col": 5,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [],
+ "name": "Bölüm 4"
+}

@@ -1,0 +1,51 @@
+{
+ "cols": 5,
+ "rows": 5,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 1,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  }
+ ],
+ "obstacles": [],
+ "name": "Bölüm 2"
+}

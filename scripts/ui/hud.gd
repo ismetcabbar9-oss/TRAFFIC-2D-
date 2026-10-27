@@ -1,10 +1,11 @@
 class_name Hud
 extends CanvasLayer
-## In-game interface: top bar (level, wrong moves left, restart) and the
-## win / lose result panel.
+## In-game interface: top bar (menu, level, wrong moves left, restart) and
+## the win / lose result panel.
 
 signal restart_requested
 signal next_requested
+signal menu_requested
 
 var _title: Label
 var _meter: MistakeMeter
@@ -13,7 +14,9 @@ var _panel: PanelContainer
 var _result_title: Label
 var _result_text: Label
 var _primary: Button
+var _secondary: Button
 var _won := false
+var _last_level := false
 
 
 func _ready() -> void:
@@ -34,12 +37,15 @@ func set_mistakes(left: int, total: int) -> void:
 	_meter.set_counts(left, total)
 
 
-func show_win() -> void:
+## `last_level`: no level follows, so the panel leads back to the menu.
+func show_win(last_level: bool) -> void:
 	_won = true
+	_last_level = last_level
 	_result_title.text = "Harika!"
 	_result_title.add_theme_color_override("font_color", UiStyle.GOOD_DARK)
-	_result_text.text = "Otopark boşaldı."
-	_primary.text = "Devam"
+	_result_text.text = "Tüm bölümleri bitirdin!" if last_level else "Otopark boşaldı."
+	_primary.text = "Menü" if last_level else "Sonraki Bölüm"
+	_secondary.visible = not last_level
 	_primary.theme_type_variation = "GoodButton"
 	_show_result()
 
@@ -51,6 +57,7 @@ func show_lose() -> void:
 	_result_text.text = "Hamle hakkın bitti."
 	_primary.text = "Tekrar Dene"
 	_primary.theme_type_variation = ""
+	_secondary.visible = true
 	_show_result()
 
 
@@ -79,41 +86,44 @@ func _build_top_bar(root: Control) -> void:
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(margin)
 
+	var rows := VBoxContainer.new()
+	rows.add_theme_constant_override("separation", 6)
+	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_child(rows)
+
 	var bar := HBoxContainer.new()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	margin.add_child(bar)
-
+	rows.add_child(bar)
+	bar.add_child(_small_button("Menü", menu_requested.emit))
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 42)
+	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_title.size_flags_stretch_ratio = 1.0
 	bar.add_child(_title)
+	bar.add_child(_small_button("Tekrar", restart_requested.emit))
 
-	var middle := VBoxContainer.new()
-	middle.alignment = BoxContainer.ALIGNMENT_CENTER
-	middle.add_theme_constant_override("separation", 0)
-	bar.add_child(middle)
+	var meter_row := HBoxContainer.new()
+	meter_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	meter_row.add_theme_constant_override("separation", 12)
+	meter_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rows.add_child(meter_row)
 	var caption := Label.new()
 	caption.text = "Hamle hakkı"
-	caption.add_theme_font_size_override("font_size", 22)
+	caption.add_theme_font_size_override("font_size", 24)
 	caption.add_theme_color_override("font_color", UiStyle.INK.lerp(Color.WHITE, 0.25))
-	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	middle.add_child(caption)
+	meter_row.add_child(caption)
 	_meter = MistakeMeter.new()
-	middle.add_child(_meter)
+	meter_row.add_child(_meter)
 
-	var right := HBoxContainer.new()
-	right.alignment = BoxContainer.ALIGNMENT_END
-	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bar.add_child(right)
-	var restart := Button.new()
-	restart.text = "Tekrar"
-	restart.theme_type_variation = "IconButton"
-	restart.add_theme_font_size_override("font_size", 28)
-	restart.pressed.connect(_click)
-	restart.pressed.connect(restart_requested.emit)
-	right.add_child(restart)
+
+func _small_button(text: String, action: Callable) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.theme_type_variation = "IconButton"
+	b.add_theme_font_size_override("font_size", 26)
+	b.pressed.connect(_click)
+	b.pressed.connect(action)
+	return b
 
 
 func _build_result(root: Control) -> void:
@@ -150,6 +160,13 @@ func _build_result(root: Control) -> void:
 	_primary = Button.new()
 	_primary.pressed.connect(_on_primary)
 	buttons.add_child(_primary)
+	_secondary = Button.new()
+	_secondary.text = "Menü"
+	_secondary.theme_type_variation = "IconButton"
+	_secondary.pressed.connect(func():
+		_click()
+		menu_requested.emit())
+	buttons.add_child(_secondary)
 
 
 func _click() -> void:
@@ -159,7 +176,9 @@ func _click() -> void:
 func _on_primary() -> void:
 	_click()
 	hide_result()
-	if _won:
+	if _won and _last_level:
+		menu_requested.emit()
+	elif _won:
 		next_requested.emit()
 	else:
 		restart_requested.emit()
