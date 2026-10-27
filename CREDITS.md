@@ -12,3 +12,5 @@
   See `assets/fonts/OFL_Baloo2.txt`.
 - Sound effects and jingles: Kenney audio packs and Freesound contributors,
   all CC0 1.0. Per-file sources in `assets/audio/LICENSES.md`.
+- Music: "Happy Clappy Loop" by owlishmedia and "Apple Cider" by Zane Little
+  Music (OpenGameArt), CC0 1.0.

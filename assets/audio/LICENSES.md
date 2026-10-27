@@ -19,3 +19,6 @@ All audio is CC0 1.0 (public domain dedication); edited (trimmed, mixed, normali
 | sfx/horn_truck.ogg | Freesound #546528 "powerfull horn" by trezz77 |
 | sfx/horn_small.ogg | Freesound #436589 "Horn 01a - Car Short Mini" by Julien_Matthey |
 | sfx/horn_sedan.ogg | Freesound #164625 "Car_horn_short" (Freesound user, account deleted) |
+| music/menu_theme.ogg | OpenGameArt "Happy Clappy Loop" by owlishmedia (https://opengameart.org/content/happy-clappy-loop) |
+| music/game_theme.ogg | OpenGameArt "Apple Cider" by Zane Little Music (https://opengameart.org/content/apple-cider) |
+| sfx/combo.ogg, sfx/celebrate.ogg | Kenney "Interface Sounds" (glass_001, confirmation_001), CC0 |

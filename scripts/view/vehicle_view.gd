@@ -137,6 +137,14 @@ func play_crash(distance: float, on_impact: Callable) -> void:
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
+## Pops the car onto the lot at level start (scale from nothing, slight bounce).
+func pop_in(delay: float) -> void:
+	scale = Vector3.ONE * 0.01
+	var t := create_tween()
+	t.tween_interval(delay)
+	t.tween_property(self, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
 ## Briefly lights up the roof arrow to point the player at this car.
 func flash_hint() -> void:
 	_arrow.flash_hint()

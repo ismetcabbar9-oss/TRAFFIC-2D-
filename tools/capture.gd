@@ -8,7 +8,7 @@ extends SceneTree
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	var out := args[0] if args.size() > 0 else "user://capture.png"
-	var frames := int(args[1]) if args.size() > 1 else 30
+	var frames := int(args[1]) if args.size() > 1 else 45
 	var scene: PackedScene = load(ProjectSettings.get_setting("application/run/main_scene"))
 	root.add_child(scene.instantiate())
 	for i in frames:

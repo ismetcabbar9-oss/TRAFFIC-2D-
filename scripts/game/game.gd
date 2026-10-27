@@ -13,6 +13,7 @@ const MENU_SCENE := "res://scenes/menu.tscn"
 @export var first_level_hint_delay := 2.5 ## quicker on the very first level
 @export var hint_repeat := 4.0 ## flash again this often while still idle
 @export var tutorial_levels := 1 ## the first N levels also show a text tip
+@export var combo_window := 1.6 ## seconds between exits that keep a combo going
 
 var session: GameSession
 var level_index := 0
@@ -22,6 +23,10 @@ var _idle := 0.0
 var _next_hint := 0.0
 var _hinted_id := -1
 var _sun_scale := 1.0
+var _combo := 0
+var _clock := 0.0 ## game time in seconds (follows pauses and time scale)
+var _last_exit_time := -100.0
+var _tutorial_open := false
 var _ambient_scale := 1.0
 
 @onready var board: BoardView = $Board
@@ -33,11 +38,19 @@ var _ambient_scale := 1.0
 
 
 func _ready() -> void:
+	Sfx.play_music("game")
 	_adapt_lighting()
-	hud.restart_requested.connect(func(): load_level(level_index))
-	hud.next_requested.connect(func(): load_level(level_index + 1))
-	hud.menu_requested.connect(func(): get_tree().change_scene_to_file(MENU_SCENE))
+	hud.restart_requested.connect(func(): Transition.cover(load_level.bind(level_index)))
+	hud.next_requested.connect(func(): Transition.cover(load_level.bind(level_index + 1)))
+	hud.menu_requested.connect(func(): Transition.change_scene(MENU_SCENE))
+	hud.tutorial_closed.connect(func():
+		_tutorial_open = false
+		Progress.mark_tutorial_seen()
+		_clear_hint())
 	load_level(Progress.current_level)
+	if level_index == 0 and not Progress.tutorial_seen:
+		_tutorial_open = true
+		hud.show_tutorial()
 
 
 ## Devices without Vulkan fall back to the Compatibility renderer, which lights
@@ -89,6 +102,11 @@ func load_level(index: int) -> void:
 	TimeOfDay.apply(hour, $Sun, ($WorldEnvironment as WorldEnvironment).environment, _sun_scale, _ambient_scale)
 	# Keep the exit barrier in view below the board.
 	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y)
+	camera.play_intro()
+	# Cars pop in one after another, row by row.
+	for id in vehicle_views:
+		var v: VehicleView = vehicle_views[id]
+		v.pop_in(0.25 + minf((v.cell.y * level.cols + v.cell.x) * 0.012, 0.55))
 
 	hud.hide_result()
 	_clear_hint()
@@ -99,7 +117,7 @@ func load_level(index: int) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST: # Android back button
-		get_tree().change_scene_to_file(MENU_SCENE)
+		Transition.change_scene(MENU_SCENE)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -114,7 +132,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	if session == null or session.state != GameSession.State.PLAYING:
+	_clock += delta
+	if session == null or session.state != GameSession.State.PLAYING or _tutorial_open:
 		return
 	_idle += delta
 	if _idle < _next_hint:
@@ -160,6 +179,19 @@ func _on_vehicle_exited(id: int, _result: BoardState.MoveResult) -> void:
 	view.play_exit()
 	_play_launch_sounds(view.type)
 	Haptics.pulse(12, 0.4)
+	_count_combo(view)
+
+
+## Quick successive exits build a combo: a pop-up over the car and a chime
+## that climbs a whole tone per step. A crash breaks the chain.
+func _count_combo(view: VehicleView) -> void:
+	_combo = _combo + 1 if _clock - _last_exit_time <= combo_window else 1
+	_last_exit_time = _clock
+	if _combo < 2:
+		return
+	var steps := mini(_combo - 2, 8)
+	Sfx.play("combo", -5.0, pow(2.0, steps * 2.0 / 12.0), 0.0)
+	hud.show_combo(_combo, camera.unproject_position(view.global_position + Vector3.UP * 1.5))
 
 
 ## Engine, exhaust and tyres; emergency vehicles add their siren. Tyres share
@@ -188,6 +220,7 @@ func _on_vehicle_crashed(id: int, result: BoardState.MoveResult) -> void:
 
 
 func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
+	_combo = 0
 	var push := view.forward()
 	if is_instance_valid(target):
 		target.nudge(push)
@@ -217,13 +250,15 @@ func _on_won() -> void:
 		waited += get_process_delta_time()
 	await get_tree().create_timer(win_delay).timeout
 	if played == session:
+		Sfx.duck_music(2.0)
 		Sfx.play("win", -2.0, 1.0, 0.0)
-		hud.show_win(not Progress.has_next(level_index))
+		hud.show_win(not Progress.has_next(level_index), session.mistakes_left == session.level.mistakes)
 
 
 func _on_lost() -> void:
 	var played := session
 	await get_tree().create_timer(lose_delay).timeout
 	if played == session and session.state == GameSession.State.LOST:
+		Sfx.duck_music(2.0)
 		Sfx.play("lose", -2.0, 1.0, 0.0)
 		hud.show_lose()

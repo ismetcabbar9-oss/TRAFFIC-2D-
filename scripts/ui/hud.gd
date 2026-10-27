@@ -1,11 +1,13 @@
 class_name Hud
 extends CanvasLayer
-## In-game interface: top bar (menu, level, wrong moves left, restart) and
-## the win / lose result panel.
+## In-game interface: top bar (menu, level, wrong moves left, restart), combo
+## pop-ups, the first-time tutorial card and the win / lose result panel with
+## its confetti celebration.
 
 signal restart_requested
 signal next_requested
 signal menu_requested
+signal tutorial_closed
 
 var _title: Label
 var _time_label: Label
@@ -20,6 +22,8 @@ var _won := false
 var _hint: PanelContainer
 var _hint_label: Label
 var _last_level := false
+var _root: Control
+var _badge: Label
 
 
 func _ready() -> void:
@@ -28,6 +32,7 @@ func _ready() -> void:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.theme = UiStyle.make_theme()
 	add_child(root)
+	_root = root
 	_build_top_bar(root)
 	_build_hint(root)
 	_build_result(root)
@@ -46,8 +51,15 @@ func set_mistakes(left: int, total: int) -> void:
 
 
 ## `last_level`: no level follows, so the panel leads back to the menu.
-func show_win(last_level: bool) -> void:
+## `perfect`: cleared without a single crash.
+func show_win(last_level: bool, perfect := false) -> void:
 	_won = true
+	_badge.visible = perfect
+	# Behind the panel, in front of the dimmed board.
+	var confetti := Confetti.new()
+	_overlay.add_child(confetti)
+	_overlay.move_child(confetti, 0)
+	Sfx.play("celebrate", -4.0, 1.0, 0.0)
 	_last_level = last_level
 	_result_title.text = "Harika!"
 	_result_title.add_theme_color_override("font_color", UiStyle.GOOD_DARK)
@@ -66,7 +78,75 @@ func show_lose() -> void:
 	_primary.text = "Tekrar Dene"
 	_primary.theme_type_variation = ""
 	_secondary.visible = true
+	_badge.visible = false
 	_show_result()
+
+
+## Floating "x3 Süper!" over the car that just left; `at` is a screen position.
+func show_combo(count: int, at: Vector2) -> void:
+	var words := ["", "", "", "Süper!", "Harika!"]
+	var label := Label.new()
+	label.text = "x%d %s" % [count, words[count] if count < words.size() else "Muhteşem!"]
+	label.add_theme_font_override("font", UiStyle.font(800))
+	label.add_theme_font_size_override("font_size", 46 + mini(count, 6) * 4)
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_color_override("font_outline_color", UiStyle.ACCENT_DARK)
+	label.add_theme_constant_override("outline_size", 12)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.add_child(label)
+	await get_tree().process_frame
+	label.pivot_offset = label.size * 0.5
+	label.position = _root.get_global_transform_with_canvas().affine_inverse() * at - label.size * 0.5
+	label.scale = Vector2.ONE * 0.4
+	var t := label.create_tween().set_parallel()
+	t.tween_property(label, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_property(label, "position:y", label.position.y - 110.0, 0.9).set_ease(Tween.EASE_OUT)
+	t.tween_property(label, "modulate:a", 0.0, 0.35).set_delay(0.6)
+	t.chain().tween_callback(label.queue_free)
+
+
+## One-time "how to play" card; emits `tutorial_closed` when dismissed.
+func show_tutorial() -> void:
+	var dim := ColorRect.new()
+	dim.color = Color(0.1, 0.12, 0.2, 0.55)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(520, 0)
+	center.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 16)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = "Nasıl oynanır?"
+	title.add_theme_font_size_override("font_size", 52)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	for line in ["Bir arabaya dokun: okun gösterdiği yöne gider.",
+			"Yolu açıksa otoparktan çıkar.",
+			"Önü kapalıysa çarpar ve bir hamle hakkın gider.",
+			"Doğru sırayla tüm arabaları çıkar!"]:
+		var l := Label.new()
+		l.text = line
+		l.add_theme_font_size_override("font_size", 28)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size.x = 460
+		box.add_child(l)
+	var go := Button.new()
+	go.text = "Başla"
+	go.theme_type_variation = "GoodButton"
+	box.add_child(go)
+	go.pressed.connect(func():
+		_click()
+		var t := dim.create_tween()
+		t.tween_property(dim, "modulate:a", 0.0, 0.2)
+		t.tween_callback(dim.queue_free)
+		tutorial_closed.emit())
+	dim.modulate.a = 0.0
+	dim.create_tween().tween_property(dim, "modulate:a", 1.0, 0.25)
 
 
 func show_hint(text: String) -> void:
@@ -220,6 +300,14 @@ func _build_result(root: Control) -> void:
 	_result_title.add_theme_font_size_override("font_size", 72)
 	_result_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_result_title)
+
+	_badge = Label.new()
+	_badge.text = "Hatasız bitirdin!"
+	_badge.add_theme_font_size_override("font_size", 30)
+	_badge.add_theme_color_override("font_color", UiStyle.ACCENT_DARK)
+	_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_badge.visible = false
+	box.add_child(_badge)
 
 	_result_text = Label.new()
 	_result_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

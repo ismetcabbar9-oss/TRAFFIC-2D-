@@ -7,11 +7,13 @@ var _grid: GridContainer
 var _sound: Button
 var _vibration: Button
 var _speed: Button
+var _music: Button
 var _column: VBoxContainer
 var _title: Label
 
 
 func _ready() -> void:
+	Sfx.play_music("menu")
 	theme = UiStyle.make_theme()
 	_build()
 	_refresh()
@@ -85,12 +87,16 @@ func _build() -> void:
 		tile.pressed.connect(_open_level.bind(i))
 		_grid.add_child(tile)
 
-	var settings := HBoxContainer.new()
-	settings.alignment = BoxContainer.ALIGNMENT_CENTER
-	settings.add_theme_constant_override("separation", 16)
+	var settings := GridContainer.new()
+	settings.columns = 2
+	settings.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	settings.add_theme_constant_override("h_separation", 14)
+	settings.add_theme_constant_override("v_separation", 12)
 	column.add_child(settings)
 	_sound = _toggle_button(func(): Progress.set_sound(not Progress.sound_on))
 	settings.add_child(_sound)
+	_music = _toggle_button(func(): Progress.set_music(not Progress.music_on))
+	settings.add_child(_music)
 	_vibration = _toggle_button(func(): Progress.set_vibration(not Progress.vibration_on))
 	settings.add_child(_vibration)
 	_speed = _toggle_button(Progress.cycle_speed)
@@ -100,6 +106,7 @@ func _build() -> void:
 func _toggle_button(on_press: Callable) -> Button:
 	var b := Button.new()
 	b.theme_type_variation = "IconButton"
+	b.custom_minimum_size.x = 250
 	b.add_theme_font_size_override("font_size", 26)
 	b.pressed.connect(func():
 		on_press.call()
@@ -118,6 +125,7 @@ func _refresh() -> void:
 	_sound.text = "Ses: %s" % ("Açık" if Progress.sound_on else "Kapalı")
 	_vibration.text = "Titreşim: %s" % ("Açık" if Progress.vibration_on else "Kapalı")
 	_speed.text = "Hız: %s" % Progress.speed_label()
+	_music.text = "Müzik: %s" % ("Açık" if Progress.music_on else "Kapalı")
 
 
 func _pulse(tile: Control) -> void:
@@ -133,4 +141,4 @@ func _open_level(index: int) -> void:
 		return
 	Sfx.play("ui_click", -4.0)
 	Progress.current_level = index
-	get_tree().change_scene_to_file(GAME_SCENE)
+	Transition.change_scene(GAME_SCENE)

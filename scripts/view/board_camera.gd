@@ -17,6 +17,9 @@ var _half_extents := Vector2(6, 6)
 var _center_z := 0.0
 var _trauma := 0.0
 var _shake_time := 0.0
+var _fit := Transform3D() ## framed pose computed by _refit
+var _intro := 1.0 ## 0 = start of the level intro, 1 = settled on the board
+var _intro_tween: Tween
 
 
 func _ready() -> void:
@@ -36,6 +39,17 @@ func _process(delta: float) -> void:
 	var strength := _trauma * _trauma * shake_max_offset
 	h_offset = sin(_shake_time * 1.3) * strength
 	v_offset = cos(_shake_time * 1.7 + 1.0) * strength
+
+
+## Glides in from a little higher and further back onto the framed board.
+func play_intro(duration := 0.8) -> void:
+	if _intro_tween:
+		_intro_tween.kill()
+	_intro = 0.0
+	_apply_pose()
+	_intro_tween = create_tween()
+	_intro_tween.tween_method(func(v: float): _intro = v; _apply_pose(), 0.0, 1.0, duration) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 ## Frames the board (centered half extents) plus `extra_bottom` world units
@@ -63,9 +77,20 @@ func _refit() -> void:
 	var dist_d := depth / (tan_v * usable) + _half_extents.y * sin(tilt)
 	var dist := maxf(dist_w, dist_d)
 
-	rotation = Vector3(-PI * 0.5 + tilt, 0.0, 0.0)
-	var forward := -global_transform.basis.z
+	var basis := Basis.from_euler(Vector3(-PI * 0.5 + tilt, 0.0, 0.0))
+	var forward := -basis.z
 	# Shift the look-at point so the board sits between the HUD reserves.
 	var shift := (top - bottom_reserve) * 0.5 * 2.0 * tan_v * dist
 	var target := Vector3(0.0, 0.0, _center_z - shift * cos(tilt))
-	global_position = target - forward * dist
+	_fit = Transform3D(basis, target - forward * dist)
+	_apply_pose()
+
+
+func _apply_pose() -> void:
+	if _intro >= 1.0:
+		global_transform = _fit
+		return
+	# Start pulled back 35% and turned a little, then ease onto the fit.
+	var start_basis := _fit.basis.rotated(Vector3.RIGHT, deg_to_rad(-8.0)).rotated(Vector3.UP, deg_to_rad(6.0))
+	var start := Transform3D(start_basis, _fit.origin + _fit.basis.z * _fit.origin.length() * 0.35)
+	global_transform = start.interpolate_with(_fit, _intro)

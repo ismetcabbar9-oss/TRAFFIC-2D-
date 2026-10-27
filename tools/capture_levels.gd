@@ -13,8 +13,7 @@ func _initialize() -> void:
 		root.get_node("Progress").current_level = i
 		var game: Node = load("res://scenes/game.tscn").instantiate()
 		root.add_child(game)
-		for f in 12:
-			await process_frame
+		await create_timer(1.3).timeout # level intro: camera glide and cars popping in
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(out_dir.path_join("level_%02d.png" % (i + 1)))
 		game.queue_free()

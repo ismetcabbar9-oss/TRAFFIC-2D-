@@ -14,9 +14,10 @@ func _initialize() -> void:
 		out_dir = args[0]
 	await process_frame # let autoloads load the save file first
 	root.get_node("Progress").current_level = 0
+	root.get_node("Progress").tutorial_seen = true # skip the first-time card
 	game = load("res://scenes/game.tscn").instantiate()
 	root.add_child(game)
-	await _frames(10)
+	await _seconds(1.3) # level intro
 
 	var session: GameSession = game.session
 	var free_ids := session.board.free_vehicles()
@@ -44,10 +45,15 @@ func _initialize() -> void:
 
 	# 3. Clear the board in the solver's order.
 	var report := LevelSolver.solve(session.level)
+	var shot_combo := false
 	for id in report.order:
 		if session.board.vehicles.has(id):
 			_tap_vehicle(id)
 			await _seconds(0.12)
+			if game._combo >= 2 and not shot_combo:
+				shot_combo = true
+				await _seconds(0.15)
+				await _shot("s4_combo")
 	await _seconds(0.25)
 	for i in 6:
 		await _shot("s4_clear_%d" % i)
@@ -55,6 +61,8 @@ func _initialize() -> void:
 	await _seconds(2.0)
 	print("state after clearing: ", session.state)
 	await _shot("s5_win")
+	await _seconds(0.4)
+	await _shot("s5_win_later")
 	var progress := root.get_node("Progress")
 	print("unlocked after win: ", progress.unlocked, " completed: ", progress.completed.keys())
 	game.hud._on_primary() # "Sonraki Bölüm"
@@ -64,7 +72,7 @@ func _initialize() -> void:
 
 	# 4. Restart and lose by crashing until no moves are left.
 	game.load_level(game.level_index)
-	await _frames(5)
+	await _seconds(1.3)
 	session = game.session
 	blocked = _first_blocked(session)
 	for i in session.mistakes_left:

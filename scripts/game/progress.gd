@@ -9,8 +9,10 @@ const SPEEDS := [["Yavaş", 0.7], ["Normal", 1.0], ["Hızlı", 1.35], ["Çok Hı
 var unlocked := 1 ## number of levels the player may open
 var completed := {} ## level index -> true
 var sound_on := true
+var music_on := true
 var vibration_on := true
 var speed_level := 1 ## index into SPEEDS
+var tutorial_seen := false
 var current_level := 0 ## index of the level to play next
 
 
@@ -51,8 +53,19 @@ func cycle_speed() -> void:
 	save()
 
 
+func mark_tutorial_seen() -> void:
+	tutorial_seen = true
+	save()
+
+
 func speed_label() -> String:
 	return SPEEDS[speed_level][0]
+
+
+func set_music(on: bool) -> void:
+	music_on = on
+	_apply_settings()
+	save()
 
 
 func set_vibration(on: bool) -> void:
@@ -70,8 +83,10 @@ func save() -> void:
 		"unlocked": unlocked,
 		"completed": completed.keys(),
 		"sound": sound_on,
+		"music": music_on,
 		"vibration": vibration_on,
 		"speed": speed_level,
+		"tutorial": tutorial_seen,
 	}))
 
 
@@ -86,12 +101,15 @@ func _load() -> void:
 	for i in data.get("completed", []):
 		completed[int(i)] = true
 	sound_on = bool(data.get("sound", true))
+	music_on = bool(data.get("music", true))
 	vibration_on = bool(data.get("vibration", true))
 	speed_level = clampi(int(data.get("speed", 1)), 0, SPEEDS.size() - 1)
+	tutorial_seen = bool(data.get("tutorial", false))
 	current_level = mini(unlocked - 1, LevelCatalog.count() - 1)
 
 
 func _apply_settings() -> void:
 	Sfx.enabled = sound_on
+	Sfx.music_enabled = music_on
 	Haptics.enabled = vibration_on
 	VehicleView.speed_scale = SPEEDS[speed_level][1]

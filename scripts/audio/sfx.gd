@@ -1,6 +1,7 @@
 extends Node
 ## Autoload "Sfx": plays short sounds from a small pool of players so several
-## can overlap. Sounds are registered by name below.
+## can overlap, and the background music (cross-faded between tracks, ducked
+## under jingles). Sounds and tracks are registered by name below.
 
 const SOUNDS := {
 	"exhaust_pop": ["res://assets/audio/sfx/exhaust_pop.ogg"],
@@ -22,16 +23,33 @@ const SOUNDS := {
 		"res://assets/audio/sfx/crash_2.ogg",
 	],
 	"ui_click": ["res://assets/audio/sfx/ui_click.ogg"],
+	"combo": ["res://assets/audio/sfx/combo.ogg"],
+	"celebrate": ["res://assets/audio/sfx/celebrate.ogg"],
 	"win": ["res://assets/audio/music/win.ogg"],
 	"lose": ["res://assets/audio/music/lose.ogg"],
 }
 const POOL_SIZE := 16
+const MUSIC := {
+	"menu": "res://assets/audio/music/menu_theme.ogg",
+	"game": "res://assets/audio/music/game_theme.ogg",
+}
+const MUSIC_DB := -9.0 ## music sits under the effects
+const MUSIC_FADE := 0.8 ## seconds for a cross-fade
+
+var music_enabled := true:
+	set(value):
+		music_enabled = value
+		_apply_music_volume(0.4)
 
 var enabled := true
 
 var _streams := {} ## name -> Array[AudioStream]
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
+var _music: Array[AudioStreamPlayer] = [] ## two players for cross-fades
+var _music_active := 0
+var _music_name := ""
+var _duck_db := 0.0
 
 
 func _ready() -> void:
@@ -45,6 +63,49 @@ func _ready() -> void:
 		var p := AudioStreamPlayer.new()
 		add_child(p)
 		_players.append(p)
+	for i in 2:
+		var m := AudioStreamPlayer.new()
+		m.volume_db = -80.0
+		add_child(m)
+		_music.append(m)
+
+
+func _exit_tree() -> void:
+	for p in _music + _players:
+		p.stop()
+		p.stream = null
+
+
+## Starts a music track (no-op if it is already playing), fading the old one out.
+func play_music(track: String) -> void:
+	if track == _music_name:
+		return
+	_music_name = track
+	var old := _music[_music_active]
+	_music_active = 1 - _music_active
+	var new := _music[_music_active]
+	new.stream = load(MUSIC[track])
+	new.volume_db = -80.0
+	new.play()
+	create_tween().tween_property(old, "volume_db", -80.0, MUSIC_FADE)
+	get_tree().create_timer(MUSIC_FADE).timeout.connect(func(): if _music[_music_active] != old: old.stop())
+	_apply_music_volume(MUSIC_FADE)
+
+
+## Lowers the music for `seconds` (e.g. under a win jingle), then restores it.
+func duck_music(seconds: float, depth_db := -12.0) -> void:
+	_duck_db = depth_db
+	_apply_music_volume(0.15)
+	get_tree().create_timer(seconds).timeout.connect(func():
+		_duck_db = 0.0
+		_apply_music_volume(0.8))
+
+
+func _apply_music_volume(fade: float) -> void:
+	if _music.is_empty():
+		return
+	var target := MUSIC_DB + _duck_db if music_enabled else -80.0
+	create_tween().tween_property(_music[_music_active], "volume_db", target, fade)
 
 
 ## Plays a sound; `pitch_jitter` randomizes pitch by ± that fraction.
