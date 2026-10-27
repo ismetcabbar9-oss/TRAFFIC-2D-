@@ -6,6 +6,7 @@ extends Node3D
 @export var win_delay := 0.35 ## seconds after the last car has left the screen
 @export var max_exit_wait := 3.0 ## never wait longer than this for cars to leave
 @export var lose_delay := 0.6 ## seconds between the final crash and the lose panel
+@export_range(0.0, 1.0) var horn_chance := 0.65 ## chance a bumped car honks back
 
 var session: GameSession
 var vehicle_views := {} ## vehicle id -> VehicleView
@@ -13,6 +14,7 @@ var obstacle_views := {} ## cell -> ObstacleView
 
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
+@onready var effects: Node3D = $Effects
 @onready var camera: BoardCamera = $Camera
 @onready var hud: Hud = $Hud
 
@@ -39,7 +41,7 @@ func load_level(path: String) -> void:
 	session.won.connect(_on_won)
 	session.lost.connect(_on_lost)
 
-	for child in pieces.get_children():
+	for child in pieces.get_children() + effects.get_children():
 		child.queue_free()
 	vehicle_views.clear()
 	obstacle_views.clear()
@@ -48,7 +50,7 @@ func load_level(path: String) -> void:
 	for id in session.board.vehicles:
 		var view := VehicleView.new()
 		pieces.add_child(view)
-		view.setup(board, session.board.vehicles[id])
+		view.setup(board, session.board.vehicles[id], effects)
 		vehicle_views[id] = view
 	for e in level.obstacles:
 		var obstacle := ObstacleView.new()
@@ -91,6 +93,10 @@ func _on_vehicle_exited(id: int, _result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
 	vehicle_views.erase(id)
 	view.play_exit()
+	var size_pitch := 0.85 if view.length >= 3 else 1.0
+	Sfx.play("exhaust_pop", -3.0, size_pitch, 0.12)
+	Sfx.play("car_go", -5.0, size_pitch)
+	Haptics.pulse(12, 0.4)
 
 
 func _on_vehicle_crashed(id: int, result: BoardState.MoveResult) -> void:
@@ -103,7 +109,24 @@ func _on_vehicle_crashed(id: int, result: BoardState.MoveResult) -> void:
 	if target != null:
 		gap += target.inset_toward(view.dir)
 	var push := view.forward()
-	view.play_crash(maxf(gap - 0.02, 0.05), func(): if is_instance_valid(target): target.nudge(push))
+	view.play_crash(maxf(gap - 0.02, 0.05), _on_crash_impact.bind(view, target, result.blocker))
+
+
+func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
+	var push := view.forward()
+	if is_instance_valid(target):
+		target.nudge(push)
+	Effects.impact(effects, view.front_point(), push)
+	camera.shake(0.45)
+	Haptics.pulse(45, 0.9)
+	if blocker == BoardState.OBSTACLE:
+		Sfx.play("crash", -5.0, 1.3)
+		return
+	Sfx.play("crash", 0.0, 1.0, 0.1)
+	if target is VehicleView and randf() < horn_chance:
+		var horn_pitch := 0.8 if (target as VehicleView).length >= 3 else 1.0
+		get_tree().create_timer(0.12).timeout.connect(
+			func(): Sfx.play("horn_double" if randf() < 0.4 else "horn", -6.0, horn_pitch))
 
 
 func _on_won() -> void:
@@ -114,6 +137,7 @@ func _on_won() -> void:
 		waited += get_process_delta_time()
 	await get_tree().create_timer(win_delay).timeout
 	if played == session:
+		Sfx.play("win", -2.0, 1.0, 0.0)
 		hud.show_win()
 
 
@@ -121,4 +145,5 @@ func _on_lost() -> void:
 	var played := session
 	await get_tree().create_timer(lose_delay).timeout
 	if played == session and session.state == GameSession.State.LOST:
+		Sfx.play("lose", -2.0, 1.0, 0.0)
 		hud.show_lose()

@@ -21,14 +21,22 @@ func _initialize() -> void:
 	var blocked := _first_blocked(session)
 	print("free at start: ", free_ids, " blocked sample: ", blocked)
 
-	# 1. A free car drives out onto the ring road.
-	_tap_vehicle(free_ids[0])
-	await _seconds(0.45)
+	# 1. A free car launches and drives out onto the ring road.
+	Engine.time_scale = 0.25 # slow motion so the effects are caught on camera
+	_tap_vehicle(free_ids[-1])
+	for i in 4:
+		await _shot("s1_launch_%d" % i)
+		await _seconds(0.07)
+	Engine.time_scale = 1.0
+	await _seconds(0.3)
 	await _shot("s1_exit_mid")
 	# 2. A blocked car hits the one in front.
+	Engine.time_scale = 0.25
 	_tap_vehicle(blocked)
-	await _seconds(0.12)
-	await _shot("s2_crash")
+	for i in 8:
+		await _shot("s2_crash_%d" % i)
+		await _seconds(0.05)
+	Engine.time_scale = 1.0
 	await _seconds(1.2)
 	await _shot("s3_after_crash")
 

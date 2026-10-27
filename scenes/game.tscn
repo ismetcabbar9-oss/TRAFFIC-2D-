@@ -33,6 +33,8 @@ script = ExtResource("2_board")
 
 [node name="Vehicles" type="Node3D" parent="."]
 
+[node name="Effects" type="Node3D" parent="."]
+
 [node name="Camera" type="Camera3D" parent="."]
 fov = 32.0
 script = ExtResource("3_camera")

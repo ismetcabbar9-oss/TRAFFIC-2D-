@@ -9,11 +9,31 @@ extends Camera3D
 @export var top_reserve := 0.12
 @export var bottom_reserve := 0.06
 
+@export var shake_decay := 2.2 ## trauma lost per second
+@export var shake_max_offset := 0.35 ## world units at full trauma
+
 var _half_extents := Vector2(6, 6)
+var _trauma := 0.0
+var _shake_time := 0.0
 
 
 func _ready() -> void:
 	get_viewport().size_changed.connect(_refit)
+
+
+## Adds screen shake; `amount` in 0..1 (strength grows with its square).
+func shake(amount: float) -> void:
+	_trauma = minf(_trauma + amount, 1.0)
+
+
+func _process(delta: float) -> void:
+	if _trauma <= 0.0:
+		return
+	_trauma = maxf(_trauma - shake_decay * delta, 0.0)
+	_shake_time += delta * 45.0
+	var strength := _trauma * _trauma * shake_max_offset
+	h_offset = sin(_shake_time * 1.3) * strength
+	v_offset = cos(_shake_time * 1.7 + 1.0) * strength
 
 
 func frame_board(half_extents: Vector2) -> void:

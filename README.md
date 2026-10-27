@@ -9,10 +9,12 @@ Grid-based traffic escape puzzle for mobile, built with Godot 4.7.2 (GDScript).
 - `scripts/view/` – 3D board, vehicles, arrows, camera
 - `scripts/game/` – game scene glue (input, session ↔ animations, HUD)
 - `scripts/ui/` – HUD, result panel, shared UI style
+- `scripts/audio/` – `Sfx` autoload (pooled sound player) and haptics
 - `levels/` – level files (JSON, format documented in `scripts/core/level_data.gd`)
 - `tests/` – headless unit tests; every level file must be solvable
 - `tools/` – dev helpers (screenshot capture, scripted playthrough, model measuring)
 - `assets/fonts/` – Baloo 2 (SIL OFL)
+- `assets/audio/` – CC0 sound effects and jingles (sources in `LICENSES.md`)
 
 ## Commands
 

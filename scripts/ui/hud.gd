@@ -111,6 +111,7 @@ func _build_top_bar(root: Control) -> void:
 	restart.text = "Tekrar"
 	restart.theme_type_variation = "IconButton"
 	restart.add_theme_font_size_override("font_size", 28)
+	restart.pressed.connect(_click)
 	restart.pressed.connect(restart_requested.emit)
 	right.add_child(restart)
 
@@ -151,7 +152,12 @@ func _build_result(root: Control) -> void:
 	buttons.add_child(_primary)
 
 
+func _click() -> void:
+	Sfx.play("ui_click", -4.0)
+
+
 func _on_primary() -> void:
+	_click()
 	hide_result()
 	if _won:
 		next_requested.emit()

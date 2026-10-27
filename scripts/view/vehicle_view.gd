@@ -14,6 +14,8 @@ const ARROW_SCENE := preload("res://scenes/direction_arrow.tscn")
 @export var exit_max_speed := 24.0 ## m/s
 @export var crash_acceleration := 60.0 ## m/s²
 @export var brake_deceleration := 90.0 ## m/s² when queueing behind another car
+@export var skid_length := 1.6 ## tyre marks left behind at launch (m)
+@export var smoke_time := 0.55 ## seconds of exhaust smoke while accelerating
 
 ## Cars currently driving out. A car yields only to cars closer to the end of
 ## their route, so the one nearest the exit always keeps moving (no deadlock).
@@ -33,6 +35,7 @@ var half_length := 0.0 ## of the fitted model, along its driving axis
 var half_width := 0.0
 
 var _board: BoardView
+var _fx: Node3D ## world-space parent for effects that outlive their position
 var _body: Node3D ## pivot for model + arrow; nudged without moving the car
 var _model: Node3D
 var _arrow: Node3D
@@ -40,18 +43,25 @@ var _pick_body: StaticBody3D
 var _home := Vector3.ZERO
 var _tween: Tween
 var _nudge_tween: Tween
+var _squash_tween: Tween
+var _wheels: Array[Node3D] = []
 
 var _route: Curve3D
 var _route_pos := 0.0
 var _speed := 0.0
+var _drive_time := 0.0
+var _next_puff := 0.0
+var _skids: Array[MeshInstance3D] = []
+var _last_forward := Vector3.ZERO
 
 
 static func exiting_count() -> int:
 	return _exiting.size()
 
 
-func setup(board: BoardView, p_state: VehicleState) -> void:
+func setup(board: BoardView, p_state: VehicleState, effects_root: Node3D) -> void:
 	_board = board
+	_fx = effects_root
 	state = p_state
 	name = "Vehicle%d_%s" % [state.id, type]
 	var cell_size := board.theme.cell_size
@@ -61,6 +71,8 @@ func setup(board: BoardView, p_state: VehicleState) -> void:
 	add_child(_body)
 	_model = VehicleCatalog.load_model(type).instantiate()
 	_body.add_child(_model)
+	for wheel in _model.find_children("wheel-*", "Node3D", false, false):
+		_wheels.append(wheel)
 	var roof := _fit_model(cell_size)
 	_add_contact_shadow(cell_size)
 	_add_arrow(cell_size, roof)
@@ -92,6 +104,11 @@ func forward() -> Vector3:
 	return Vector3(v.x, 0, v.y)
 
 
+## World point on the front bumper, at mid height.
+func front_point() -> Vector3:
+	return global_position + global_basis.z.normalized() * half_length + Vector3.UP * 0.35
+
+
 ## Drives `distance` meters ahead, calls `on_impact`, then bounces back home.
 func play_crash(distance: float, on_impact: Callable) -> void:
 	_kill_tween()
@@ -101,6 +118,7 @@ func play_crash(distance: float, on_impact: Callable) -> void:
 	_tween.tween_property(self, "position", _home + forward() * distance, duration) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	_tween.tween_callback(on_impact)
+	_tween.tween_callback(_squash.bind(Vector3(1.06, 0.9, 0.92), 0.09, 0.45))
 	_tween.tween_property(self, "position", _home, 0.45) \
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
@@ -125,8 +143,26 @@ func play_exit() -> void:
 	_route = _board.exit_route(position, dir)
 	_route_pos = 0.0
 	_speed = 0.0
+	_drive_time = 0.0
+	_last_forward = global_basis.z.normalized()
 	_exiting.append(self)
 	set_process(true)
+	_launch_effects()
+
+
+## Exhaust "pop", smoke, tyre marks and a squash-and-stretch kick.
+func _launch_effects() -> void:
+	var back := -forward()
+	var exhaust := global_position + back * (half_length + 0.1) + Vector3.UP * 0.3
+	Effects.backfire(_fx, exhaust)
+	Effects.exhaust_puff(_fx, exhaust, back)
+	_next_puff = 0.05
+	var side := global_basis.x.normalized()
+	var axle := global_position + back * half_length * 0.55 + Vector3.UP * 0.01
+	for s in [-1.0, 1.0]:
+		_skids.append(Effects.skid_mark(_fx, axle + side * s * half_width * 0.7, forward(), 0.2))
+	_squash(Vector3(0.94, 1.08, 1.1), 0.08, 0.5)
+	_body.rotation.x = -0.12 # nose up as the rear squats
 
 
 func _exit_tree() -> void:
@@ -140,6 +176,8 @@ func _process(delta: float) -> void:
 	else:
 		_speed = minf(_speed + exit_acceleration * delta, limit)
 	_route_pos += _speed * delta
+	_drive_time += delta
+	_update_drive_effects(delta)
 	var total := _route.get_baked_length()
 	if _route_pos >= total:
 		set_process(false)
@@ -152,6 +190,33 @@ func _process(delta: float) -> void:
 	position = here
 	if here.distance_squared_to(ahead) > 0.0001:
 		look_at(ahead, Vector3.UP, true)
+
+
+func _update_drive_effects(delta: float) -> void:
+	for wheel in _wheels:
+		wheel.rotation.x += _speed * delta / 0.3
+	if _drive_time < smoke_time and _drive_time >= _next_puff:
+		_next_puff += 0.05
+		var back := -global_basis.z.normalized()
+		Effects.trail_puff(_fx, global_position + back * (half_length + 0.1) + Vector3.UP * 0.3, back)
+	if _route_pos < skid_length:
+		for mark in _skids:
+			Effects.stretch_skid(mark, _route_pos)
+	# Settle the launch pitch and lean the body out of turns.
+	var fwd := global_basis.z.normalized()
+	var yaw_rate := _last_forward.signed_angle_to(fwd, Vector3.UP) / maxf(delta, 0.001)
+	_last_forward = fwd
+	_body.rotation.x = move_toward(_body.rotation.x, 0.0, delta * 0.5)
+	_body.rotation.z = lerpf(_body.rotation.z, clampf(yaw_rate * 0.025, -0.12, 0.12), minf(delta * 10.0, 1.0))
+
+
+func _squash(peak: Vector3, attack: float, release: float) -> void:
+	if _squash_tween:
+		_squash_tween.kill()
+	_squash_tween = create_tween()
+	_squash_tween.tween_property(_body, "scale", peak, attack).set_ease(Tween.EASE_OUT)
+	_squash_tween.tween_property(_body, "scale", Vector3.ONE, release) \
+		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 
 ## Top speed allowed by higher-priority cars in the lane ahead: scans a strip in

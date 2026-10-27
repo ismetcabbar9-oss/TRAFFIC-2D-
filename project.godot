@@ -8,6 +8,10 @@ config/name="Traffic 2D"
 run/main_scene="res://scenes/game.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 
+[autoload]
+
+Sfx="*res://scripts/audio/sfx.gd"
+
 [display]
 
 window/size/viewport_width=720
