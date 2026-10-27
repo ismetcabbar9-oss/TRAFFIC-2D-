@@ -8,14 +8,18 @@ const MENU_SCENE := "res://scenes/menu.tscn"
 @export var max_exit_wait := 3.0 ## never wait longer than this for cars to leave
 @export var lose_delay := 0.6 ## seconds between the final crash and the lose panel
 @export_range(0.0, 1.0) var horn_chance := 0.65 ## chance a bumped car honks back
-@export var hint_levels := 1 ## the first N levels show a hint when the player waits
-@export var hint_delay := 2.5 ## idle seconds before the hint appears
+## Hint: after this many idle seconds a car that can leave flashes its arrow.
+@export var hint_delay := 7.0
+@export var first_level_hint_delay := 2.5 ## quicker on the very first level
+@export var hint_repeat := 4.0 ## flash again this often while still idle
+@export var tutorial_levels := 1 ## the first N levels also show a text tip
 
 var session: GameSession
 var level_index := 0
 var vehicle_views := {} ## vehicle id -> VehicleView
 var obstacle_views := {} ## cell -> ObstacleView
 var _idle := 0.0
+var _next_hint := 0.0
 var _hinted_id := -1
 
 @onready var board: BoardView = $Board
@@ -105,21 +109,26 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	if level_index >= hint_levels or session == null or session.state != GameSession.State.PLAYING:
+	if session == null or session.state != GameSession.State.PLAYING:
 		return
 	_idle += delta
-	if _idle >= hint_delay and _hinted_id < 0:
-		var free := session.board.free_vehicles()
-		if not free.is_empty() and vehicle_views.has(free[0]):
-			_hinted_id = free[0]
-			vehicle_views[_hinted_id].set_hint(true)
+	if _idle < _next_hint:
+		return
+	_next_hint = _idle + hint_repeat
+	# Keep pointing at the same car while it can still leave.
+	var free := session.board.free_vehicles()
+	if not _hinted_id in free:
+		_hinted_id = free[0] if not free.is_empty() else -1
+	if vehicle_views.has(_hinted_id):
+		vehicle_views[_hinted_id].flash_hint()
+		if level_index < tutorial_levels:
 			hud.show_hint("Yolu açık bir arabaya dokun!")
 
 
+## Restarts the idle timer after the player acts (or a level starts).
 func _clear_hint() -> void:
 	_idle = 0.0
-	if _hinted_id >= 0 and vehicle_views.has(_hinted_id):
-		vehicle_views[_hinted_id].set_hint(false)
+	_next_hint = first_level_hint_delay if level_index == 0 else hint_delay
 	_hinted_id = -1
 	hud.hide_hint()
 
