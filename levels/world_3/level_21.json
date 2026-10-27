@@ -1,0 +1,117 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 5,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "ambulance",
+   "col": 1,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 4,
+   "dir": "up",
+   "turn": "ccw"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 4,
+   "dir": "down",
+   "turn": "cw"
+  },
+  {
+   "type": "suv",
+   "col": 5,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 0,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "firetruck",
+   "col": 4,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 6,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "delivery",
+   "col": 0,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 0,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 2,
+   "dir": "left",
+   "turn": "cw"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 1,
+   "row": 2
+  }
+ ],
+ "name": "Level 21"
+}

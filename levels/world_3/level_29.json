@@ -1,0 +1,160 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "bus",
+   "col": 0,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 5,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 6,
+   "row": 0,
+   "dir": "up",
+   "turn": "ccw"
+  },
+  {
+   "type": "hatchback",
+   "col": 5,
+   "row": 2,
+   "dir": "right",
+   "turn": "ccw"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 5,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 5,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 4,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "delivery",
+   "col": 0,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "bus",
+   "col": 2,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "delivery",
+   "col": 6,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 3,
+   "dir": "up",
+   "turn": "cw"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 4,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "bus",
+   "col": 3,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 6,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 0,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 4,
+   "row": 6
+  }
+ ],
+ "name": "Level 29"
+}

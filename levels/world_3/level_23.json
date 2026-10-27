@@ -1,0 +1,153 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 2,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 4,
+   "row": 3,
+   "dir": "down",
+   "turn": "ccw"
+  },
+  {
+   "type": "ambulance",
+   "col": 6,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 7,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 4,
+   "dir": "right",
+   "turn": "ccw"
+  },
+  {
+   "type": "suv",
+   "col": 5,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "firetruck",
+   "col": 0,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 4,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "police",
+   "col": 1,
+   "row": 5,
+   "dir": "down",
+   "turn": "ccw"
+  },
+  {
+   "type": "sedan",
+   "col": 5,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "delivery",
+   "col": 3,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 6,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "bus",
+   "col": 3,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 4,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 0,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 4,
+   "row": 2
+  }
+ ],
+ "name": "Level 23"
+}

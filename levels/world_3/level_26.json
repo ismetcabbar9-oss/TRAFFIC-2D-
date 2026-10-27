@@ -1,0 +1,159 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan_sports",
+   "col": 6,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "delivery",
+   "col": 4,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "delivery",
+   "col": 0,
+   "row": 0,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "ambulance",
+   "col": 3,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 5,
+   "row": 4,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 0,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 6,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 7,
+   "dir": "right",
+   "turn": "ccw"
+  },
+  {
+   "type": "suv",
+   "col": 5,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "bus",
+   "col": 3,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 3,
+   "dir": "down",
+   "turn": "cw"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 1,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 5,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 1,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 1,
+   "row": 6
+  }
+ ],
+ "name": "Level 26"
+}

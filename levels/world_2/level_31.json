@@ -1,0 +1,152 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "ambulance",
+   "col": 1,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 5,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 7,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "taxi",
+   "col": 6,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "bus",
+   "col": 0,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 5,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 5,
+   "row": 1,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 3,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "suv_luxury",
+   "col": 6,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 6,
+   "row": 4,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 3,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 2,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 1,
+   "row": 6
+  }
+ ],
+ "name": "Level 31"
+}

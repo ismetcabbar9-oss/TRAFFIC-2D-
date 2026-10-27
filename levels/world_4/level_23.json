@@ -1,0 +1,143 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 7,
+   "dir": "left",
+   "turn": "cw",
+   "lock": 1
+  },
+  {
+   "type": "ambulance",
+   "col": 1,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "firetruck",
+   "col": 3,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 5,
+   "row": 0,
+   "dir": "left",
+   "lock": 1
+  },
+  {
+   "type": "bus",
+   "col": 0,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "firetruck",
+   "col": 3,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 6,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 6,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "bus",
+   "col": 0,
+   "row": 4,
+   "dir": "down",
+   "key": 1
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 5,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "firetruck",
+   "col": 3,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 4,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 6,
+   "dir": "down",
+   "lock": 0
+  },
+  {
+   "type": "delivery",
+   "col": 2,
+   "row": 2,
+   "dir": "up",
+   "key": 0
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 6,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 3,
+   "row": 0,
+   "dir": "left",
+   "lock": 0
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 5,
+   "row": 4
+  }
+ ],
+ "name": "Level 23"
+}

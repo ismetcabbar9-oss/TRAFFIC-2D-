@@ -1,0 +1,115 @@
+{
+ "cols": 6,
+ "rows": 7,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "pickup",
+   "col": 5,
+   "row": 3,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 1,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 3,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 4,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "ambulance",
+   "col": 3,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "delivery",
+   "col": 0,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 4,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "firetruck",
+   "col": 2,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 5,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 1,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 4,
+   "row": 1
+  }
+ ],
+ "name": "Level 22"
+}

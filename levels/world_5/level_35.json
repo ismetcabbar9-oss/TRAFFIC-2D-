@@ -1,0 +1,211 @@
+{
+ "cols": 8,
+ "rows": 9,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 7,
+   "row": 4,
+   "dir": "down",
+   "key": 1
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 5,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 8,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 1,
+   "dir": "down",
+   "key": 2
+  },
+  {
+   "type": "ambulance",
+   "col": 7,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 5,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 6,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 4,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 7,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 6,
+   "row": 8,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 5,
+   "dir": "right",
+   "key": 0
+  },
+  {
+   "type": "ambulance",
+   "col": 4,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 7,
+   "row": 6,
+   "dir": "down",
+   "key": 3
+  },
+  {
+   "type": "van",
+   "col": 6,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 5,
+   "dir": "left"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 2,
+   "row": 5
+  },
+  {
+   "type": "gate",
+   "col": 3,
+   "row": 6,
+   "group": 0
+  },
+  {
+   "type": "gate",
+   "col": 4,
+   "row": 3,
+   "group": 1
+  },
+  {
+   "type": "gate",
+   "col": 1,
+   "row": 1,
+   "group": 2
+  },
+  {
+   "type": "gate",
+   "col": 5,
+   "row": 7,
+   "group": 3
+  }
+ ],
+ "name": "Level 35"
+}

@@ -1,0 +1,171 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan",
+   "col": 5,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 6,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "ambulance",
+   "col": 1,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 6,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 3,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 6,
+   "dir": "down",
+   "key": 3
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 6,
+   "dir": "down",
+   "key": 2
+  },
+  {
+   "type": "police",
+   "col": 1,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 0,
+   "dir": "up",
+   "lock": 0,
+   "key": 1
+  },
+  {
+   "type": "van",
+   "col": 4,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 2,
+   "dir": "right",
+   "lock": 0
+  },
+  {
+   "type": "van",
+   "col": 6,
+   "row": 4,
+   "dir": "up",
+   "key": 0
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 5,
+   "dir": "right"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 1,
+   "row": 3
+  },
+  {
+   "type": "gate",
+   "col": 5,
+   "row": 2,
+   "group": 1
+  },
+  {
+   "type": "gate",
+   "col": 1,
+   "row": 4,
+   "group": 2
+  },
+  {
+   "type": "gate",
+   "col": 2,
+   "row": 2,
+   "group": 3
+  }
+ ],
+ "name": "Level 23"
+}

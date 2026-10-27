@@ -7,15 +7,18 @@ extends RefCounted
 ## for the worlds and at runtime for the daily puzzle.
 ##
 ## Difficulty follows a sawtooth inside each world: it climbs level by level,
-## levels 5 and 15 are easy "breathers", levels 10 and 20 are marked hard.
+## levels 5, 15, 25 and 35 are easy "breathers", 10, 20, 30 and 40 are marked
+## hard. Levels 21-40 are a second act: they start a little easier than level
+## 20 and climb further, onto boards of up to 8x9.
 ## Each world adds its mechanic (cargo, turn, lock, gate); the first two
 ## levels of a world introduce it on a small board, and later worlds mix in
 ## the previous mechanic now and then. Same code + seeds give the same levels.
 
-const LEVELS_PER_WORLD := 20
+const LEVELS_PER_WORLD := 40
+const ACT_LENGTH := 20 ## a world plays as two acts of 20 (two sawtooth climbs)
 const ATTEMPTS := 90
-const BREATHERS := [4, 14]
-const HARD := [9, 19]
+const BREATHERS := [4, 14, 24, 34]
+const HARD := [9, 19, 29, 39]
 const SMALL := ["sedan", "sedan_sports", "hatchback", "suv", "suv_luxury", "taxi", "police", "van", "pickup"]
 const LARGE := ["ambulance", "delivery", "firetruck", "bus"]
 const CARGO_TYPES := ["pickup", "van", "delivery"]
@@ -60,8 +63,9 @@ static func generate(level_spec: Dictionary, seed_parts: Array, attempts := ATTE
 ## Board size, vehicle count, target depth and mechanic counts for a level.
 static func spec(w: int, i: int, mechanic: String) -> Dictionary:
 	var tuning: Dictionary = WORLD_TUNING[mini(w, WORLD_TUNING.size() - 1)]
-	var p := float(i) / (LEVELS_PER_WORLD - 1)
-	var d: float = tuning.base + p * 0.7
+	var act := i / ACT_LENGTH
+	var p := float(i % ACT_LENGTH) / (ACT_LENGTH - 1)
+	var d: float = tuning.base + p * 0.7 if act == 0 else tuning.base + 0.45 + p * 0.75
 	if i in BREATHERS:
 		d -= 0.22
 	if i in HARD:
@@ -69,9 +73,10 @@ static func spec(w: int, i: int, mechanic: String) -> Dictionary:
 	var intro := mechanic != "" and i < 2
 	if intro:
 		d = minf(d, 0.08 + i * 0.08)
-	d = clampf(d, 0.0, 1.0)
-	var cols := clampi(4 + roundi(d * 3.4 + 0.25), 4, 7)
-	var rows := clampi(cols + (1 if d > 0.35 else 0), 4, 8)
+	d = clampf(d, 0.0, 1.0 if act == 0 else 1.25)
+	var cols := clampi(4 + roundi(d * 3.4 + 0.25), 4, 7 if act == 0 else 8)
+	var rows := clampi(cols + (1 if d > 0.35 else 0), 4, 8 if act == 0 else 9)
+	var fill := minf(d, 1.0) # density and truck share stop growing past 1
 	var mechanic_count := 0
 	if mechanic != "":
 		mechanic_count = 1 if i == 0 else (2 if i == 1 else roundi(lerpf(2.0, 5.0, d)))
@@ -81,13 +86,13 @@ static func spec(w: int, i: int, mechanic: String) -> Dictionary:
 	var extra_count := 0
 	if tuning.extra != "" and i >= 6 and not i in BREATHERS:
 		extra = tuning.extra
-		extra_count = 1 if p < 0.6 else 2
+		extra_count = 1 if act == 0 and p < 0.6 else 2
 	return {
 		"cols": cols, "rows": rows,
-		"cars": roundi(cols * rows * lerpf(0.3, 0.44, d)),
+		"cars": roundi(cols * rows * lerpf(0.3, 0.44, fill)),
 		"depth": roundi(lerpf(2.0, 11.0, d)) + (1 if i in HARD else 0),
 		"cones": roundi(d * (2.5 if mechanic == "" else 1.2)) if not intro else 0,
-		"trucks": lerpf(0.0, 0.25, d),
+		"trucks": lerpf(0.0, 0.25, fill),
 		"breather": i in BREATHERS,
 		"mechanic": mechanic, "count": mechanic_count,
 		"extra": extra, "extra_count": extra_count,

@@ -54,24 +54,26 @@ sonuç ekranı (yıldız, jeton, combo, süre) → sonraki bölüm.
 ## 3. İçerik yapısı
 
 ### Dünyalar
-Her dünya 20 bölüm; kendi çevresi, müziği ve **bir yeni mekaniği** vardır.
+Her dünya 40 bölüm (iki perde × 20); kendi çevresi, müziği ve **bir yeni mekaniği** vardır.
 Dünya içinde gün sabahtan akşama ilerler (mevcut günün saati sistemi).
 
 | Dünya | Ortam | Yeni mekanik | Açılış |
 |---|---|---|---|
 | 1 | Şehir otoparkı | Temel kurallar, koniler | Başta açık |
-| 2 | Sahil kasabası | **Yük**: bazı araçlar iki dokunuşla çıkar (ilk dokunuşta bir hücre ilerleyip durur) | 40 ★ |
-| 3 | Karlı dağ köyü | **Dönen araç**: dokununca önce 90° döner, sonraki dokunuşta yeni yönüne gider | 80 ★ |
-| 4 | Gece şehri | **Kilitli araç**: aynı renkteki anahtar araç çıkmadan hareket etmez | 120 ★ |
-| 5 | Havalimanı | **Kapı**: otopark içindeki bariyer, bağlı araç çıkınca açılır | 160 ★ |
+| 2 | Sahil kasabası | **Yük**: bazı araçlar iki dokunuşla çıkar (ilk dokunuşta bir hücre ilerleyip durur) | 80 ★ |
+| 3 | Karlı dağ köyü | **Dönen araç**: dokununca önce 90° döner, sonraki dokunuşta yeni yönüne gider | 160 ★ |
+| 4 | Gece şehri | **Kilitli araç**: aynı renkteki anahtar araç çıkmadan hareket etmez | 240 ★ |
+| 5 | Havalimanı | **Kapı**: otopark içindeki bariyer, bağlı araç çıkınca açılır | 320 ★ |
 
-Yayında 5 dünya × 20 = **100 bölüm**. Yayından sonra her 3–4 haftada bir
+Yayında 5 dünya × 40 = **200 bölüm**. Yayından sonra her 3–4 haftada bir
 yeni dünya (güncelleme = oyuncuyu geri getirir).
 
 ### Zorluk eğrisi (testere dişi)
-- Dünya içinde zorluk artar; her 5. bölüm bir "nefes" bölümü (kolay, çok
+- Dünya içinde zorluk artar; 5., 15., 25. ve 35. bölümler "nefes" bölümü (kolay, çok
   combo yapılabilir).
-- Her dünyanın 10. ve 20. bölümü **zor bölüm** (rozetli, daha fazla jeton).
+- Her dünyanın 10., 20., 30. ve 40. bölümü **zor bölüm** (rozetli, daha fazla jeton).
+- 21–40. bölümler ikinci perde: 20. bölümden biraz kolay başlar, daha büyük
+  tahtalara (8×9'a kadar) ve daha sık karışan mekaniklere tırmanır.
 - Yeni mekanik ilk kez çıktığında 2 bölümlük kısa öğretici + ipucu.
 - Zorluk ölçüleri: çözüm derinliği (dalga sayısı), başta serbest araç
   sayısı, araç sayısı, mekanik yoğunluğu. Hepsi bölüm üreticisinde
@@ -211,7 +213,7 @@ Her faz sonunda: testler + oynanış senaryosu + ekran görüntüsüyle onay.
 
 ### Faz 2 – İçerik
 - 4 yeni mekanik: kurallar + çözücü + testler + görseller + öğretici.
-- Bölüm üreticisi dünya/mekanik parametreleriyle; 100 bölüm, testere dişi
+- Bölüm üreticisi dünya/mekanik parametreleriyle; 200 bölüm (dünya başına 40), testere dişi
   zorluk, zor bölüm işaretleri.
 - 5 dünya ortamı (tema, çevre modelleri, müzik).
 

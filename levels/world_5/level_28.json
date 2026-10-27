@@ -1,0 +1,207 @@
+{
+ "cols": 8,
+ "rows": 9,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 4,
+   "dir": "up",
+   "key": 2
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "delivery",
+   "col": 7,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 6,
+   "row": 5,
+   "dir": "right",
+   "key": 3
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 0,
+   "dir": "left",
+   "key": 0
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 7,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 4,
+   "row": 4,
+   "dir": "right",
+   "lock": 0
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 6,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "bus",
+   "col": 2,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 7,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 7,
+   "row": 0,
+   "dir": "up",
+   "lock": 0
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 8,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 6,
+   "dir": "up",
+   "key": 1
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 7,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 8,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 7,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 5,
+   "row": 7
+  },
+  {
+   "type": "gate",
+   "col": 2,
+   "row": 6,
+   "group": 1
+  },
+  {
+   "type": "gate",
+   "col": 6,
+   "row": 7,
+   "group": 2
+  },
+  {
+   "type": "gate",
+   "col": 5,
+   "row": 3,
+   "group": 3
+  }
+ ],
+ "name": "Level 28"
+}

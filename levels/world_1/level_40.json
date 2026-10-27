@@ -1,0 +1,194 @@
+{
+ "cols": 8,
+ "rows": 9,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "police",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 8,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "firetruck",
+   "col": 4,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 7,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 6,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "hatchback",
+   "col": 5,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "ambulance",
+   "col": 3,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 5,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 7,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 7,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "firetruck",
+   "col": 3,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 5,
+   "row": 8,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 8,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 7,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 6,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 6,
+   "dir": "down"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 4,
+   "row": 1
+  },
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 5
+  },
+  {
+   "type": "cone",
+   "col": 2,
+   "row": 5
+  }
+ ],
+ "name": "Level 40",
+ "hard": true
+}

@@ -1,0 +1,202 @@
+{
+ "cols": 8,
+ "rows": 9,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "suv_luxury",
+   "col": 7,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "firetruck",
+   "col": 0,
+   "row": 8,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 6,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 3,
+   "dir": "right",
+   "turn": "ccw"
+  },
+  {
+   "type": "firetruck",
+   "col": 2,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 1,
+   "dir": "right",
+   "turn": "ccw"
+  },
+  {
+   "type": "van",
+   "col": 2,
+   "row": 0,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 3,
+   "dir": "down",
+   "turn": "cw"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 5,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "sedan_sports",
+   "col": 7,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "ambulance",
+   "col": 6,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 4,
+   "dir": "right",
+   "turn": "cw"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "delivery",
+   "col": 5,
+   "row": 8,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "van",
+   "col": 0,
+   "row": 6,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 7,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 7,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 5,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 6,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 7,
+   "dir": "down"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 3,
+   "row": 6
+  }
+ ],
+ "name": "Level 31"
+}

@@ -1,0 +1,153 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "police",
+   "col": 3,
+   "row": 2,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 3,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "bus",
+   "col": 5,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 1,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 0,
+   "dir": "down",
+   "turn": "ccw"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 6,
+   "row": 1,
+   "dir": "down",
+   "turn": "cw"
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 1,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 1,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 1,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "ambulance",
+   "col": 0,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 6,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 5,
+   "row": 7,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 5,
+   "dir": "right"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 2,
+   "row": 3
+  }
+ ],
+ "name": "Level 22"
+}

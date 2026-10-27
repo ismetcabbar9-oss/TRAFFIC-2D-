@@ -1,0 +1,159 @@
+{
+ "cols": 7,
+ "rows": 8,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 4,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 2,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 6,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 0,
+   "dir": "up",
+   "turn": "cw"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "ambulance",
+   "col": 0,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 6,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 5,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 5,
+   "row": 1,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "police",
+   "col": 5,
+   "row": 7,
+   "dir": "left",
+   "turn": "cw"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 5,
+   "dir": "left",
+   "turn": "ccw"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 3,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 1,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 6,
+   "dir": "up"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 1,
+   "row": 3
+  }
+ ],
+ "name": "Level 24"
+}

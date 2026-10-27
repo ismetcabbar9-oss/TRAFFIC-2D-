@@ -163,7 +163,7 @@ ACH_COLLECTED,Collected,Alındı
 ACH_FIRST_WIN,Clear your first level,İlk bölümünü bitir
 ACH_LEVELS_10,Clear 10 levels,10 bölüm bitir
 ACH_LEVELS_50,Clear 50 levels,50 bölüm bitir
-ACH_LEVELS_100,Clear all 100 levels,100 bölümün hepsini bitir
+ACH_LEVELS_100,Clear 100 levels,100 bölüm bitir
 ACH_PERFECT_10,Clear 10 levels without a crash,10 bölümü hatasız bitir
 ACH_PERFECT_50,Clear 50 levels without a crash,50 bölümü hatasız bitir
 ACH_COMBO_5,Reach a x5 combo,x5 combo yap
@@ -201,3 +201,5 @@ DEV_WIN,Win now,Hemen kazan
 DEV_LOSE,Lose now,Hemen kaybet
 DEV_PREV,Previous level,Önceki bölüm
 DEV_NEXT,Next level,Sonraki bölüm
+ACH_LEVELS_200,Clear all 200 levels,200 bölümün hepsini bitir
+ACH_PERFECT_150,Clear 150 levels without a crash,150 bölümü hatasız bitir
