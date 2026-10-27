@@ -6,6 +6,7 @@ const GAME_SCENE := "res://scenes/game.tscn"
 var _grid: GridContainer
 var _sound: Button
 var _vibration: Button
+var _speed: Button
 var _column: VBoxContainer
 var _title: Label
 
@@ -92,6 +93,8 @@ func _build() -> void:
 	settings.add_child(_sound)
 	_vibration = _toggle_button(func(): Progress.set_vibration(not Progress.vibration_on))
 	settings.add_child(_vibration)
+	_speed = _toggle_button(Progress.cycle_speed)
+	settings.add_child(_speed)
 
 
 func _toggle_button(on_press: Callable) -> Button:
@@ -114,6 +117,7 @@ func _refresh() -> void:
 			_pulse(tile)
 	_sound.text = "Ses: %s" % ("Açık" if Progress.sound_on else "Kapalı")
 	_vibration.text = "Titreşim: %s" % ("Açık" if Progress.vibration_on else "Kapalı")
+	_speed.text = "Hız: %s" % Progress.speed_label()
 
 
 func _pulse(tile: Control) -> void:

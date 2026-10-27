@@ -21,6 +21,9 @@ const ARROW_SCENE := preload("res://scenes/direction_arrow.tscn")
 ## their route, so the one nearest the exit always keeps moving (no deadlock).
 static var _exiting: Array[VehicleView] = []
 
+## Player's driving speed setting; scales exit acceleration and top speed.
+static var speed_scale := 1.0
+
 var state: VehicleState
 var type: String:
 	get: return state.type
@@ -191,7 +194,7 @@ func _process(delta: float) -> void:
 	if _speed > limit:
 		_speed = maxf(limit, _speed - brake_deceleration * delta)
 	else:
-		_speed = minf(_speed + exit_acceleration * delta, limit)
+		_speed = minf(_speed + exit_acceleration * speed_scale * delta, limit)
 	_route_pos += _speed * delta
 	_drive_time += delta
 	_update_drive_effects(delta)
@@ -243,7 +246,8 @@ func _speed_limit() -> float:
 	var forward_dir := global_transform.basis.z.normalized() # model front is +Z
 	var side_dir := global_transform.basis.x.normalized()
 	var bumper := global_position + forward_dir * (half_length + 0.15)
-	var limit := exit_max_speed
+	var limit := exit_max_speed * speed_scale
+	var follow := 8.0 * speed_scale # allowed speed per meter of free road ahead
 	var my_remaining := _remaining()
 	for other in _exiting:
 		if other == self or other._remaining() > my_remaining \
@@ -251,7 +255,7 @@ func _speed_limit() -> float:
 			continue
 		var to_local := other.global_transform.affine_inverse()
 		for ahead in LOOK_AHEAD:
-			if ahead * 8.0 >= limit:
+			if ahead * follow >= limit:
 				break
 			var hit := false
 			for side in [-1.0, 0.0, 1.0]:
@@ -260,7 +264,7 @@ func _speed_limit() -> float:
 					hit = true
 					break
 			if hit:
-				limit = ahead * 8.0
+				limit = ahead * follow
 				break
 	return limit
 

@@ -3,11 +3,14 @@ extends Node
 ## user://progress.json. Also remembers which level the game scene should open.
 
 const SAVE_PATH := "user://progress.json"
+## Car speed settings: [label, multiplier].
+const SPEEDS := [["Yavaş", 0.7], ["Normal", 1.0], ["Hızlı", 1.35], ["Çok Hızlı", 1.7]]
 
 var unlocked := 1 ## number of levels the player may open
 var completed := {} ## level index -> true
 var sound_on := true
 var vibration_on := true
+var speed_level := 1 ## index into SPEEDS
 var current_level := 0 ## index of the level to play next
 
 
@@ -41,6 +44,17 @@ func set_sound(on: bool) -> void:
 	save()
 
 
+## Steps to the next speed setting (wraps around).
+func cycle_speed() -> void:
+	speed_level = (speed_level + 1) % SPEEDS.size()
+	_apply_settings()
+	save()
+
+
+func speed_label() -> String:
+	return SPEEDS[speed_level][0]
+
+
 func set_vibration(on: bool) -> void:
 	vibration_on = on
 	_apply_settings()
@@ -57,6 +71,7 @@ func save() -> void:
 		"completed": completed.keys(),
 		"sound": sound_on,
 		"vibration": vibration_on,
+		"speed": speed_level,
 	}))
 
 
@@ -72,9 +87,11 @@ func _load() -> void:
 		completed[int(i)] = true
 	sound_on = bool(data.get("sound", true))
 	vibration_on = bool(data.get("vibration", true))
+	speed_level = clampi(int(data.get("speed", 1)), 0, SPEEDS.size() - 1)
 	current_level = mini(unlocked - 1, LevelCatalog.count() - 1)
 
 
 func _apply_settings() -> void:
 	Sfx.enabled = sound_on
 	Haptics.enabled = vibration_on
+	VehicleView.speed_scale = SPEEDS[speed_level][1]

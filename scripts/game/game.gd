@@ -21,6 +21,8 @@ var obstacle_views := {} ## cell -> ObstacleView
 var _idle := 0.0
 var _next_hint := 0.0
 var _hinted_id := -1
+var _sun_scale := 1.0
+var _ambient_scale := 1.0
 
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
@@ -41,10 +43,9 @@ func _ready() -> void:
 ## Devices without Vulkan fall back to the Compatibility renderer, which lights
 ## in a different color space and looks washed out with the same values.
 func _adapt_lighting() -> void:
-	if RenderingServer.get_current_rendering_method() != "gl_compatibility":
-		return
-	($Sun as DirectionalLight3D).light_energy *= 0.45
-	($WorldEnvironment as WorldEnvironment).environment.ambient_light_energy *= 0.5
+	if RenderingServer.get_current_rendering_method() == "gl_compatibility":
+		_sun_scale = 0.45
+		_ambient_scale = 0.5
 
 
 func load_level(index: int) -> void:
@@ -83,12 +84,16 @@ func load_level(index: int) -> void:
 		pieces.add_child(obstacle)
 		obstacle.setup(board, e.type, e.cell)
 		obstacle_views[e.cell] = obstacle
+	# Each level is a little later in the day: morning light to sunset.
+	var hour := TimeOfDay.hour_for_level(level_index, LevelCatalog.count())
+	TimeOfDay.apply(hour, $Sun, ($WorldEnvironment as WorldEnvironment).environment, _sun_scale, _ambient_scale)
 	# Keep the exit barrier in view below the board.
 	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y)
 
 	hud.hide_result()
 	_clear_hint()
 	hud.set_level_title(level.name)
+	hud.set_time_of_day(TimeOfDay.label(hour))
 	hud.set_mistakes(session.mistakes_left, level.mistakes)
 
 

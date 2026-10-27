@@ -8,6 +8,7 @@ signal next_requested
 signal menu_requested
 
 var _title: Label
+var _time_label: Label
 var _meter: MistakeMeter
 var _overlay: Control
 var _panel: PanelContainer
@@ -34,6 +35,10 @@ func _ready() -> void:
 
 func set_level_title(text: String) -> void:
 	_title.text = text
+
+
+func set_time_of_day(text: String) -> void:
+	_time_label.text = text + "  ·"
 
 
 func set_mistakes(left: int, total: int) -> void:
@@ -140,6 +145,10 @@ func _build_top_bar(root: Control) -> void:
 	meter_row.add_theme_constant_override("separation", 12)
 	meter_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rows.add_child(meter_row)
+	_time_label = Label.new()
+	_time_label.add_theme_font_size_override("font_size", 24)
+	_time_label.add_theme_color_override("font_color", UiStyle.ACCENT_DARK)
+	meter_row.add_child(_time_label)
 	var caption := Label.new()
 	caption.text = "Hamle hakkı"
 	caption.add_theme_font_size_override("font_size", 24)
