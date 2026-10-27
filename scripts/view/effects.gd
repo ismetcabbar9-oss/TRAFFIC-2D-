@@ -107,7 +107,9 @@ static func stretch_skid(mark: MeshInstance3D, length: float) -> void:
 
 
 static func _smoke_ball(parent: Node3D, at: Vector3, drift: Vector3, start_scale: float,
-		grow: float, life: float, color := Color(0.97, 0.97, 0.98, 0.95)) -> void:
+		grow: float, life: float, color := Color(0, 0, 0, 0)) -> void:
+	if color.a == 0.0:
+		color = Color(Cosmetics.color("smoke"), 0.95) # garage smoke color
 	var ball := MeshInstance3D.new()
 	ball.mesh = _puff()
 	var mat := _effect_material(color, false, 1)

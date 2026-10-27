@@ -33,6 +33,7 @@ var _mesh_instance: MeshInstance3D
 
 
 func _ready() -> void:
+	fill_color = Color(Cosmetics.color("arrow"), fill_color.a)
 	_material = ShaderMaterial.new()
 	_material.shader = SHADER
 	_material.set_shader_parameter("phase", randf() * 10.0)

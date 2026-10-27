@@ -18,6 +18,8 @@ var inventory := {} ## rescue name ("hint", "undo", "crane") -> count owned
 ## "ads": {placement: count, "total": count}}.
 var daily := {}
 var flags := {} ## one-time events, e.g. "crane_gift"
+var owned: Array = [] ## bought garage items (see Cosmetics)
+var equipped_items := {} ## garage category -> item id
 var ad_free := false ## lifetime ad-free purchase (phase 4)
 var tutorial_seen := false
 var tips_seen: Array = [] ## mechanic tip cards already shown
@@ -149,6 +151,31 @@ func count_ad(placement: String) -> void:
 	save()
 
 
+# --- Garage ----------------------------------------------------------------------
+
+func owns(id: String) -> bool:
+	return id in owned or int(Cosmetics.find(id).get("price", -1)) == 0
+
+
+## Buys a garage item with coins; false if not affordable.
+func buy_cosmetic(id: String) -> bool:
+	if owns(id) or not spend_coins(int(Cosmetics.find(id).price)):
+		return false
+	owned.append(id)
+	save()
+	return true
+
+
+func equip(id: String) -> void:
+	if owns(id):
+		equipped_items[Cosmetics.category_of(id)] = id
+		save()
+
+
+func equipped(category: String) -> String:
+	return equipped_items.get(category, "")
+
+
 func flag(name: String) -> bool:
 	return bool(flags.get(name, false))
 
@@ -243,6 +270,7 @@ func save() -> void:
 		"inventory": inventory,
 		"daily": daily,
 		"flags": flags,
+		"garage": {"owned": owned, "equipped": equipped_items},
 		"ad_free": ad_free,
 		"tutorial": tutorial_seen,
 		"tips": tips_seen,
@@ -276,6 +304,9 @@ func _load() -> void:
 	inventory = data.get("inventory", {})
 	daily = data.get("daily", {})
 	flags = data.get("flags", {})
+	var garage: Dictionary = data.get("garage", {})
+	owned = garage.get("owned", [])
+	equipped_items = garage.get("equipped", {})
 	ad_free = bool(data.get("ad_free", false))
 	tutorial_seen = bool(data.get("tutorial", false))
 	tips_seen = data.get("tips", [])

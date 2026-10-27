@@ -98,3 +98,47 @@ CRANE_GIFT_TITLE,A gift: the crane!,Hediye: vinç!
 CRANE_GIFT_1,"Stuck? The crane lifts any car straight out of the lot.","Sıkıştın mı? Vinç herhangi bir aracı havadan çıkarır."
 CRANE_GIFT_2,Here is one for free. Find it in the bar at the bottom.,Bir tanesi bizden. Alttaki çubukta duruyor.
 AD_PLACEHOLDER,Ad (test),Reklam (test)
+MENU_SHOP,Shop,Mağaza
+MENU_GARAGE,Garage,Garaj
+SHOP_TITLE,Shop,Mağaza
+SHOP_YOU_HAVE,You have: Hint %d · Undo %d · Crane %d,Sende: İpucu %d · Geri al %d · Vinç %d
+SHOP_RESCUES,Rescues,Kurtarmalar
+PACK_HINTS,Hint pack,İpucu paketi
+PACK_UNDOS,Undo pack,Geri alma paketi
+PACK_CRANES,Crane pack,Vinç paketi
+PACK_MIXED,Rescue box,Kurtarma kutusu
+SHOP_FREE_COINS,+%d free coins,+%d bedava jeton
+SHOP_FREE_COINS_SUB,A few times a day,Günde birkaç kez
+SHOP_STORE,Store,Market
+STORE_AD_FREE,No ads forever,Ömür boyu reklamsız
+STORE_AD_FREE_SUB,"No ads between levels, rewards without watching + 500 coins","Bölüm arası reklam yok, ödüller izlemeden + 500 jeton"
+STORE_STARTER,Starter pack,Başlangıç paketi
+STORE_STARTER_SUB,No ads + 3 cranes + 1000 coins,Reklamsız + 3 vinç + 1000 jeton
+STORE_COINS_S,500 coins,500 jeton
+STORE_COINS_S_SUB,A handful of coins,Bir avuç jeton
+STORE_COINS_M,1500 coins,1500 jeton
+STORE_COINS_M_SUB,A bag of coins,Bir kese jeton
+STORE_COINS_L,4000 coins,4000 jeton
+STORE_COINS_L_SUB,A chest of coins,Bir sandık jeton
+GARAGE_TITLE,Garage,Garaj
+GARAGE_NOTE,Just for looks: they never change the game.,Sadece görünüm için: oyunu değiştirmez.
+GARAGE_ARROW,Roof arrows,Tavan okları
+GARAGE_SMOKE,Exhaust smoke,Egzoz dumanı
+GARAGE_CONFETTI,Celebration,Kutlama
+GARAGE_OWNED,Owned,Sende
+GARAGE_EQUIPPED,In use,Kullanımda
+COS_ARROW_WHITE,Classic,Klasik
+COS_ARROW_GOLD,Gold,Altın
+COS_ARROW_MINT,Mint,Nane
+COS_ARROW_SKY,Sky,Gökyüzü
+COS_ARROW_PINK,Bubblegum,Sakız
+COS_ARROW_LIME,Lime,Misket
+COS_SMOKE_WHITE,Classic,Klasik
+COS_SMOKE_PINK,Candy floss,Pamuk şeker
+COS_SMOKE_BLUE,Ice,Buz
+COS_SMOKE_MINT,Mint,Nane
+COS_SMOKE_RAINBOW,Rainbow,Gökkuşağı
+COS_CONFETTI_PARTY,Party,Parti
+COS_CONFETTI_GOLD,Gold rush,Altın yağmuru
+COS_CONFETTI_OCEAN,Ocean,Okyanus
+COS_CONFETTI_CANDY,Candy,Şeker

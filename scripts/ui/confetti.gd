@@ -3,7 +3,6 @@ extends Control
 ## Burst of paper confetti shot up from the bottom corners; pieces tumble,
 ## flutter and fall, then the node frees itself. Drawn in one _draw call.
 
-const COLORS := [Color("ff5a5f"), Color("ffb23e"), Color("37c47a"), Color("4aa3ff"), Color("b07cff"), Color("ffe066")]
 const COUNT := 120
 const LIFETIME := 2.8
 const GRAVITY := 1500.0
@@ -25,7 +24,7 @@ func _ready() -> void:
 			"pos": origin, "vel": Vector2(cos(angle), sin(angle)) * speed,
 			"rot": randf() * TAU, "spin": randf_range(-9.0, 9.0),
 			"size": Vector2(randf_range(14, 24), randf_range(8, 13)),
-			"color": COLORS.pick_random(), "flutter": randf() * TAU,
+			"color": Cosmetics.color("confetti"), "flutter": randf() * TAU,
 		})
 
 

@@ -18,7 +18,10 @@ func _initialize() -> void:
 		progress.levels["0:%d" % i] = {"stars": sample[i], "time": 20.0, "combo": 3}
 	var menu: Node = load("res://scenes/menu.tscn").instantiate()
 	root.add_child(menu)
-	for page in ["home", "world", "settings", "credits"]:
+	progress.inventory = {"hint": 2, "crane": 1}
+	progress.owned = ["arrow_gold", "smoke_pink"]
+	progress.equipped_items = {"arrow": "arrow_gold"}
+	for page in ["home", "world", "settings", "credits", "shop", "garage"]:
 		menu._show(page, false)
 		for i in 20:
 			await process_frame

@@ -35,6 +35,8 @@ func _ready() -> void:
 	_pages["world"] = _page()
 	_pages["settings"] = _page()
 	_pages["credits"] = _page()
+	_pages["shop"] = _page()
+	_pages["garage"] = _page()
 	if return_to_world:
 		return_to_world = false
 		_world = Progress.current_world
@@ -50,7 +52,7 @@ func _notification(what: int) -> void:
 			get_tree().quit()
 		else:
 			_click()
-			_show("settings" if _current == "credits" else "home")
+			_show({"credits": "settings", "world": "home"}.get(_current, "home"))
 
 
 # --- Page plumbing -------------------------------------------------------------
@@ -97,6 +99,8 @@ func _show(page: String, animate := true) -> void:
 		"world": _build_world()
 		"settings": _build_settings()
 		"credits": _build_credits()
+		"shop": _build_shop()
+		"garage": _build_garage()
 	for name in _pages:
 		(_pages[name] as Control).get_parent().get_parent().visible = name == page
 	var shown: Control = (_pages[page] as Control).get_parent().get_parent()
@@ -146,6 +150,13 @@ func _build_home() -> void:
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	play.pressed.connect(_continue)
 	page.add_child(play)
+
+	var extras := HBoxContainer.new()
+	extras.add_theme_constant_override("separation", 16)
+	page.add_child(extras)
+	for entry in [["MENU_SHOP", "shop"], ["MENU_GARAGE", "garage"]]:
+		var b := _wide_button(tr(entry[0]), func(): _show(entry[1]))
+		extras.add_child(b)
 
 	for w in LevelCatalog.world_count():
 		page.add_child(_world_card(w))
@@ -334,6 +345,139 @@ func _build_credits() -> void:
 	text.add_child(_label(tr("CREDITS_INTRO"), 28, UiStyle.INK, true))
 	for line in CREDITS:
 		text.add_child(_label("• " + line, 24, UiStyle.INK.lerp(Color.WHITE, 0.15), true))
+
+
+# --- Shop and garage ----------------------------------------------------------------
+
+func _page_header(page: VBoxContainer, title_key: String, back_to: String) -> void:
+	var bar := HBoxContainer.new()
+	page.add_child(bar)
+	bar.add_child(_small_button(tr("BACK"), func(): _show(back_to)))
+	var title := _label(tr(title_key), 42, UiStyle.INK)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	bar.add_child(title)
+	bar.add_child(_coin_pill())
+
+
+func _section(page: VBoxContainer, key: String) -> void:
+	var l := _label(tr(key), 30, UiStyle.INK.lerp(Color.WHITE, 0.25))
+	page.add_child(l)
+
+
+## Rescue packs for coins, free coins for an ad, and (phase 4) the store.
+func _build_shop() -> void:
+	var page: VBoxContainer = _pages["shop"]
+	_clear(page)
+	_page_header(page, "SHOP_TITLE", "home")
+	var have := _label(tr("SHOP_YOU_HAVE") % [Progress.item_count("hint"), Progress.item_count("undo"),
+			Progress.item_count("crane")], 26, UiStyle.INK)
+	have.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	page.add_child(have)
+	_section(page, "SHOP_RESCUES")
+	var shop: Dictionary = Economy.value("shop")
+	for pack in shop.packs:
+		var parts := PackedStringArray()
+		for item in pack.items:
+			parts.append("%s ×%d" % [tr("RESCUE_" + str(item).to_upper()), int(pack.items[item])])
+		var buy := func():
+			if Progress.spend_coins(int(pack.price)):
+				for item in pack.items:
+					Progress.add_item(item, int(pack.items[item]))
+				Sfx.play("combo", -4.0, 1.2, 0.0)
+				_show("shop", false)
+		_shop_row(page, tr(pack.id), " · ".join(parts), "%d" % int(pack.price), true,
+				Progress.coins >= int(pack.price), buy)
+	var free := int(shop.free_coins)
+	_shop_row(page, tr("SHOP_FREE_COINS") % free, tr("SHOP_FREE_COINS_SUB"), tr("OFFER_AD"), false,
+			AdManager.rewarded_available("free_coins"), func():
+				AdManager.show_rewarded("free_coins", func():
+					Progress.add_coins(free)
+					_show("shop", false)))
+	_section(page, "SHOP_STORE")
+	for key in ["STORE_AD_FREE", "STORE_STARTER", "STORE_COINS_S", "STORE_COINS_M", "STORE_COINS_L"]:
+		_shop_row(page, tr(key), tr(key + "_SUB"), tr("SOON_SHORT"), false, false, Callable())
+
+
+## Panel row: title and detail on the left, action button on the right.
+func _shop_row(page: VBoxContainer, title: String, detail: String, action: String, is_price: bool,
+		enabled: bool, on_press: Callable) -> void:
+	var panel := PanelContainer.new()
+	page.add_child(panel)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	panel.add_child(row)
+	var texts := VBoxContainer.new()
+	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(texts)
+	texts.add_child(_label(title, 30, UiStyle.INK))
+	var d := _label(detail, 22, UiStyle.INK.lerp(Color.WHITE, 0.3), true)
+	d.custom_minimum_size.x = 360
+	texts.add_child(d)
+	var b := Button.new()
+	b.custom_minimum_size = Vector2(190, 0)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	b.add_theme_font_size_override("font_size", 26)
+	b.disabled = not enabled
+	if is_price:
+		b.text = "   " + action
+		var coin := CoinIcon.new(28)
+		coin.position = Vector2(26, 0)
+		b.add_child(coin)
+		b.resized.connect(func(): coin.position = Vector2(30, (b.size.y - 28) * 0.5))
+	else:
+		b.text = action
+		b.theme_type_variation = "GoodButton"
+	if on_press.is_valid():
+		b.pressed.connect(func():
+			_click()
+			on_press.call())
+	row.add_child(b)
+
+
+## Cosmetic unlocks per category; tap to buy (coins) or to equip.
+func _build_garage() -> void:
+	var page: VBoxContainer = _pages["garage"]
+	_clear(page)
+	_page_header(page, "GARAGE_TITLE", "home")
+	var note := _label(tr("GARAGE_NOTE"), 24, UiStyle.INK.lerp(Color.WHITE, 0.3), true)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	page.add_child(note)
+	for category in Cosmetics.CATEGORIES:
+		_section(page, "GARAGE_" + category.to_upper())
+		var grid := GridContainer.new()
+		grid.columns = 3
+		grid.add_theme_constant_override("h_separation", 14)
+		grid.add_theme_constant_override("v_separation", 14)
+		grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		page.add_child(grid)
+		for item in Cosmetics.items(category):
+			var tile := GarageTile.new()
+			grid.add_child(tile)
+			var id: String = item.id
+			var equipped_id := Progress.equipped(category)
+			if equipped_id == "":
+				equipped_id = Cosmetics.items(category)[0].id
+			tile.setup(category, item, Progress.owns(id), id == equipped_id)
+			tile.pressed.connect(func():
+				if Progress.owns(id):
+					_click()
+					Progress.equip(id)
+				elif Progress.buy_cosmetic(id):
+					Sfx.play("combo", -4.0, 1.2, 0.0)
+					Progress.equip(id)
+				else:
+					Sfx.play("lock_rattle", -4.0)
+					_shake(tile)
+					return
+				_show("garage", false))
+
+
+func _shake(node: Control) -> void:
+	var start := node.position
+	var t := node.create_tween()
+	for dx in [10.0, -8.0, 5.0, 0.0]:
+		t.tween_property(node, "position:x", start.x + dx, 0.05)
 
 
 # --- Helpers -----------------------------------------------------------------------
