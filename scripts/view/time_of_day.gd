@@ -15,6 +15,7 @@ const KEYS := [
 ]
 const MAX_ELEVATION := 62.0 ## degrees, at noon
 const MIN_ELEVATION := 30.0 ## never lower: long shadows would hide cars
+const NIGHT_HOUR := 22.0 ## label hour used by night worlds
 
 
 ## Hour of day for a level, spread evenly from morning to sunset.
@@ -25,6 +26,8 @@ static func hour_for_level(index: int, count: int) -> float:
 
 
 static func label(hour: float) -> String:
+	if hour >= 21.0:
+		return TranslationServer.translate("TOD_NIGHT")
 	if hour < 11.0:
 		return TranslationServer.translate("TOD_MORNING")
 	if hour < 14.0:
@@ -50,6 +53,17 @@ static func apply(hour: float, sun: DirectionalLight3D, env: Environment,
 	sun.light_energy = k[1] * sun_scale
 	env.ambient_light_color = k[2]
 	env.ambient_light_energy = k[3] * ambient_scale
+
+
+## Night: cool moonlight from high up and a deep blue ambient, bright enough
+## that every car stays easy to read.
+static func apply_night(sun: DirectionalLight3D, env: Environment, sun_scale := 1.0, ambient_scale := 1.0) -> void:
+	var sun_dir := Vector3(0.35, 1.0, 0.45).normalized()
+	sun.global_basis = Basis.looking_at(-sun_dir, Vector3.UP)
+	sun.light_color = Color(0.66, 0.75, 1.0)
+	sun.light_energy = 0.55 * sun_scale
+	env.ambient_light_color = Color(0.45, 0.52, 0.85)
+	env.ambient_light_energy = 0.72 * ambient_scale
 
 
 static func _sample(hour: float) -> Array:

@@ -25,6 +25,8 @@ static var _exiting: Array[VehicleView] = []
 
 ## Player's driving speed setting; scales exit acceleration and top speed.
 static var speed_scale := 1.0
+## Night worlds: cars throw a pool of headlight on the ground ahead.
+static var headlights := false
 
 var state: VehicleState
 var type: String:
@@ -99,6 +101,8 @@ func setup(board: BoardView, p_state: VehicleState, effects_root: Node3D) -> voi
 	_add_arrow(cell_size, roof)
 	_add_pick_body(roof)
 	_add_mechanic_markers(cell_size)
+	if headlights:
+		_add_headlights(cell_size)
 
 	rotation.y = GridDir.to_yaw(dir)
 	_home = board.cell_to_world(footprint_center())
@@ -519,3 +523,23 @@ func unlock() -> void:
 		f.tween_property(frame, "scale", Vector3(1.15, 1.0, 1.08), 0.25)
 		f.parallel().tween_property(frame, "transparency", 1.0, 0.25)
 		f.tween_callback(frame.queue_free)
+
+
+static var _headlight_material: ShaderMaterial
+
+func _add_headlights(cell_size: float) -> void:
+	if _headlight_material == null:
+		_headlight_material = ShaderMaterial.new()
+		_headlight_material.shader = preload("res://shaders/glow.gdshader")
+		_headlight_material.set_shader_parameter("glow_color", Color(1.0, 0.93, 0.72))
+		_headlight_material.set_shader_parameter("strength", 0.42)
+		_headlight_material.set_shader_parameter("stretch", 1.0)
+	var beam := MeshInstance3D.new()
+	var quad := QuadMesh.new()
+	quad.orientation = PlaneMesh.FACE_Y
+	quad.size = Vector2(cell_size * 0.95, cell_size * 1.3)
+	beam.mesh = quad
+	beam.material_override = _headlight_material
+	beam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	beam.position = Vector3(0.0, 0.06, half_length + cell_size * 0.5)
+	_body.add_child(beam)

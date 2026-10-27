@@ -24,3 +24,7 @@ All audio is CC0 1.0 (public domain dedication); edited (trimmed, mixed, normali
 | sfx/combo.ogg, sfx/celebrate.ogg | Kenney "Interface Sounds" (glass_001, confirmation_001), CC0 |
 | sfx/lock_rattle.ogg, sfx/unlock.ogg | Kenney "RPG Audio" (metalLatch, metalClick), CC0 |
 | sfx/gate_open.ogg | Kenney "Interface Sounds" (maximize_006), CC0 |
+| music/beach_theme.ogg | OpenGameArt "Sandy Seaside 2" by spring-spring (https://opengameart.org/content/sandy-seaside-2), CC0 |
+| music/snow_theme.ogg | OpenGameArt "Happy synths loop with slight christmas feeling" by 3xBlast (https://opengameart.org/content/happy-synths-loop-with-slight-christmas-feeling), CC0 |
+| music/night_theme.ogg | OpenGameArt "Chill lofi inspired [loop edit]" by qubodup (https://opengameart.org/content/chill-lofi-inspired-loop-edit), CC0 |
+| music/airport_theme.ogg | OpenGameArt "City Loop" by wipics (https://opengameart.org/content/city-loop-0), CC0 |

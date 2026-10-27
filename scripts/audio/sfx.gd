@@ -35,6 +35,10 @@ const POOL_SIZE := 16
 const MUSIC := {
 	"menu": "res://assets/audio/music/menu_theme.ogg",
 	"game": "res://assets/audio/music/game_theme.ogg",
+	"beach": "res://assets/audio/music/beach_theme.ogg",
+	"snow": "res://assets/audio/music/snow_theme.ogg",
+	"night": "res://assets/audio/music/night_theme.ogg",
+	"airport": "res://assets/audio/music/airport_theme.ogg",
 }
 const MUSIC_DB := -9.0 ## music sits under the effects
 const MUSIC_FADE := 0.8 ## seconds for a cross-fade
@@ -81,6 +85,8 @@ func _exit_tree() -> void:
 
 ## Starts a music track (no-op if it is already playing), fading the old one out.
 func play_music(track: String) -> void:
+	if not MUSIC.has(track):
+		track = "game" # worlds without their own track yet
 	if track == _music_name:
 		return
 	_music_name = track

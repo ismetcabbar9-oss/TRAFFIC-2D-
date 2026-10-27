@@ -10,9 +10,12 @@ const CREDITS := [
 	"Trees: \"Polygon Tree Pack\" by StreakByte (CC BY 4.0)",
 	"Buildings: \"Low poly City Assets\" by Paulisia (CC BY 4.0)",
 	"Street props: \"City Props Collection vol. 1\" by TampaJoey (Sketchfab Free Standard)",
+	"Beach: \"Stylized Palm tree set\" by parelaxel, \"Coconut Tree\" by sujirour, \"Beach Umbrella\" by stealth86, \"Lifeguard's Chair\" and \"Resort\" by jaromir.ternavskiy (CC BY 4.0)",
+	"Snow: \"Low Poly Snowy Trees\" by PeToDes, \"Snowman\" by LiveToWin34, \"Snowy Wooden Hut\" by gecko0307 (CC BY 4.0)",
+	"Airport: \"Cartoon Plane\" by antonmoek (CC BY 4.0); hangar, control tower and baggage truck by assetfactory (Sketchfab Free Standard)",
 	"Cones, sounds and jingles: Kenney (CC0)",
 	"Sound effects: Freesound contributors (CC0)",
-	"Music: \"Happy Clappy Loop\" by owlishmedia, \"Apple Cider\" by Zane Little Music (CC0)",
+	"Music: \"Happy Clappy Loop\" by owlishmedia, \"Apple Cider\" by Zane Little Music, \"Sandy Seaside 2\" by spring-spring, \"Happy synths loop\" by 3xBlast, \"Chill lofi inspired\" by qubodup, \"City Loop\" by wipics (CC0)",
 	"Font: Baloo 2 by Ek Type (SIL Open Font License)",
 ]
 

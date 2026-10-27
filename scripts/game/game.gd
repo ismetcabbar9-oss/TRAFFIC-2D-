@@ -41,7 +41,6 @@ var _ambient_scale := 1.0
 
 
 func _ready() -> void:
-	Sfx.play_music("game")
 	_adapt_lighting()
 	hud.restart_requested.connect(func(): Transition.cover(load_level.bind(level_index)))
 	hud.next_requested.connect(func(): Transition.cover(load_level.bind(level_index + 1)))
@@ -95,8 +94,12 @@ func load_level(index: int) -> void:
 	vehicle_views.clear()
 	obstacle_views.clear()
 
+	var world_theme := WorldTheme.for_world(world_index)
+	Sfx.play_music(world_theme.music)
+	VehicleView.headlights = world_theme.night
+	board.theme = world_theme.board
 	board.build(level.cols, level.rows)
-	scenery.build(board.view_half_extents(), board.theme.road_width * 0.5, level.cols * 31 + level.rows)
+	scenery.build(board.view_half_extents(), board.theme.road_width * 0.5, level.cols * 31 + level.rows, world_theme)
 	for id in session.board.vehicles:
 		var view := VehicleView.new()
 		pieces.add_child(view)
@@ -109,7 +112,13 @@ func load_level(index: int) -> void:
 		obstacle_views[e.cell] = obstacle
 	# Each level is a little later in the day: morning light to sunset.
 	var hour := TimeOfDay.hour_for_level(level_index, LevelCatalog.level_count(world_index))
-	TimeOfDay.apply(hour, $Sun, ($WorldEnvironment as WorldEnvironment).environment, _sun_scale, _ambient_scale)
+	var env := ($WorldEnvironment as WorldEnvironment).environment
+	env.background_color = world_theme.sky
+	if world_theme.night:
+		hour = TimeOfDay.NIGHT_HOUR
+		TimeOfDay.apply_night($Sun, env, _sun_scale, _ambient_scale)
+	else:
+		TimeOfDay.apply(hour, $Sun, env, _sun_scale, _ambient_scale)
 	# Keep the exit barrier in view below the board.
 	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y)
 	camera.play_intro()
