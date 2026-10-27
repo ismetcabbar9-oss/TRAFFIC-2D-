@@ -1,0 +1,105 @@
+{
+ "name": "Demo",
+ "cols": 6,
+ "rows": 6,
+ "mistakes": 3,
+ "vehicles": [
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "garbage",
+   "col": 2,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 0,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "ambulance",
+   "col": 5,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "firetruck",
+   "col": 0,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 3,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 1,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 4,
+   "row": 5,
+   "dir": "right"
+  }
+ ],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 5,
+   "row": 0
+  }
+ ]
+}

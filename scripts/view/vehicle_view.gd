@@ -6,25 +6,30 @@ extends Node3D
 const SIDE_GAP := 0.28 ## free space left beside the car inside its cell
 const END_GAP := 0.45 ## free space left between bumpers inside the slot
 
-var type := ""
-var dir := GridDir.UP
-var cell := Vector2i.ZERO ## top-left cell of the footprint
-var length := 2
+const ARROW_SCENE := preload("res://scenes/direction_arrow.tscn")
+
+var state: VehicleState
+var type: String:
+	get: return state.type
+var dir: int:
+	get: return state.dir
+var cell: Vector2i:
+	get: return state.cell
+var length: int:
+	get: return state.length
 
 var _model: Node3D
 
 
-func setup(board: BoardView, p_type: String, p_cell: Vector2i, p_dir: int) -> void:
-	type = p_type
-	cell = p_cell
-	dir = p_dir
-	length = VehicleCatalog.cells(type)
-	name = "%s_%d_%d" % [type, cell.x, cell.y]
+func setup(board: BoardView, p_state: VehicleState) -> void:
+	state = p_state
+	name = "Vehicle%d_%s" % [state.id, type]
 
 	_model = VehicleCatalog.load_model(type).instantiate()
 	add_child(_model)
-	_fit_model(board.theme.cell_size)
+	var top := _fit_model(board.theme.cell_size)
 	_add_contact_shadow(board.theme.cell_size)
+	_add_arrow(board.theme.cell_size, top)
 
 	rotation.y = GridDir.to_yaw(dir)
 	position = board.cell_to_world(footprint_center())
@@ -36,7 +41,8 @@ func footprint_center() -> Vector2:
 	return Vector2(cell) + span * 0.5
 
 
-func _fit_model(cell_size: float) -> void:
+## Returns the height of the fitted model's roof.
+func _fit_model(cell_size: float) -> float:
 	var aabb := _model_aabb(_model, Transform3D())
 	# Kenney cars face +Z; detect it from the front wheels in case a model differs.
 	var front := _model.find_child("wheel-front-left", false, false) as Node3D
@@ -54,6 +60,14 @@ func _fit_model(cell_size: float) -> void:
 	if _model.rotation.y != 0.0:
 		offset = -offset
 	_model.position = offset
+	return aabb.end.y * s
+
+
+func _add_arrow(cell_size: float, roof: float) -> void:
+	var arrow: Node3D = ARROW_SCENE.instantiate()
+	arrow.position.y = roof + 0.04
+	arrow.scale = Vector3.ONE * cell_size * 0.5
+	add_child(arrow)
 
 
 ## Soft dark patch under the car so it reads as grounded on any renderer.
