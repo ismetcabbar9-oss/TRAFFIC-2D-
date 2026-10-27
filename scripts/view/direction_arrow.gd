@@ -14,32 +14,29 @@ const SHAPE := [
 
 
 func _ready() -> void:
+	# Outline and fill share one mesh (vertex colors) so each arrow is one draw call.
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var outline := Geometry2D.offset_polygon(PackedVector2Array(SHAPE), outline_width, Geometry2D.JOIN_ROUND)
-	_add_polygon("Outline", outline[0], 0.0, outline_color)
-	_add_polygon("Fill", PackedVector2Array(SHAPE), 0.01, fill_color)
-
-
-func _add_polygon(node_name: String, points: PackedVector2Array, y: float, color: Color) -> void:
-	var vertices := PackedVector3Array()
-	for p in points:
-		vertices.append(Vector3(p.x, y, p.y))
-	var indices := Geometry2D.triangulate_polygon(points)
-	var arrays := []
-	arrays.resize(Mesh.ARRAY_MAX)
-	arrays[Mesh.ARRAY_VERTEX] = vertices
-	arrays[Mesh.ARRAY_INDEX] = indices
-	var mesh := ArrayMesh.new()
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	_add_polygon(st, outline[0], 0.0, outline_color)
+	_add_polygon(st, PackedVector2Array(SHAPE), 0.01, fill_color)
 
 	var material := StandardMaterial3D.new()
-	material.albedo_color = color
+	material.vertex_color_use_as_albedo = true
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 
 	var mi := MeshInstance3D.new()
-	mi.name = node_name
-	mi.mesh = mesh
+	mi.name = "Arrow"
+	mi.mesh = st.commit()
 	mi.material_override = material
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
+
+
+func _add_polygon(st: SurfaceTool, points: PackedVector2Array, y: float, color: Color) -> void:
+	var indices := Geometry2D.triangulate_polygon(points)
+	for i in indices:
+		st.set_color(color)
+		st.add_vertex(Vector3(points[i].x, y, points[i].y))

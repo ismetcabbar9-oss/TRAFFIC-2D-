@@ -6,7 +6,8 @@ Grid-based traffic escape puzzle for mobile, built with Godot 4.7.2 (GDScript).
 
 - `scripts/core/` – game rules without visuals: grid, level data, move rule, solver, session
 - `scripts/data/` – vehicle catalog (types, models, footprint lengths)
-- `scripts/view/` – 3D board, vehicles, arrows, camera
+- `scripts/view/` – 3D board (merged meshes), exit gate, scenery (MultiMesh), vehicles, arrows, effects, camera
+- `shaders/` – asphalt/pavement/grass surface shader
 - `scripts/game/` – game scene glue (input, session ↔ animations, HUD), level catalog, `Progress` autoload (save file + settings)
 - `scripts/ui/` – level select menu, HUD, result panel, shared UI style, `ScreenFit` autoload
 - `scripts/audio/` – `Sfx` autoload (pooled sound player) and haptics

@@ -5,8 +5,17 @@ extends Node
 const SOUNDS := {
 	"exhaust_pop": ["res://assets/audio/sfx/exhaust_pop.ogg"],
 	"car_go": ["res://assets/audio/sfx/car_go.ogg"],
+	"engine_sports": ["res://assets/audio/sfx/engine_sports.ogg"],
+	"engine_truck": ["res://assets/audio/sfx/engine_truck.ogg"],
+	"tire_squeal": ["res://assets/audio/sfx/tire_squeal.ogg"],
 	"horn": ["res://assets/audio/sfx/horn.ogg"],
 	"horn_double": ["res://assets/audio/sfx/horn_double.ogg"],
+	"horn_sedan": ["res://assets/audio/sfx/horn_sedan.ogg"],
+	"horn_small": ["res://assets/audio/sfx/horn_small.ogg"],
+	"horn_truck": ["res://assets/audio/sfx/horn_truck.ogg"],
+	"horn_air": ["res://assets/audio/sfx/horn_air.ogg"],
+	"siren_police": ["res://assets/audio/sfx/siren_police.ogg"],
+	"siren_ambulance": ["res://assets/audio/sfx/siren_ambulance.ogg"],
 	"crash": [
 		"res://assets/audio/sfx/crash_0.ogg",
 		"res://assets/audio/sfx/crash_1.ogg",
@@ -16,7 +25,7 @@ const SOUNDS := {
 	"win": ["res://assets/audio/music/win.ogg"],
 	"lose": ["res://assets/audio/music/lose.ogg"],
 }
-const POOL_SIZE := 12
+const POOL_SIZE := 16
 
 var enabled := true
 

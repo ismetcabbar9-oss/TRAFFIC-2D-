@@ -94,6 +94,22 @@ func _show_result() -> void:
 
 
 func _build_top_bar(root: Control) -> void:
+	# Soft backdrop so the bar stays readable over trees and houses.
+	var backdrop := TextureRect.new()
+	var fade := Gradient.new()
+	fade.set_color(0, Color(1, 1, 1, 0.82))
+	fade.set_color(1, Color(1, 1, 1, 0.0))
+	var tex := GradientTexture2D.new()
+	tex.gradient = fade
+	tex.fill_from = Vector2(0, 0.55)
+	tex.fill_to = Vector2(0, 1)
+	backdrop.texture = tex
+	backdrop.stretch_mode = TextureRect.STRETCH_SCALE
+	backdrop.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	backdrop.offset_bottom = 190 + get_node("/root/ScreenFit").safe_insets().y
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(backdrop)
+
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	var insets: Vector4 = get_node("/root/ScreenFit").safe_insets()

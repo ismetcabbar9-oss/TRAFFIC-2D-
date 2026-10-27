@@ -21,6 +21,7 @@ var _hinted_id := -1
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
 @onready var effects: Node3D = $Effects
+@onready var scenery: Scenery = $Scenery
 @onready var camera: BoardCamera = $Camera
 @onready var hud: Hud = $Hud
 
@@ -67,6 +68,7 @@ func load_level(index: int) -> void:
 	obstacle_views.clear()
 
 	board.build(level.cols, level.rows)
+	scenery.build(board.view_half_extents(), board.theme.road_width * 0.5, level.cols * 31 + level.rows)
 	for id in session.board.vehicles:
 		var view := VehicleView.new()
 		pieces.add_child(view)
@@ -77,7 +79,8 @@ func load_level(index: int) -> void:
 		pieces.add_child(obstacle)
 		obstacle.setup(board, e.type, e.cell)
 		obstacle_views[e.cell] = obstacle
-	camera.frame_board(board.view_half_extents())
+	# Keep the exit barrier in view below the board.
+	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y)
 
 	hud.hide_result()
 	_clear_hint()
@@ -141,10 +144,21 @@ func _on_vehicle_exited(id: int, _result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
 	vehicle_views.erase(id)
 	view.play_exit()
-	var size_pitch := 0.85 if view.length >= 3 else 1.0
-	Sfx.play("exhaust_pop", -3.0, size_pitch, 0.12)
-	Sfx.play("car_go", -5.0, size_pitch)
+	_play_launch_sounds(view.type)
 	Haptics.pulse(12, 0.4)
+
+
+## Engine, exhaust and tyres; emergency vehicles add their siren. Tyres share
+## one sample and only lean a little toward the vehicle's pitch so launches
+## sound consistent while trucks stay a touch deeper than sports cars.
+func _play_launch_sounds(type: String) -> void:
+	var pitch := VehicleCatalog.pitch(type)
+	Sfx.play("exhaust_pop", -3.0, pitch, 0.08)
+	Sfx.play(VehicleCatalog.engine_sound(type), -5.0, pitch, 0.04)
+	Sfx.play("tire_squeal", -10.0, lerpf(1.0, pitch, 0.35), 0.03)
+	var siren := VehicleCatalog.siren_sound(type)
+	if siren != "":
+		get_tree().create_timer(0.08).timeout.connect(func(): Sfx.play(siren, -7.0, 1.0, 0.02))
 
 
 func _on_vehicle_crashed(id: int, result: BoardState.MoveResult) -> void:
@@ -156,7 +170,6 @@ func _on_vehicle_crashed(id: int, result: BoardState.MoveResult) -> void:
 	var gap := view.length * cell_size * 0.5 + result.steps * cell_size - view.half_length
 	if target != null:
 		gap += target.inset_toward(view.dir)
-	var push := view.forward()
 	view.play_crash(maxf(gap - 0.02, 0.05), _on_crash_impact.bind(view, target, result.blocker))
 
 
@@ -172,9 +185,13 @@ func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
 		return
 	Sfx.play("crash", 0.0, 1.0, 0.1)
 	if target is VehicleView and randf() < horn_chance:
-		var horn_pitch := 0.8 if (target as VehicleView).length >= 3 else 1.0
-		get_tree().create_timer(0.12).timeout.connect(
-			func(): Sfx.play("horn_double" if randf() < 0.4 else "horn", -6.0, horn_pitch))
+		# The bumped car answers with its own horn; emergency vehicles often
+		# with their siren instead.
+		var type := (target as VehicleView).type
+		var sound := VehicleCatalog.horn_sound(type)
+		if VehicleCatalog.siren_sound(type) != "" and randf() < 0.5:
+			sound = VehicleCatalog.siren_sound(type)
+		get_tree().create_timer(0.12).timeout.connect(func(): Sfx.play(sound, -6.0, 1.0, 0.03))
 
 
 func _on_won() -> void:

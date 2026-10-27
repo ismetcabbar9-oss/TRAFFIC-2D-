@@ -3,7 +3,7 @@ extends Camera3D
 ## Slightly tilted top-down camera that keeps the whole board on screen in both
 ## portrait and landscape.
 
-@export_range(0.0, 45.0) var tilt_degrees := 20.0 ## 0 = straight down
+@export_range(0.0, 45.0) var tilt_degrees := 23.0 ## 0 = straight down
 @export var margin := 0.3 ## extra world units around the board
 ## Screen fraction reserved for the HUD at the top and kept free at the bottom.
 @export var top_reserve := 0.12
@@ -14,6 +14,7 @@ extends Camera3D
 @export var shake_max_offset := 0.35 ## world units at full trauma
 
 var _half_extents := Vector2(6, 6)
+var _center_z := 0.0
 var _trauma := 0.0
 var _shake_time := 0.0
 
@@ -37,8 +38,11 @@ func _process(delta: float) -> void:
 	v_offset = cos(_shake_time * 1.7 + 1.0) * strength
 
 
-func frame_board(half_extents: Vector2) -> void:
-	_half_extents = half_extents + Vector2.ONE * margin
+## Frames the board (centered half extents) plus `extra_bottom` world units
+## below it, e.g. the exit barrier.
+func frame_board(half_extents: Vector2, extra_bottom := 0.0) -> void:
+	_half_extents = half_extents + Vector2(0.0, extra_bottom * 0.5) + Vector2.ONE * margin
+	_center_z = extra_bottom * 0.5
 	_refit()
 
 
@@ -63,5 +67,5 @@ func _refit() -> void:
 	var forward := -global_transform.basis.z
 	# Shift the look-at point so the board sits between the HUD reserves.
 	var shift := (top - bottom_reserve) * 0.5 * 2.0 * tan_v * dist
-	var target := Vector3(0.0, 0.0, -shift * cos(tilt))
+	var target := Vector3(0.0, 0.0, _center_z - shift * cos(tilt))
 	global_position = target - forward * dist

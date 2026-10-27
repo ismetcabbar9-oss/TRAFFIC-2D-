@@ -1,16 +1,20 @@
 class_name BoardView
 extends Node3D
-## Builds the parking lot, the ring road around it and the surrounding ground.
+## Builds the parking lot, the ring road around it, the exit with its barrier
+## and the surrounding ground. Static pieces are merged into one mesh per
+## material to keep draw calls low.
 ## Cell (0, 0) is the top-left cell; the lot is centered on the origin.
 
 const EXIT_ROAD_LENGTH := 80.0
+const ASPHALT := preload("res://shaders/asphalt.gdshader")
 
 @export var theme: BoardTheme
 
 var cols := 6
 var rows := 6
 
-var _materials := {}
+var _boxes := {} ## material key -> Array[Transform3D] of unit boxes
+var _gate: ExitGate
 
 
 func build(p_cols: int, p_rows: int) -> void:
@@ -20,23 +24,35 @@ func build(p_cols: int, p_rows: int) -> void:
 		theme = BoardTheme.new()
 	for child in get_children():
 		child.queue_free()
-	_materials.clear()
+	_boxes.clear()
 
-	var lot := lot_size()
-	var sw := theme.sidewalk_width
-	var road := theme.road_width
-	var outer := theme.outer_sidewalk_width
+	var lot := lot_size() * 0.5
+	var road_outer := lot + Vector2.ONE * (theme.sidewalk_width + theme.road_width)
+	var curb := theme.curb_width
+	var exit_gap := theme.road_width
 
-	# Layers from the outside in; each one is drawn slightly higher than the last.
-	_add_box("Grass", Vector2(400, 400), -0.05, theme.grass, 0.1)
-	_add_layer("OuterSidewalk", lot + Vector2.ONE * 2.0 * (sw + road + outer), 0.0, theme.sidewalk)
-	_add_layer("Road", lot + Vector2.ONE * 2.0 * (sw + road), 0.01, theme.road)
-	_add_layer("InnerCurb", lot + Vector2.ONE * 2.0 * sw, 0.02, theme.curb)
-	_add_layer("InnerSidewalk", lot + Vector2.ONE * 2.0 * (sw - 0.08), 0.025, theme.sidewalk)
-	_add_layer("Lot", lot, 0.03, theme.lot)
-	_add_exit_road()
-	_add_lot_lines()
-	_add_road_dashes()
+	# Ground, road surface (also under the lot) and the exit road.
+	_box("grass", Vector3.ZERO, Vector2(400, 400), 0.0, 0.1)
+	_box("road", Vector3.ZERO, road_outer * 2.0, 0.01, 0.02)
+	_box("road", Vector3(0, 0, road_outer.y + EXIT_ROAD_LENGTH * 0.5), Vector2(theme.road_width, EXIT_ROAD_LENGTH), 0.01, 0.02)
+	# Raised curbs and pavements on both sides of the ring road.
+	_ring("curb", road_outer, road_outer + Vector2.ONE * curb, 0.065, 0.1, exit_gap)
+	_ring("pavement", road_outer + Vector2.ONE * curb, road_outer + Vector2.ONE * theme.outer_sidewalk_width, 0.055, 0.1, exit_gap)
+	_ring("pavement", lot + Vector2.ONE * curb, lot + Vector2.ONE * theme.sidewalk_width, 0.055, 0.1)
+	_ring("curb", lot, lot + Vector2.ONE * curb, 0.065, 0.1)
+	_box("lot", Vector3.ZERO, lot * 2.0, 0.03, 0.04)
+	_add_markings(lot, road_outer)
+	_commit_boxes()
+	_add_exit_label(road_outer)
+
+	_gate = ExitGate.new()
+	add_child(_gate)
+	_gate.setup(Vector3(0, 0.01, exit_gate_z()), theme.road_width)
+
+
+## Z of the barrier on the exit road.
+func exit_gate_z() -> float:
+	return lot_size().y * 0.5 + theme.sidewalk_width + theme.road_width + theme.outer_sidewalk_width + 2.1
 
 
 func lot_size() -> Vector2:
@@ -150,54 +166,26 @@ func cell_to_world(cell: Vector2) -> Vector3:
 	return Vector3(p.x, surface_height(), p.y)
 
 
-func _add_layer(node_name: String, size: Vector2, y: float, color: Color) -> void:
-	_add_box(node_name, size, y, color, 0.02)
-
-
-func _add_box(node_name: String, size: Vector2, top_y: float, color: Color, height: float) -> MeshInstance3D:
-	var mi := MeshInstance3D.new()
-	mi.name = node_name
-	var mesh := BoxMesh.new()
-	mesh.size = Vector3(size.x, height, size.y)
-	mi.mesh = mesh
-	mi.material_override = _material(color)
-	mi.position = Vector3(0, top_y - height * 0.5, 0)
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(mi)
-	return mi
-
-
-func _add_lot_lines() -> void:
-	var lot := lot_size()
+## Painted lines: parking grid, yellow lot border, road edge lines, center
+## dashes, exit-road dashes and the zebra crossing at the exit.
+func _add_markings(lot: Vector2, road_outer: Vector2) -> void:
+	var paint_y := 0.034
+	var road_paint_y := 0.014
 	var w := theme.lot_line_width
-	var y := 0.035
 	for c in range(1, cols):
-		var x := -lot.x * 0.5 + c * theme.cell_size
-		_add_box("LotLineV%d" % c, Vector2(w, lot.y), y, theme.lot_line, 0.004).position.x = x
+		_paint("lot_line", Vector3(-lot.x + c * theme.cell_size, 0, 0), Vector2(w, lot.y * 2.0), paint_y)
 	for r in range(1, rows):
-		var z := -lot.y * 0.5 + r * theme.cell_size
-		_add_box("LotLineH%d" % r, Vector2(lot.x, w), y, theme.lot_line, 0.004).position.z = z
+		_paint("lot_line", Vector3(0, 0, -lot.y + r * theme.cell_size), Vector2(lot.x * 2.0, w), paint_y)
+	_ring("lot_border", lot - Vector2.ONE * 0.16, lot - Vector2.ONE * 0.08, paint_y + 0.002, 0.004)
 
+	var inner_edge := lot + Vector2.ONE * (theme.sidewalk_width + 0.14)
+	_ring("road_line", inner_edge, inner_edge + Vector2.ONE * 0.07, road_paint_y, 0.004)
+	var outer_edge := road_outer - Vector2.ONE * 0.21
+	_ring("road_line", outer_edge, outer_edge + Vector2.ONE * 0.07, road_paint_y, 0.004, theme.road_width)
 
-## Straight road from the bottom of the ring down off screen.
-func _add_exit_road() -> void:
-	var h := ring_half_extents()
-	var box := _add_box("ExitRoad", Vector2(theme.road_width, EXIT_ROAD_LENGTH), 0.012, theme.road, 0.02)
-	box.position.z = h.y + EXIT_ROAD_LENGTH * 0.5
+	var half := ring_half_extents()
 	var dash := 0.7
 	var gap := 0.55
-	var z := h.y + theme.road_width * 0.5 + gap
-	while z < h.y + EXIT_ROAD_LENGTH:
-		_add_box("ExitDash", Vector2(0.1, dash), 0.017, theme.road_line, 0.004).position.z = z + dash * 0.5
-		z += dash + gap
-
-
-## Dashed center line running around the ring road.
-func _add_road_dashes() -> void:
-	var half := lot_size() * 0.5 + Vector2.ONE * (theme.sidewalk_width + theme.road_width * 0.5)
-	var dash := 0.7
-	var gap := 0.55
-	var y := 0.015
 	for side in 4:
 		var horizontal := side % 2 == 0
 		var length := half.x * 2.0 if horizontal else half.y * 2.0
@@ -208,21 +196,106 @@ func _add_road_dashes() -> void:
 			if side == 2 and absf(t) < theme.road_width * 0.5 + dash:
 				continue # junction with the exit road
 			var size := Vector2(dash, 0.1) if horizontal else Vector2(0.1, dash)
-			var box := _add_box("Dash", size, y, theme.road_line, 0.004)
-			match side:
-				0: box.position = Vector3(t, box.position.y, -half.y)
-				1: box.position = Vector3(half.x, box.position.y, t)
-				2: box.position = Vector3(t, box.position.y, half.y)
-				3: box.position = Vector3(-half.x, box.position.y, t)
+			var at: Vector3 = [Vector3(t, 0, -half.y), Vector3(half.x, 0, t), Vector3(t, 0, half.y), Vector3(-half.x, 0, t)][side]
+			_paint("road_line", at, size, road_paint_y)
+
+	# Zebra crossing where the pavement meets the exit road.
+	var cross_z := road_outer.y + theme.outer_sidewalk_width * 0.5
+	var stripes := 5
+	var stripe_w := theme.road_width / (stripes * 2.0 - 1.0)
+	for i in stripes:
+		var x := -theme.road_width * 0.5 + stripe_w * (i * 2.0 + 0.5)
+		_paint("road_line", Vector3(x, 0, cross_z), Vector2(stripe_w * 0.9, theme.outer_sidewalk_width * 0.85), road_paint_y)
+	var z := road_outer.y + theme.outer_sidewalk_width + 3.6
+	while z < road_outer.y + EXIT_ROAD_LENGTH:
+		_paint("road_line", Vector3(0, 0, z + dash * 0.5), Vector2(0.1, dash), road_paint_y)
+		z += dash + gap
 
 
-func _material(color: Color) -> StandardMaterial3D:
-	if _materials.has(color):
-		return _materials[color]
+## "ÇIKIŞ" painted on the exit road, readable from the camera.
+func _add_exit_label(road_outer: Vector2) -> void:
+	var label := Label3D.new()
+	label.text = "ÇIKIŞ"
+	label.font = UiStyle.font(800)
+	label.font_size = 96
+	label.pixel_size = 0.0075
+	label.outline_size = 0
+	label.modulate = Color(theme.road_line, 0.9)
+	label.double_sided = false
+	label.rotation_degrees.x = -90.0
+	label.position = Vector3(0, 0.016, road_outer.y + theme.outer_sidewalk_width + 1.0)
+	add_child(label)
+
+
+## Frame of four boxes between two centered rectangles (half extents), with an
+## optional opening of width `gap` in the bottom side for the exit road.
+func _ring(key: String, inner: Vector2, outer: Vector2, top_y: float, height: float, gap := 0.0) -> void:
+	var band := outer - inner
+	var mid := (inner + outer) * 0.5
+	_box(key, Vector3(0, 0, -mid.y), Vector2(outer.x * 2.0, band.y), top_y, height)
+	if gap <= 0.0:
+		_box(key, Vector3(0, 0, mid.y), Vector2(outer.x * 2.0, band.y), top_y, height)
+	else:
+		var piece := outer.x - gap * 0.5
+		for side in [-1.0, 1.0]:
+			_box(key, Vector3(side * (gap * 0.5 + piece * 0.5), 0, mid.y), Vector2(piece, band.y), top_y, height)
+	for side in [-1.0, 1.0]:
+		_box(key, Vector3(side * mid.x, 0, 0), Vector2(band.x, inner.y * 2.0), top_y, height)
+
+
+func _paint(key: String, center: Vector3, size: Vector2, top_y: float) -> void:
+	_box(key, center, size, top_y, 0.004)
+
+
+## Queues an axis-aligned box; boxes sharing a key become one mesh.
+func _box(key: String, center: Vector3, size: Vector2, top_y: float, height: float) -> void:
+	var xf := Transform3D(Basis.from_scale(Vector3(size.x, height, size.y)),
+			Vector3(center.x, top_y - height * 0.5, center.z))
+	if not _boxes.has(key):
+		_boxes[key] = []
+	_boxes[key].append(xf)
+
+
+func _commit_boxes() -> void:
+	var unit := BoxMesh.new()
+	for key in _boxes:
+		var st := SurfaceTool.new()
+		for xf in _boxes[key]:
+			st.append_from(unit, 0, xf)
+		var mi := MeshInstance3D.new()
+		mi.name = key.capitalize().replace(" ", "")
+		mi.mesh = st.commit()
+		mi.material_override = _material(key)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if key == "curb" \
+				else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(mi)
+
+
+func _material(key: String) -> Material:
+	match key:
+		"grass":
+			return _surface(theme.grass, 0.05, 0.09, 2.5)
+		"road":
+			return _surface(theme.road, 0.07, 0.05, 7.0)
+		"lot":
+			return _surface(theme.lot, 0.06, 0.04, 7.0)
+		"pavement":
+			return _surface(theme.sidewalk, 0.03, 0.03, 5.0)
+	var color: Color = {"curb": theme.curb, "lot_line": theme.lot_line,
+			"lot_border": theme.lot_border, "road_line": theme.road_line}[key]
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
-	m.roughness = 0.95
+	m.roughness = 0.9
 	if color.a < 1.0:
 		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_materials[color] = m
+	return m
+
+
+func _surface(color: Color, grain: float, blotch: float, scale: float) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = ASPHALT
+	m.set_shader_parameter("base_color", color)
+	m.set_shader_parameter("grain", grain)
+	m.set_shader_parameter("blotch", blotch)
+	m.set_shader_parameter("grain_scale", scale)
 	return m

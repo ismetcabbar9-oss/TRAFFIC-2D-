@@ -61,6 +61,13 @@ static func exiting_count() -> int:
 	return _exiting.size()
 
 
+static func exiting_positions() -> Array[Vector3]:
+	var result: Array[Vector3] = []
+	for v in _exiting:
+		result.append(v.global_position)
+	return result
+
+
 func setup(board: BoardView, p_state: VehicleState, effects_root: Node3D) -> void:
 	_board = board
 	_fx = effects_root
@@ -75,6 +82,10 @@ func setup(board: BoardView, p_state: VehicleState, effects_root: Node3D) -> voi
 	_body.add_child(_model)
 	for wheel in _model.find_children("wheel-*", "Node3D", false, false):
 		_wheels.append(wheel)
+		# Wheels sit inside the body's shadow; skipping them saves draw calls.
+		for part in [wheel] + wheel.find_children("*", "GeometryInstance3D", true, false):
+			if part is GeometryInstance3D:
+				part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var roof := _fit_model(cell_size)
 	_add_contact_shadow(cell_size)
 	_add_arrow(cell_size, roof)
