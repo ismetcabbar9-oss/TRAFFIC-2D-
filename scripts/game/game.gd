@@ -16,6 +16,7 @@ const MENU_SCENE := "res://scenes/menu.tscn"
 @export var combo_window := 1.6 ## seconds between exits that keep a combo going
 
 var session: GameSession
+var world_index := 0
 var level_index := 0
 var vehicle_views := {} ## vehicle id -> VehicleView
 var obstacle_views := {} ## cell -> ObstacleView
@@ -24,6 +25,8 @@ var _next_hint := 0.0
 var _hinted_id := -1
 var _sun_scale := 1.0
 var _combo := 0
+var _best_combo := 0
+var _level_start := 0.0
 var _clock := 0.0 ## game time in seconds (follows pauses and time scale)
 var _last_exit_time := -100.0
 var _tutorial_open := false
@@ -48,7 +51,7 @@ func _ready() -> void:
 		Progress.mark_tutorial_seen()
 		_clear_hint())
 	load_level(Progress.current_level)
-	if level_index == 0 and not Progress.tutorial_seen:
+	if world_index == 0 and level_index == 0 and not Progress.tutorial_seen:
 		_tutorial_open = true
 		hud.show_tutorial()
 
@@ -62,9 +65,10 @@ func _adapt_lighting() -> void:
 
 
 func load_level(index: int) -> void:
-	level_index = clampi(index, 0, LevelCatalog.count() - 1)
+	world_index = Progress.current_world
+	level_index = clampi(index, 0, LevelCatalog.level_count(world_index) - 1)
 	Progress.current_level = level_index
-	var path := LevelCatalog.path(level_index)
+	var path := LevelCatalog.path(world_index, level_index)
 	var level := LevelData.load_file(path)
 	var report := LevelSolver.solve(level)
 	if not report.errors.is_empty():
@@ -74,6 +78,9 @@ func load_level(index: int) -> void:
 		push_warning("Level %s cannot be cleared; stuck vehicles: %s" % [path, report.stuck])
 
 	session = GameSession.new(level)
+	_combo = 0
+	_best_combo = 0
+	_level_start = _clock
 	session.vehicle_exited.connect(_on_vehicle_exited)
 	session.vehicle_crashed.connect(_on_vehicle_crashed)
 	session.mistakes_changed.connect(func(left: int): hud.set_mistakes(left, level.mistakes))
@@ -98,7 +105,7 @@ func load_level(index: int) -> void:
 		obstacle.setup(board, e.type, e.cell)
 		obstacle_views[e.cell] = obstacle
 	# Each level is a little later in the day: morning light to sunset.
-	var hour := TimeOfDay.hour_for_level(level_index, LevelCatalog.count())
+	var hour := TimeOfDay.hour_for_level(level_index, LevelCatalog.level_count(world_index))
 	TimeOfDay.apply(hour, $Sun, ($WorldEnvironment as WorldEnvironment).environment, _sun_scale, _ambient_scale)
 	# Keep the exit barrier in view below the board.
 	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y)
@@ -145,14 +152,14 @@ func _process(delta: float) -> void:
 		_hinted_id = free[0] if not free.is_empty() else -1
 	if vehicle_views.has(_hinted_id):
 		vehicle_views[_hinted_id].flash_hint()
-		if level_index < tutorial_levels:
+		if world_index == 0 and level_index < tutorial_levels:
 			hud.show_hint("Yolu açık bir arabaya dokun!")
 
 
 ## Restarts the idle timer after the player acts (or a level starts).
 func _clear_hint() -> void:
 	_idle = 0.0
-	_next_hint = first_level_hint_delay if level_index == 0 else hint_delay
+	_next_hint = first_level_hint_delay if world_index == 0 and level_index == 0 else hint_delay
 	_hinted_id = -1
 	hud.hide_hint()
 
@@ -187,6 +194,7 @@ func _on_vehicle_exited(id: int, _result: BoardState.MoveResult) -> void:
 func _count_combo(view: VehicleView) -> void:
 	_combo = _combo + 1 if _clock - _last_exit_time <= combo_window else 1
 	_last_exit_time = _clock
+	_best_combo = maxi(_best_combo, _combo)
 	if _combo < 2:
 		return
 	var steps := mini(_combo - 2, 8)
@@ -243,7 +251,9 @@ func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
 
 func _on_won() -> void:
 	var played := session
-	Progress.complete(level_index)
+	var mistakes_used := session.level.mistakes - session.mistakes_left
+	var stars := Economy.stars_for(mistakes_used)
+	var earned := Progress.record_win(world_index, level_index, stars, _clock - _level_start, _best_combo, session.level.hard)
 	var waited := 0.0
 	while VehicleView.exiting_count() > 0 and waited < max_exit_wait:
 		await get_tree().process_frame
@@ -252,7 +262,7 @@ func _on_won() -> void:
 	if played == session:
 		Sfx.duck_music(2.0)
 		Sfx.play("win", -2.0, 1.0, 0.0)
-		hud.show_win(not Progress.has_next(level_index), session.mistakes_left == session.level.mistakes)
+		hud.show_win(not Progress.has_next_level(world_index, level_index), mistakes_used == 0)
 
 
 func _on_lost() -> void:

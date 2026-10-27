@@ -72,7 +72,7 @@ func _build() -> void:
 	play.add_theme_font_size_override("font_size", 48)
 	play.custom_minimum_size = Vector2(320, 0)
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	play.pressed.connect(func(): _open_level(mini(Progress.unlocked - 1, LevelCatalog.count() - 1)))
+	play.pressed.connect(func(): _open_level(Progress.next_open_level(0)))
 	column.add_child(play)
 
 	_grid = GridContainer.new()
@@ -81,7 +81,7 @@ func _build() -> void:
 	_grid.add_theme_constant_override("v_separation", 16)
 	_grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	column.add_child(_grid)
-	for i in LevelCatalog.count():
+	for i in LevelCatalog.level_count(0):
 		var tile := LevelTile.new()
 		tile.custom_minimum_size = Vector2(112, 112)
 		tile.pressed.connect(_open_level.bind(i))
@@ -117,8 +117,8 @@ func _toggle_button(on_press: Callable) -> Button:
 
 func _refresh() -> void:
 	for tile: LevelTile in _grid.get_children():
-		tile.setup(tile.get_index(), not Progress.is_unlocked(tile.get_index()), Progress.is_completed(tile.get_index()))
-		var is_next := tile.get_index() == Progress.unlocked - 1 and not tile.done
+		tile.setup(tile.get_index(), not Progress.is_level_unlocked(0, tile.get_index()), Progress.level_stars(0, tile.get_index()) > 0)
+		var is_next := tile.get_index() == Progress.next_open_level(0) and not tile.done
 		if is_next and not tile.has_meta("pulsing"):
 			tile.set_meta("pulsing", true)
 			_pulse(tile)
@@ -137,8 +137,9 @@ func _pulse(tile: Control) -> void:
 
 
 func _open_level(index: int) -> void:
-	if not Progress.is_unlocked(index):
+	if not Progress.is_level_unlocked(0, index):
 		return
 	Sfx.play("ui_click", -4.0)
+	Progress.current_world = 0
 	Progress.current_level = index
 	Transition.change_scene(GAME_SCENE)

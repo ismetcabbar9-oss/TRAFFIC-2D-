@@ -6,7 +6,7 @@ extends SceneTree
 func _initialize() -> void:
 	var out_dir := OS.get_cmdline_user_args()[0]
 	await process_frame # let autoloads load the save file first
-	var levels := range(LevelCatalog.count())
+	var levels := range(LevelCatalog.level_count(0))
 	if OS.get_cmdline_user_args().size() > 1:
 		levels = [int(OS.get_cmdline_user_args()[1]) - 1]
 	for i in levels:

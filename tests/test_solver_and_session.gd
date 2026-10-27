@@ -49,9 +49,9 @@ func test_session_lose_and_continue() -> void:
 
 
 func test_all_level_files_are_solvable() -> void:
-	for file in DirAccess.get_files_at("res://levels/"):
-		if not file.ends_with(".json"):
-			continue
-		var report := LevelSolver.solve(LevelData.load_file("res://levels/" + file))
-		check(report.errors.is_empty(), "%s errors: %s" % [file, report.errors])
-		check(report.solvable, "%s unsolvable, stuck: %s" % [file, report.stuck])
+	for w in LevelCatalog.world_count():
+		for file in LevelCatalog.paths(w):
+			var report := LevelSolver.solve(LevelData.load_file(file))
+			check(report.errors.is_empty(), "%s errors: %s" % [file, report.errors])
+			check(report.solvable, "%s unsolvable, stuck: %s" % [file, report.stuck])
+	check(LevelCatalog.level_count(0) > 0, "world 1 has levels")

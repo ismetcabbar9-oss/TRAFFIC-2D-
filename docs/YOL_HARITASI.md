@@ -6,6 +6,15 @@ burası güncellenir.
 
 ---
 
+## 0. Alınan kararlar
+
+- Diller: **İngilizce (ana dil) + Türkçe**; cihaz Türkçe ise Türkçe açılır.
+- Hedef yaş: **13+**.
+- Reklam: **AdMob**, **banner yok**, kurallar bölüm 7'deki gibi.
+- Ölçümleme: **GameAnalytics** (Godot'ya hafif kurulum).
+- Fiyatlar: sonra belirlenecek.
+- Dünya mekanikleri: Yük, Dönen araç, Kilitli araç, Kapı (bölüm 3).
+
 ## 1. Hedef ve ilkeler
 
 **Hedef:** Play Store'da yüksek puanlı (4,5+), uzun süre oynanan, reklam ve
@@ -51,10 +60,10 @@ Dünya içinde gün sabahtan akşama ilerler (mevcut günün saati sistemi).
 | Dünya | Ortam | Yeni mekanik | Açılış |
 |---|---|---|---|
 | 1 | Şehir otoparkı | Temel kurallar, koniler | Başta açık |
-| 2 | Sahil kasabası | **Tek yönlü şerit oku**: araç çıkınca yolda zorunlu yöne döner | 40 ★ |
-| 3 | Karlı dağ köyü | **Kilitli araç**: anahtar rengindeki araç çıkmadan hareket etmez | 80 ★ |
-| 4 | Gece şehri | **Zamanlı bariyer**: belirli araç çıkınca otopark içindeki kapı açılır | 120 ★ |
-| 5 | Havalimanı / liman | **Çoklu çıkış**: iki çıkış kapısı, araç en yakın kapıya gider | 160 ★ |
+| 2 | Sahil kasabası | **Yük**: bazı araçlar iki dokunuşla çıkar (ilk dokunuşta bir hücre ilerleyip durur) | 40 ★ |
+| 3 | Karlı dağ köyü | **Dönen araç**: dokununca önce 90° döner, sonraki dokunuşta yeni yönüne gider | 80 ★ |
+| 4 | Gece şehri | **Kilitli araç**: aynı renkteki anahtar araç çıkmadan hareket etmez | 120 ★ |
+| 5 | Havalimanı | **Kapı**: otopark içindeki bariyer, bağlı araç çıkınca açılır | 160 ★ |
 
 Yayında 5 dünya × 20 = **100 bölüm**. Yayından sonra her 3–4 haftada bir
 yeni dünya (güncelleme = oyuncuyu geri getirir).

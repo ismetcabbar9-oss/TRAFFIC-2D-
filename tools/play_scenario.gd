@@ -64,7 +64,7 @@ func _initialize() -> void:
 	await _seconds(0.4)
 	await _shot("s5_win_later")
 	var progress := root.get_node("Progress")
-	print("unlocked after win: ", progress.unlocked, " completed: ", progress.completed.keys())
+	print("after win: coins ", progress.coins, " stars ", progress.level_stars(0, 0))
 	game.hud._on_primary() # "Sonraki Bölüm"
 	await _frames(10)
 	print("level after next: ", game.level_index + 1)

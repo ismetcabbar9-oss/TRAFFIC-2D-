@@ -6,6 +6,7 @@ extends RefCounted
 ##   "name": "Level 1",
 ##   "cols": 6, "rows": 6,
 ##   "mistakes": 3,                                   // wrong taps until the level is lost
+##   "hard": false,                                   // optional: marked hard, pays more
 ##   "vehicles": [{"type": "sedan", "col": 0, "row": 0, "dir": "right"}],
 ##   "obstacles": [{"type": "cone", "col": 2, "row": 3}]
 ## }
@@ -16,6 +17,7 @@ var name := ""
 var cols := 6
 var rows := 6
 var mistakes := 3
+var hard := false
 var vehicles: Array[Dictionary] = [] ## {type, cell: Vector2i, dir: int}
 var obstacles: Array[Dictionary] = [] ## {type, cell: Vector2i}
 var errors: PackedStringArray = [] ## problems found while parsing
@@ -48,7 +50,7 @@ func to_dict() -> Dictionary:
 	var o := []
 	for e in obstacles:
 		o.append({"type": e.type, "col": e.cell.x, "row": e.cell.y})
-	return {"name": name, "cols": cols, "rows": rows, "mistakes": mistakes, "vehicles": v, "obstacles": o}
+	return {"name": name, "cols": cols, "rows": rows, "mistakes": mistakes, "hard": hard, "vehicles": v, "obstacles": o}
 
 
 func is_valid() -> bool:
@@ -60,6 +62,7 @@ func _parse(data: Dictionary) -> void:
 	cols = int(data.get("cols", 6))
 	rows = int(data.get("rows", 6))
 	mistakes = int(data.get("mistakes", 3))
+	hard = bool(data.get("hard", false))
 	if cols < 2 or rows < 2 or cols > 12 or rows > 12:
 		errors.append("board size %dx%d out of range" % [cols, rows])
 	if mistakes < 1:

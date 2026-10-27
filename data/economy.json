@@ -1,0 +1,8 @@
+{
+  "level_coins": 10,
+  "star_bonus": [0, 0, 5, 10],
+  "combo_coins_per_step": 2,
+  "combo_coins_max": 10,
+  "hard_level_multiplier": 2,
+  "stars_by_mistakes_used": [3, 2, 1]
+}

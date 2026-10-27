@@ -49,7 +49,7 @@ func _initialize() -> void:
 		var report_text: String = best["_report"]
 		best.erase("_report")
 		best["name"] = "Bölüm %d" % (i + 1)
-		var path := "res://levels/level_%02d.json" % (i + 1)
+		var path := "res://levels/world_1/level_%02d.json" % (i + 1)
 		var f := FileAccess.open(path, FileAccess.WRITE)
 		f.store_string(JSON.stringify(best, " ", false) + "\n")
 		print("%s: %s" % [path, report_text])

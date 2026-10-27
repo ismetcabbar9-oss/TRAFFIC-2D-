@@ -1,0 +1,7 @@
+[
+  {"id": "city", "name": "WORLD_CITY", "stars_required": 0, "mechanic": "", "levels": "res://levels/world_1/"},
+  {"id": "beach", "name": "WORLD_BEACH", "stars_required": 40, "mechanic": "cargo", "levels": "res://levels/world_2/"},
+  {"id": "snow", "name": "WORLD_SNOW", "stars_required": 80, "mechanic": "turn", "levels": "res://levels/world_3/"},
+  {"id": "night", "name": "WORLD_NIGHT", "stars_required": 120, "mechanic": "lock", "levels": "res://levels/world_4/"},
+  {"id": "airport", "name": "WORLD_AIRPORT", "stars_required": 160, "mechanic": "gate", "levels": "res://levels/world_5/"}
+]
