@@ -1,12 +1,23 @@
 class_name VehicleView
 extends Node3D
-## Visual for one vehicle: loads its model, faces it along its direction and
-## scales it to fit its footprint on the grid.
+## Visual for one vehicle: loads its model, faces it along its direction,
+## scales it to fit its footprint and plays its exit / crash animations.
+
+signal exit_finished ## drove off screen; the node frees itself right after
 
 const SIDE_GAP := 0.28 ## free space left beside the car inside its cell
 const END_GAP := 0.45 ## free space left between bumpers inside the slot
 
 const ARROW_SCENE := preload("res://scenes/direction_arrow.tscn")
+
+@export var exit_acceleration := 45.0 ## m/s²
+@export var exit_max_speed := 24.0 ## m/s
+@export var crash_acceleration := 60.0 ## m/s²
+@export var brake_deceleration := 90.0 ## m/s² when queueing behind another car
+
+## Cars currently driving out. A car yields only to cars closer to the end of
+## their route, so the one nearest the exit always keeps moving (no deadlock).
+static var _exiting: Array[VehicleView] = []
 
 var state: VehicleState
 var type: String:
@@ -18,27 +29,168 @@ var cell: Vector2i:
 var length: int:
 	get: return state.length
 
+var half_length := 0.0 ## of the fitted model, along its driving axis
+var half_width := 0.0
+
+var _board: BoardView
+var _body: Node3D ## pivot for model + arrow; nudged without moving the car
 var _model: Node3D
+var _arrow: Node3D
+var _pick_body: StaticBody3D
+var _home := Vector3.ZERO
+var _tween: Tween
+var _nudge_tween: Tween
+
+var _route: Curve3D
+var _route_pos := 0.0
+var _speed := 0.0
+
+
+static func exiting_count() -> int:
+	return _exiting.size()
 
 
 func setup(board: BoardView, p_state: VehicleState) -> void:
+	_board = board
 	state = p_state
 	name = "Vehicle%d_%s" % [state.id, type]
+	var cell_size := board.theme.cell_size
 
+	_body = Node3D.new()
+	_body.name = "Body"
+	add_child(_body)
 	_model = VehicleCatalog.load_model(type).instantiate()
-	add_child(_model)
-	var top := _fit_model(board.theme.cell_size)
-	_add_contact_shadow(board.theme.cell_size)
-	_add_arrow(board.theme.cell_size, top)
+	_body.add_child(_model)
+	var roof := _fit_model(cell_size)
+	_add_contact_shadow(cell_size)
+	_add_arrow(cell_size, roof)
+	_add_pick_body(roof)
 
 	rotation.y = GridDir.to_yaw(dir)
-	position = board.cell_to_world(footprint_center())
+	_home = board.cell_to_world(footprint_center())
+	position = _home
+	set_process(false)
 
 
 ## Center of the footprint in (fractional) cell coordinates.
 func footprint_center() -> Vector2:
 	var span := Vector2(length - 1, 0) if GridDir.is_horizontal(dir) else Vector2(0, length - 1)
 	return Vector2(cell) + span * 0.5
+
+
+## Free space between this car's body and the edge of its footprint, seen from
+## a car arriving along `axis_dir`.
+func inset_toward(axis_dir: int) -> float:
+	var cell_size := _board.theme.cell_size
+	if GridDir.is_horizontal(axis_dir) == GridDir.is_horizontal(dir):
+		return length * cell_size * 0.5 - half_length
+	return cell_size * 0.5 - half_width
+
+
+func forward() -> Vector3:
+	var v := GridDir.to_vector(dir)
+	return Vector3(v.x, 0, v.y)
+
+
+## Drives `distance` meters ahead, calls `on_impact`, then bounces back home.
+func play_crash(distance: float, on_impact: Callable) -> void:
+	_kill_tween()
+	position = _home
+	var duration := sqrt(2.0 * maxf(distance, 0.05) / crash_acceleration)
+	_tween = create_tween()
+	_tween.tween_property(self, "position", _home + forward() * distance, duration) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_callback(on_impact)
+	_tween.tween_property(self, "position", _home, 0.45) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Small knock when something bumps into this car.
+func nudge(push: Vector3) -> void:
+	if _nudge_tween:
+		_nudge_tween.kill()
+	_body.position = Vector3.ZERO
+	var local := global_transform.basis.inverse() * push
+	_nudge_tween = create_tween()
+	_nudge_tween.tween_property(_body, "position", local * 0.18, 0.06).set_ease(Tween.EASE_OUT)
+	_nudge_tween.tween_property(_body, "position", Vector3.ZERO, 0.4) \
+		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+
+## Leaves the lot along the board's exit route and frees itself off screen.
+func play_exit() -> void:
+	_kill_tween()
+	_arrow.visible = false
+	_pick_body.queue_free()
+	_route = _board.exit_route(position, dir)
+	_route_pos = 0.0
+	_speed = 0.0
+	_exiting.append(self)
+	set_process(true)
+
+
+func _exit_tree() -> void:
+	_exiting.erase(self)
+
+
+func _process(delta: float) -> void:
+	var limit := _speed_limit()
+	if _speed > limit:
+		_speed = maxf(limit, _speed - brake_deceleration * delta)
+	else:
+		_speed = minf(_speed + exit_acceleration * delta, limit)
+	_route_pos += _speed * delta
+	var total := _route.get_baked_length()
+	if _route_pos >= total:
+		set_process(false)
+		exit_finished.emit()
+		queue_free()
+		return
+	var lift := Vector3.UP * _board.surface_height()
+	var here := _route.sample_baked(_route_pos) + lift
+	var ahead := _route.sample_baked(minf(_route_pos + 0.4, total)) + lift
+	position = here
+	if here.distance_squared_to(ahead) > 0.0001:
+		look_at(ahead, Vector3.UP, true)
+
+
+## Top speed allowed by higher-priority cars in the lane ahead: scans a strip in
+## front of the bumper and slows down the closer another car's body is.
+func _speed_limit() -> float:
+	const LOOK_AHEAD := [0.0, 0.6, 1.2, 1.8, 2.4, 3.0]
+	var forward_dir := global_transform.basis.z.normalized() # model front is +Z
+	var side_dir := global_transform.basis.x.normalized()
+	var bumper := global_position + forward_dir * (half_length + 0.15)
+	var limit := exit_max_speed
+	var my_remaining := _remaining()
+	for other in _exiting:
+		if other == self or other._remaining() > my_remaining \
+				or (other._remaining() == my_remaining and other.state.id > state.id):
+			continue
+		var to_local := other.global_transform.affine_inverse()
+		for ahead in LOOK_AHEAD:
+			if ahead * 8.0 >= limit:
+				break
+			var hit := false
+			for side in [-1.0, 0.0, 1.0]:
+				var p: Vector3 = to_local * (bumper + forward_dir * ahead + side_dir * side * half_width)
+				if absf(p.x) < other.half_width + 0.2 and absf(p.z) < other.half_length + 0.2:
+					hit = true
+					break
+			if hit:
+				limit = ahead * 8.0
+				break
+	return limit
+
+
+func _remaining() -> float:
+	return _route.get_baked_length() - _route_pos
+
+
+func _kill_tween() -> void:
+	if _tween:
+		_tween.kill()
+		_tween = null
 
 
 ## Returns the height of the fitted model's roof.
@@ -54,6 +206,8 @@ func _fit_model(cell_size: float) -> float:
 	var s := minf(width_scale, length_scale)
 	var stretch := clampf(length_scale / s, 1.0, VehicleCatalog.max_stretch(type))
 	_model.scale = Vector3(s, s, s * stretch)
+	half_width = aabb.size.x * s * 0.5
+	half_length = aabb.size.z * s * stretch * 0.5
 	# Center the model on its footprint.
 	var c := aabb.get_center()
 	var offset := Vector3(-c.x, 0.0, -c.z) * _model.scale
@@ -64,10 +218,23 @@ func _fit_model(cell_size: float) -> float:
 
 
 func _add_arrow(cell_size: float, roof: float) -> void:
-	var arrow: Node3D = ARROW_SCENE.instantiate()
-	arrow.position.y = roof + 0.04
-	arrow.scale = Vector3.ONE * cell_size * 0.5
-	add_child(arrow)
+	_arrow = ARROW_SCENE.instantiate()
+	_arrow.position.y = roof + 0.04
+	_arrow.scale = Vector3.ONE * cell_size * 0.5
+	_body.add_child(_arrow)
+
+
+## Collision box used only for tap picking.
+func _add_pick_body(roof: float) -> void:
+	_pick_body = StaticBody3D.new()
+	_pick_body.set_meta("vehicle_id", state.id)
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(half_width * 2.0, roof, half_length * 2.0)
+	shape.shape = box
+	shape.position.y = roof * 0.5
+	_pick_body.add_child(shape)
+	add_child(_pick_body)
 
 
 ## Soft dark patch under the car so it reads as grounded on any renderer.
