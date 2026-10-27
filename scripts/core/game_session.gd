@@ -5,6 +5,9 @@ extends RefCounted
 
 signal vehicle_exited(id: int, result: BoardState.MoveResult)
 signal vehicle_crashed(id: int, result: BoardState.MoveResult)
+signal vehicle_advanced(id: int, result: BoardState.MoveResult) ## cargo pulled forward
+signal vehicle_turned(id: int, result: BoardState.MoveResult)
+signal vehicle_locked(id: int) ## tapped while still locked; costs nothing
 signal mistakes_changed(left: int)
 signal won
 signal lost
@@ -30,20 +33,33 @@ func tap(id: int) -> BoardState.MoveResult:
 		return null
 	taps += 1
 	var result := board.probe(id)
-	if result.free:
-		board.remove_vehicle(id)
-		vehicle_exited.emit(id, result)
-		if board.is_cleared():
-			state = State.WON
-			won.emit()
-	else:
-		mistakes_left -= 1
-		vehicle_crashed.emit(id, result)
-		mistakes_changed.emit(mistakes_left)
-		if mistakes_left <= 0:
-			state = State.LOST
-			lost.emit()
+	board.apply(id, result)
+	match result.action:
+		BoardState.Action.EXIT:
+			vehicle_exited.emit(id, result)
+			if board.is_cleared():
+				state = State.WON
+				won.emit()
+		BoardState.Action.ADVANCE:
+			vehicle_advanced.emit(id, result)
+		BoardState.Action.TURN:
+			vehicle_turned.emit(id, result)
+		BoardState.Action.LOCKED:
+			vehicle_locked.emit(id)
+		BoardState.Action.CRASH:
+			mistakes_left -= 1
+			vehicle_crashed.emit(id, result)
+			mistakes_changed.emit(mistakes_left)
+			if mistakes_left <= 0:
+				state = State.LOST
+				lost.emit()
 	return result
+
+
+## True when no order of taps can clear the board any more (a pull-forward or
+## turn boxed something in). Only possible in levels with those mechanics.
+func is_deadlocked() -> bool:
+	return state == State.PLAYING and not LevelSolver.solve_board(board).solvable
 
 
 ## Grants extra wrong moves (e.g. reward ad) and resumes a lost game.

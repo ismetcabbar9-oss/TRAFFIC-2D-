@@ -146,10 +146,11 @@ func _process(delta: float) -> void:
 	if _idle < _next_hint:
 		return
 	_next_hint = _idle + hint_repeat
-	# Keep pointing at the same car while it can still leave.
+	# Keep pointing at the same car while it can still leave; otherwise ask
+	# the solver for the next move of a winning line.
 	var free := session.board.free_vehicles()
 	if not _hinted_id in free:
-		_hinted_id = free[0] if not free.is_empty() else -1
+		_hinted_id = free[0] if not free.is_empty() else LevelSolver.next_tap(session.board)
 	if vehicle_views.has(_hinted_id):
 		vehicle_views[_hinted_id].flash_hint()
 		if world_index == 0 and level_index < tutorial_levels:
@@ -217,7 +218,7 @@ func _play_launch_sounds(type: String) -> void:
 
 func _on_vehicle_crashed(id: int, result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
-	var target: Node3D = obstacle_views.get(result.contact_cell) if result.blocker == BoardState.OBSTACLE \
+	var target: Node3D = obstacle_views.get(result.contact_cell) if result.blocker < 0 \
 		else vehicle_views.get(result.blocker)
 	var cell_size := board.theme.cell_size
 	# From the car's center to the blocker's edge, minus the car's own half length.
@@ -235,7 +236,7 @@ func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
 	Effects.impact(effects, view.front_point(), push)
 	camera.shake(0.45)
 	Haptics.pulse(45, 0.9)
-	if blocker == BoardState.OBSTACLE:
+	if blocker < 0: # cone, box or gate
 		Sfx.play("crash", -5.0, 1.3)
 		return
 	Sfx.play("crash", 0.0, 1.0, 0.1)
