@@ -20,6 +20,10 @@ var daily := {}
 var flags := {} ## one-time events, e.g. "crane_gift"
 var owned: Array = [] ## bought garage items (see Cosmetics)
 var equipped_items := {} ## garage category -> item id
+var stats := {} ## lifetime counters: cars, best_combo, cranes, daily_best
+var claimed: Array = [] ## collected achievement ids
+var gift := {} ## daily gift: {"last_day", "index" (0..6) of the last claim}
+var daily_puzzle := {} ## {"last_day", "streak"}
 var ad_free := false ## lifetime ad-free purchase (phase 4)
 var tutorial_seen := false
 var tips_seen: Array = [] ## mechanic tip cards already shown
@@ -151,6 +155,82 @@ func count_ad(placement: String) -> void:
 	save()
 
 
+# --- Stats, achievements, daily gift and puzzle ------------------------------------
+
+## Adds to a lifetime counter (saved with the next save).
+func add_stat(name: String, amount := 1) -> void:
+	stats[name] = int(stats.get(name, 0)) + amount
+
+
+## Keeps the highest value seen.
+func max_stat(name: String, value: int) -> void:
+	stats[name] = maxi(int(stats.get(name, 0)), value)
+
+
+func claim_achievement(id: String) -> int:
+	for entry in Achievements.LIST:
+		if entry.id == id and Achievements.claimable(self, entry):
+			claimed.append(id)
+			add_coins(int(entry.coins))
+			return int(entry.coins)
+	return 0
+
+
+## Day (0..6) of the gift that can be claimed today, or -1 if already claimed.
+## Missing a day starts the week over.
+func gift_day() -> int:
+	var today := Daily.today()
+	var last: String = gift.get("last_day", "")
+	if last == today:
+		return -1
+	if last == Daily.day_before(today):
+		return (int(gift.get("index", -1)) + 1) % Daily.GIFT_REWARDS.size()
+	return 0
+
+
+## Day the calendar shows as current (today's, or the one claimed today).
+func gift_display_day() -> int:
+	var day := gift_day()
+	return int(gift.get("index", 0)) if day < 0 else day
+
+
+## Claims today's gift (`times` = 2 after a rewarded ad). Returns the coins.
+func claim_gift(times := 1) -> int:
+	var day := gift_day()
+	if day < 0:
+		return 0
+	var coins: int = Daily.GIFT_REWARDS[day] * times
+	gift = {"last_day": Daily.today(), "index": day}
+	if day == Daily.GIFT_REWARDS.size() - 1:
+		add_item(Daily.GIFT_BONUS_ITEM)
+	add_coins(coins)
+	return coins
+
+
+func daily_done_today() -> bool:
+	return daily_puzzle.get("last_day", "") == Daily.today()
+
+
+## Current streak (0 once a day was missed).
+func daily_streak() -> int:
+	var last: String = daily_puzzle.get("last_day", "")
+	if last == Daily.today() or last == Daily.day_before(Daily.today()):
+		return int(daily_puzzle.get("streak", 0))
+	return 0
+
+
+## Records today's puzzle as solved; returns {coins, streak}.
+func record_daily_win() -> Dictionary:
+	if daily_done_today():
+		return {"coins": 0, "streak": daily_streak()}
+	var streak := daily_streak() + 1
+	daily_puzzle = {"last_day": Daily.today(), "streak": streak}
+	max_stat("daily_best", streak)
+	var coins := int(Economy.value("daily_puzzle_coins")) + mini(streak - 1, 7) * int(Economy.value("daily_streak_bonus"))
+	add_coins(coins)
+	return {"coins": coins, "streak": streak}
+
+
 # --- Garage ----------------------------------------------------------------------
 
 func owns(id: String) -> bool:
@@ -271,6 +351,10 @@ func save() -> void:
 		"daily": daily,
 		"flags": flags,
 		"garage": {"owned": owned, "equipped": equipped_items},
+		"stats": stats,
+		"claimed": claimed,
+		"gift": gift,
+		"daily_puzzle": daily_puzzle,
 		"ad_free": ad_free,
 		"tutorial": tutorial_seen,
 		"tips": tips_seen,
@@ -307,6 +391,10 @@ func _load() -> void:
 	var garage: Dictionary = data.get("garage", {})
 	owned = garage.get("owned", [])
 	equipped_items = garage.get("equipped", {})
+	stats = data.get("stats", {})
+	claimed = data.get("claimed", [])
+	gift = data.get("gift", {})
+	daily_puzzle = data.get("daily_puzzle", {})
 	ad_free = bool(data.get("ad_free", false))
 	tutorial_seen = bool(data.get("tutorial", false))
 	tips_seen = data.get("tips", [])

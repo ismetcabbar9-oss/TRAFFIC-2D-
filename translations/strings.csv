@@ -142,3 +142,39 @@ COS_CONFETTI_PARTY,Party,Parti
 COS_CONFETTI_GOLD,Gold rush,Altın yağmuru
 COS_CONFETTI_OCEAN,Ocean,Okyanus
 COS_CONFETTI_CANDY,Candy,Şeker
+MENU_ACHIEVEMENTS,Trophies,Başarımlar
+MENU_DAILY,Daily puzzle,Günlük bulmaca
+MENU_DAILY_DONE,Daily puzzle · done,Günlük bulmaca · bitti
+MENU_GIFT,Daily gift,Günlük hediye
+STREAK_N,%d days,%d gün
+GIFT_TITLE,Daily gift,Günlük hediye
+GIFT_NOTE,Come back every day for a bigger gift. Miss a day and the week starts over.,"Her gün gel, hediye büyüsün. Bir gün kaçırırsan hafta baştan başlar."
+GIFT_DAY,Day %d,%d. gün
+GIFT_TAKE,Collect,Al
+GIFT_DOUBLE,Collect ×2 · watch an ad,2 katını al · reklam izle
+GIFT_COME_BACK,Come back tomorrow,Yarın tekrar gel
+GIFT_TAKEN,Collected,Alındı
+DAILY_TITLE,Daily puzzle,Günlük bulmaca
+DAILY_PREPARING,Preparing today's puzzle…,Bugünün bulmacası hazırlanıyor…
+DAILY_STREAK,Daily streak: %d,Günlük seri: %d
+ACH_TITLE,Trophies,Başarımlar
+ACH_UNLOCKED,Trophy unlocked!,Başarım açıldı!
+ACH_COLLECTED,Collected,Alındı
+ACH_FIRST_WIN,Clear your first level,İlk bölümünü bitir
+ACH_LEVELS_10,Clear 10 levels,10 bölüm bitir
+ACH_LEVELS_50,Clear 50 levels,50 bölüm bitir
+ACH_LEVELS_100,Clear all 100 levels,100 bölümün hepsini bitir
+ACH_PERFECT_10,Clear 10 levels without a crash,10 bölümü hatasız bitir
+ACH_PERFECT_50,Clear 50 levels without a crash,50 bölümü hatasız bitir
+ACH_COMBO_5,Reach a x5 combo,x5 combo yap
+ACH_COMBO_8,Reach a x8 combo,x8 combo yap
+ACH_CARS_100,Get 100 cars out,100 araç çıkar
+ACH_CARS_500,Get 500 cars out,500 araç çıkar
+ACH_CARS_1000,Get 1000 cars out,1000 araç çıkar
+ACH_CRANE_1,Use the crane,Vinci kullan
+ACH_DAILY_3,Daily puzzle 3 days in a row,3 gün üst üste günlük bulmaca
+ACH_DAILY_7,Daily puzzle 7 days in a row,7 gün üst üste günlük bulmaca
+ACH_WORLDS_1,Complete a world,Bir dünyayı tamamla
+ACH_WORLDS_3,Complete 3 worlds,3 dünyayı tamamla
+ACH_WORLDS_5,Complete every world,Tüm dünyaları tamamla
+ACH_GARAGE_1,Buy something in the garage,Garajdan bir şey al

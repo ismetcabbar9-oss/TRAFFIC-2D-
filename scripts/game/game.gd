@@ -34,6 +34,7 @@ var _ambient_scale := 1.0
 var _crane_mode := false ## next tapped car is lifted out
 var _held_hint := -1 ## car glowing from a paid hint
 var _earned := 0 ## coins from the last win (for "double coins")
+var _done_at_start: Array = [] ## achievements already reached when the level began
 
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
@@ -77,11 +78,20 @@ func _adapt_lighting() -> void:
 
 
 func load_level(index: int) -> void:
-	world_index = Progress.current_world
-	level_index = clampi(index, 0, LevelCatalog.level_count(world_index) - 1)
-	Progress.current_level = level_index
-	var path := LevelCatalog.path(world_index, level_index)
-	var level := LevelData.load_file(path)
+	var level: LevelData
+	var path := "daily"
+	if Daily.playing:
+		# The daily puzzle borrows the look of the world its mechanic comes from.
+		world_index = Daily.world_index
+		level_index = 0
+		level = LevelData.from_dict(Daily.level_data)
+	else:
+		world_index = Progress.current_world
+		level_index = clampi(index, 0, LevelCatalog.level_count(world_index) - 1)
+		Progress.current_level = level_index
+		path = LevelCatalog.path(world_index, level_index)
+		level = LevelData.load_file(path)
+	_done_at_start = Achievements.done_ids(Progress)
 	var report := LevelSolver.solve(level)
 	if not report.errors.is_empty():
 		push_error("Level %s is invalid: %s" % [path, report.errors])
@@ -152,7 +162,9 @@ func load_level(index: int) -> void:
 	_show_mechanic_tip(level)
 	_maybe_gift_crane()
 	var title := tr("LEVEL_N") % (level_index + 1)
-	if level.hard:
+	if Daily.playing:
+		title = tr("DAILY_TITLE")
+	elif level.hard:
 		title += "  ·  " + tr("LEVEL_HARD")
 	hud.set_level_title(title, level.hard)
 	hud.set_time_of_day(TimeOfDay.label(hour))
@@ -249,6 +261,7 @@ func _on_vehicle_exited(id: int, result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
 	vehicle_views.erase(id)
 	view.play_exit()
+	Progress.add_stat("cars")
 	_play_launch_sounds(view.type)
 	Haptics.pulse(12, 0.4)
 	_count_combo(view)
@@ -311,6 +324,7 @@ func _count_combo(view: VehicleView) -> void:
 	_combo = _combo + 1 if _clock - _last_exit_time <= combo_window else 1
 	_last_exit_time = _clock
 	_best_combo = maxi(_best_combo, _combo)
+	Progress.max_stat("best_combo", _combo)
 	if _combo < 2:
 		return
 	var steps := mini(_combo - 2, 8)
@@ -374,13 +388,20 @@ func _on_won() -> void:
 	var mistakes_used := session.crashes
 	var stars := Economy.stars_for(mistakes_used)
 	var time := _clock - _level_start
-	var record := Progress.record_win(world_index, level_index, stars, time, _best_combo, session.level.hard)
+	var record: Dictionary
+	if Daily.playing:
+		var daily := Progress.record_daily_win()
+		record = {"coins": daily.coins, "best_time": false, "streak": daily.streak}
+	else:
+		record = Progress.record_win(world_index, level_index, stars, time, _best_combo, session.level.hard)
 	var result := {
 		"stars": stars, "time": time, "combo": _best_combo, "coins": record.coins,
 		"best_time": record.best_time, "perfect": mistakes_used == 0,
-		"last_level": not Progress.has_next_level(world_index, level_index),
+		"last_level": Daily.playing or not Progress.has_next_level(world_index, level_index),
 		"double_ok": record.coins > 0 and AdManager.rewarded_available("double_coins"),
 	}
+	if record.has("streak"):
+		result["streak"] = record.streak
 	_earned = record.coins
 	var waited := 0.0
 	while VehicleView.exiting_count() > 0 and waited < max_exit_wait:
@@ -391,6 +412,7 @@ func _on_won() -> void:
 		Sfx.duck_music(2.0)
 		Sfx.play("win", -2.0, 1.0, 0.0)
 		hud.show_win(result)
+		_announce_achievements()
 
 
 func _on_lost() -> void:
@@ -539,6 +561,9 @@ func _on_vehicle_lifted(id: int, result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
 	vehicle_views.erase(id)
 	view.play_lift()
+	Progress.add_stat("cars")
+	Progress.add_stat("cranes")
+	_announce_achievements()
 	Sfx.play("unlock", -4.0, 0.7, 0.0)
 	Haptics.pulse(25, 0.5)
 	if view.state.key >= 0:
@@ -551,6 +576,21 @@ func _on_vehicle_restored(id: int) -> void:
 	view.play_restore()
 
 
+## Toasts every achievement reached since the level began (once each).
+func _announce_achievements() -> void:
+	var now := Achievements.done_ids(Progress)
+	var delay := 0.0
+	for id in now:
+		if id in _done_at_start:
+			continue
+		_done_at_start.append(id)
+		get_tree().create_timer(delay).timeout.connect(func():
+			hud.show_toast(tr("ACH_UNLOCKED"), tr("ACH_" + str(id).to_upper())))
+		delay += 2.6
+
+
 func _to_menu() -> void:
-	MainMenu.return_to_world = true
+	Progress.save() # lifetime stats gathered during play
+	MainMenu.return_to_world = not Daily.playing
+	Daily.stop()
 	Transition.change_scene(MENU_SCENE)

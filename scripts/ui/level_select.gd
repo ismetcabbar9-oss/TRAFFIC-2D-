@@ -25,6 +25,7 @@ var _coin_label: Label
 var _world := 0 ## world shown on the world page
 ## Set by the game so leaving a level lands on that world's level grid.
 static var return_to_world := false
+static var _gift_offered := false
 
 
 func _ready() -> void:
@@ -37,12 +38,18 @@ func _ready() -> void:
 	_pages["credits"] = _page()
 	_pages["shop"] = _page()
 	_pages["garage"] = _page()
+	_pages["gift"] = _page()
+	_pages["achievements"] = _page()
 	if return_to_world:
 		return_to_world = false
 		_world = Progress.current_world
 		_show("world", false)
 	else:
 		_show("home", false)
+		# Once per launch, greet the player with the gift waiting for them.
+		if not _gift_offered and Progress.tutorial_seen and Progress.gift_day() >= 0:
+			_gift_offered = true
+			_show("gift", false)
 	Progress.coins_changed.connect(func(_c): _refresh_coins())
 
 
@@ -101,6 +108,8 @@ func _show(page: String, animate := true) -> void:
 		"credits": _build_credits()
 		"shop": _build_shop()
 		"garage": _build_garage()
+		"gift": _build_gift()
+		"achievements": _build_achievements()
 	for name in _pages:
 		(_pages[name] as Control).get_parent().get_parent().visible = name == page
 	var shown: Control = (_pages[page] as Control).get_parent().get_parent()
@@ -128,6 +137,10 @@ func _build_home() -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(spacer)
+	var trophies := _small_button(tr("MENU_ACHIEVEMENTS"), func(): _show("achievements"))
+	bar.add_child(trophies)
+	if Achievements.any_claimable(Progress):
+		_add_dot(trophies)
 	bar.add_child(_small_button(tr("MENU_SETTINGS"), func(): _show("settings")))
 
 	var title := Label.new()
@@ -151,9 +164,21 @@ func _build_home() -> void:
 	play.pressed.connect(_continue)
 	page.add_child(play)
 
-	var extras := HBoxContainer.new()
-	extras.add_theme_constant_override("separation", 16)
+	var extras := GridContainer.new()
+	extras.columns = 2
+	extras.add_theme_constant_override("h_separation", 16)
+	extras.add_theme_constant_override("v_separation", 14)
 	page.add_child(extras)
+	var streak := Progress.daily_streak()
+	var puzzle_text := tr("MENU_DAILY_DONE") if Progress.daily_done_today() else tr("MENU_DAILY")
+	if streak > 0:
+		puzzle_text += "  ·  " + tr("STREAK_N") % streak
+	var puzzle := _wide_button(puzzle_text, _start_daily)
+	extras.add_child(puzzle)
+	var gift := _wide_button(tr("MENU_GIFT"), func(): _show("gift"))
+	extras.add_child(gift)
+	if Progress.gift_day() >= 0:
+		_add_dot(gift)
 	for entry in [["MENU_SHOP", "shop"], ["MENU_GARAGE", "garage"]]:
 		var b := _wide_button(tr(entry[0]), func(): _show(entry[1]))
 		extras.add_child(b)
@@ -478,6 +503,163 @@ func _shake(node: Control) -> void:
 	var t := node.create_tween()
 	for dx in [10.0, -8.0, 5.0, 0.0]:
 		t.tween_property(node, "position:x", start.x + dx, 0.05)
+
+
+# --- Daily gift, daily puzzle and achievements ----------------------------------------
+
+## Seven-day calendar; today's gift can be taken once (or doubled with an ad).
+func _build_gift() -> void:
+	var page: VBoxContainer = _pages["gift"]
+	_clear(page)
+	_page_header(page, "GIFT_TITLE", "home")
+	var note := _label(tr("GIFT_NOTE"), 24, UiStyle.INK.lerp(Color.WHITE, 0.3), true)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	page.add_child(note)
+	var today := Progress.gift_display_day()
+	var claimable := Progress.gift_day() >= 0
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 12)
+	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	page.add_child(grid)
+	for day in Daily.GIFT_REWARDS.size():
+		var done := day < today or (day == today and not claimable)
+		grid.add_child(_gift_tile(day, done, day == today and claimable))
+	var take := Button.new()
+	take.text = tr("GIFT_TAKE") if claimable else tr("GIFT_COME_BACK")
+	take.disabled = not claimable
+	take.theme_type_variation = "GoodButton"
+	take.pressed.connect(func():
+		_click()
+		Progress.claim_gift()
+		Sfx.play("celebrate", -4.0)
+		_show("gift", false))
+	page.add_child(take)
+	if claimable and AdManager.rewarded_available("daily_gift"):
+		var double := Button.new()
+		double.text = tr("GIFT_DOUBLE")
+		double.pressed.connect(func():
+			_click()
+			AdManager.show_rewarded("daily_gift", func():
+				Progress.claim_gift(2)
+				Sfx.play("celebrate", -4.0)
+				_show("gift", false)))
+		page.add_child(double)
+
+
+func _gift_tile(day: int, done: bool, is_today: bool) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(150, 170)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("fff4d6") if is_today else (Color("e3f7ea") if done else Color.WHITE)
+	style.set_corner_radius_all(20)
+	style.set_border_width_all(4 if is_today else 0)
+	style.border_color = UiStyle.ACCENT
+	panel.add_theme_stylebox_override("panel", style)
+	var box := VBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 6)
+	panel.add_child(box)
+	var title := _label(tr("GIFT_DAY") % (day + 1), 22, UiStyle.INK)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var coin := CoinIcon.new(44)
+	coin.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(coin)
+	var amount := "%d" % Daily.GIFT_REWARDS[day]
+	if day == Daily.GIFT_REWARDS.size() - 1:
+		amount += " + " + tr("RESCUE_CRANE")
+	var value := _label(amount, 22 if day < 6 else 18, UiStyle.ACCENT_DARK)
+	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(value)
+	if done:
+		var check := _label(tr("GIFT_TAKEN"), 18, UiStyle.GOOD_DARK)
+		check.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(check)
+	return panel
+
+
+## Builds (or loads) today's puzzle on a worker thread, then starts it.
+func _start_daily() -> void:
+	Daily.prepare()
+	if not Daily.is_ready():
+		var veil := ColorRect.new()
+		veil.color = Color(0.1, 0.12, 0.2, 0.6)
+		veil.set_anchors_preset(Control.PRESET_FULL_RECT)
+		add_child(veil)
+		var l := _label(tr("DAILY_PREPARING"), 34, Color.WHITE)
+		l.set_anchors_preset(Control.PRESET_CENTER)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		veil.add_child(l)
+		while not Daily.is_ready():
+			await get_tree().process_frame
+	Daily.start()
+	Transition.change_scene(GAME_SCENE)
+
+
+func _build_achievements() -> void:
+	var page: VBoxContainer = _pages["achievements"]
+	_clear(page)
+	_page_header(page, "ACH_TITLE", "home")
+	for entry in Achievements.LIST:
+		var value := mini(Achievements.stat(Progress, entry.stat), int(entry.goal))
+		var done := Achievements.is_done(Progress, entry)
+		var claimed: bool = entry.id in Progress.claimed
+		var panel := PanelContainer.new()
+		page.add_child(panel)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 14)
+		panel.add_child(row)
+		var star := StarIcon.new(46, done)
+		star.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(star)
+		var texts := VBoxContainer.new()
+		texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(texts)
+		var name_label := _label(tr("ACH_" + str(entry.id).to_upper()), 26, UiStyle.INK)
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_label.custom_minimum_size.x = 200
+		texts.add_child(name_label)
+		var bar := ProgressBar.new()
+		bar.max_value = int(entry.goal)
+		bar.value = value
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 14)
+		texts.add_child(bar)
+		texts.add_child(_label("%d / %d" % [value, int(entry.goal)], 20, UiStyle.INK.lerp(Color.WHITE, 0.35)))
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(150, 0)
+		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		b.add_theme_font_size_override("font_size", 24)
+		if claimed:
+			b.text = tr("ACH_COLLECTED")
+			b.disabled = true
+			b.theme_type_variation = "IconButton"
+		else:
+			b.text = "+%d" % int(entry.coins)
+			b.disabled = not done
+			b.theme_type_variation = "GoodButton" if done else ""
+			var id: String = entry.id
+			b.pressed.connect(func():
+				_click()
+				if Progress.claim_achievement(id) > 0:
+					Sfx.play("celebrate", -4.0)
+				_show("achievements", false))
+		row.add_child(b)
+
+
+## Small red dot in the top-right corner of a button (something to collect).
+static func _add_dot(button: Control) -> void:
+	var dot := Panel.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = UiStyle.DANGER
+	style.set_corner_radius_all(10)
+	dot.add_theme_stylebox_override("panel", style)
+	dot.size = Vector2(20, 20)
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(dot)
+	button.resized.connect(func(): dot.position = Vector2(button.size.x - 16, -4))
 
 
 # --- Helpers -----------------------------------------------------------------------

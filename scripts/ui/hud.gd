@@ -90,6 +90,8 @@ func show_win(result: Dictionary) -> void:
 	_result_title.add_theme_color_override("font_color", UiStyle.GOOD_DARK)
 	_result_text.visible = _last_level
 	_result_text.text = tr("WIN_WORLD_DONE")
+	if result.has("streak"):
+		_result_text.text = tr("DAILY_STREAK") % result.streak
 	_star_row.visible = true
 	_stats.visible = true
 	_time_value.text = _format_time(result.time)
@@ -167,6 +169,44 @@ func coins_doubled() -> void:
 	_coin_value.scale = Vector2.ONE * 1.5
 	_coin_value.create_tween().tween_property(_coin_value, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK)
 	Sfx.play("combo", -4.0, 1.5, 0.0)
+
+
+## Small banner sliding in under the top bar (e.g. an achievement).
+func show_toast(title: String, text: String) -> void:
+	var panel := PanelContainer.new()
+	var box := StyleBoxFlat.new()
+	box.bg_color = Color(0.17, 0.19, 0.28, 0.92)
+	box.set_corner_radius_all(22)
+	box.content_margin_left = 24
+	box.content_margin_right = 24
+	box.content_margin_top = 10
+	box.content_margin_bottom = 12
+	panel.add_theme_stylebox_override("panel", box)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	panel.add_child(row)
+	row.add_child(StarIcon.new(40))
+	var texts := VBoxContainer.new()
+	row.add_child(texts)
+	for pair in [[title, 22, Color("ffc93c")], [text, 28, Color.WHITE]]:
+		var l := Label.new()
+		l.text = pair[0]
+		l.add_theme_font_size_override("font_size", pair[1])
+		l.add_theme_color_override("font_color", pair[2])
+		texts.add_child(l)
+	add_child(panel) # above the result overlay
+	await get_tree().process_frame
+	var width := get_viewport().get_visible_rect().size.x
+	var insets: Vector4 = get_node("/root/ScreenFit").safe_insets()
+	var y := 150.0 + insets.y
+	panel.position = Vector2((width - panel.size.x) * 0.5, -panel.size.y)
+	Sfx.play("celebrate", -8.0, 1.2, 0.0)
+	var t := panel.create_tween()
+	t.tween_property(panel, "position:y", y, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_interval(2.0)
+	t.tween_property(panel, "modulate:a", 0.0, 0.3)
+	t.tween_callback(panel.queue_free)
 
 
 # --- Rescue bar --------------------------------------------------------------------

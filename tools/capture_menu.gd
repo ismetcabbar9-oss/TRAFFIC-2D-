@@ -21,7 +21,11 @@ func _initialize() -> void:
 	progress.inventory = {"hint": 2, "crane": 1}
 	progress.owned = ["arrow_gold", "smoke_pink"]
 	progress.equipped_items = {"arrow": "arrow_gold"}
-	for page in ["home", "world", "settings", "credits", "shop", "garage"]:
+	progress.gift = {"last_day": Daily.day_before(Daily.today()), "index": 2}
+	progress.daily_puzzle = {"last_day": Daily.day_before(Daily.today()), "streak": 3}
+	progress.stats = {"cars": 140, "best_combo": 5, "cranes": 1}
+	progress.claimed = ["first_win"]
+	for page in ["home", "world", "settings", "credits", "shop", "garage", "gift", "achievements"]:
 		menu._show(page, false)
 		for i in 20:
 			await process_frame
