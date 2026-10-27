@@ -2,7 +2,7 @@ class_name VehicleCatalog
 ## Vehicle types available to levels: model, footprint length and size limits.
 ## Swap models or add types here without touching gameplay code.
 
-const MODEL_DIR := "res://assets/models/vehicles/"
+const MODEL_DIR := "res://assets/models/hq/vehicles/"
 
 ## cells: footprint length in grid cells.
 ## max_stretch: how much the model may be lengthened (Z only) to fill its slot.
@@ -12,13 +12,13 @@ const MODEL_DIR := "res://assets/models/vehicles/"
 const TYPES := {
 	"sedan": {"model": "sedan.glb", "cells": 2, "max_stretch": 1.15,
 		"engine": "car_go", "horn": "horn_sedan", "pitch": 1.0},
-	"sedan_sports": {"model": "sedan-sports.glb", "cells": 2, "max_stretch": 1.15,
+	"sedan_sports": {"model": "sedan_sports.glb", "cells": 2, "max_stretch": 1.15,
 		"engine": "engine_sports", "horn": "horn_small", "pitch": 1.08},
-	"hatchback": {"model": "hatchback-sports.glb", "cells": 2, "max_stretch": 1.15,
+	"hatchback": {"model": "hatchback.glb", "cells": 2, "max_stretch": 1.15,
 		"engine": "engine_sports", "horn": "horn_small", "pitch": 1.14},
 	"suv": {"model": "suv.glb", "cells": 2, "max_stretch": 1.15,
 		"engine": "car_go", "horn": "horn", "pitch": 0.95},
-	"suv_luxury": {"model": "suv-luxury.glb", "cells": 2, "max_stretch": 1.15,
+	"suv_luxury": {"model": "suv_luxury.glb", "cells": 2, "max_stretch": 1.15,
 		"engine": "car_go", "horn": "horn", "pitch": 0.98},
 	"taxi": {"model": "taxi.glb", "cells": 2, "max_stretch": 1.15,
 		"engine": "car_go", "horn": "horn_double", "pitch": 1.03},
@@ -26,7 +26,7 @@ const TYPES := {
 		"engine": "car_go", "horn": "horn", "siren": "siren_police", "pitch": 1.0},
 	"van": {"model": "van.glb", "cells": 2, "max_stretch": 1.15,
 		"engine": "car_go", "horn": "horn", "pitch": 0.93},
-	"pickup": {"model": "truck.glb", "cells": 2, "max_stretch": 1.15,
+	"pickup": {"model": "pickup.glb", "cells": 2, "max_stretch": 1.15,
 		"engine": "car_go", "horn": "horn", "pitch": 0.9},
 	"ambulance": {"model": "ambulance.glb", "cells": 3, "max_stretch": 1.5,
 		"engine": "engine_truck", "horn": "horn_truck", "siren": "siren_ambulance", "pitch": 0.92},
@@ -34,7 +34,7 @@ const TYPES := {
 		"engine": "engine_truck", "horn": "horn_truck", "pitch": 0.88},
 	"firetruck": {"model": "firetruck.glb", "cells": 3, "max_stretch": 1.5,
 		"engine": "engine_truck", "horn": "horn_air", "siren": "horn_air", "pitch": 0.85},
-	"garbage": {"model": "garbage-truck.glb", "cells": 3, "max_stretch": 1.5,
+	"bus": {"model": "bus.glb", "cells": 3, "max_stretch": 1.5,
 		"engine": "engine_truck", "horn": "horn_truck", "pitch": 0.82},
 }
 

@@ -22,7 +22,7 @@
    "dir": "up"
   },
   {
-   "type": "garbage",
+   "type": "bus",
    "col": 1,
    "row": 0,
    "dir": "down"

@@ -24,7 +24,7 @@ const SPECS := [
 ]
 const ATTEMPTS := 400
 const SMALL := ["sedan", "sedan_sports", "hatchback", "suv", "suv_luxury", "taxi", "police", "van", "pickup"]
-const LARGE := ["ambulance", "delivery", "firetruck", "garbage"]
+const LARGE := ["ambulance", "delivery", "firetruck", "bus"]
 
 
 func _initialize() -> void:

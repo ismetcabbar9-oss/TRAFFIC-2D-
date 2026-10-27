@@ -100,7 +100,7 @@
    "dir": "right"
   },
   {
-   "type": "garbage",
+   "type": "bus",
    "col": 1,
    "row": 3,
    "dir": "right"

@@ -9,7 +9,7 @@ func _aabb(n: Node, xf: Transform3D, acc: Array) -> void:
 		_aabb(c, t, acc)
 
 func _init() -> void:
-	for d in ["res://assets/models/vehicles/", "res://assets/models/props/", "res://assets/models/suburban/", "res://assets/models/roads/", "res://assets/models/nature/"]:
+	for d in ["res://assets/models/hq/vehicles/", "res://assets/models/props/", "res://assets/models/hq/props/", "res://assets/models/hq/trees/"]:
 		for f in DirAccess.get_files_at(d):
 			if f.ends_with(".glb"):
 				var n: Node = load(d + f).instantiate()
