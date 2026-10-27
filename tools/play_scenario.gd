@@ -61,11 +61,11 @@ func _initialize() -> void:
 	await _seconds(2.0)
 	print("state after clearing: ", session.state)
 	await _shot("s5_win")
-	await _seconds(0.4)
+	await _seconds(2.2) # stars and coin count-up
 	await _shot("s5_win_later")
 	var progress := root.get_node("Progress")
 	print("after win: coins ", progress.coins, " stars ", progress.level_stars(0, 0))
-	game.hud._on_primary() # "Sonraki Bölüm"
+	game.hud._on_primary() # "Next Level"
 	await _frames(10)
 	print("level after next: ", game.level_index + 1)
 	await _shot("s5b_next_level")

@@ -24,6 +24,13 @@ var _hint_label: Label
 var _last_level := false
 var _root: Control
 var _badge: Label
+var _star_row: HBoxContainer
+var _stars: Array[StarIcon] = []
+var _stats: VBoxContainer
+var _time_value: Label
+var _record_tag: Label
+var _combo_value: Label
+var _coin_value: Label
 
 
 func _ready() -> void:
@@ -50,36 +57,78 @@ func set_mistakes(left: int, total: int) -> void:
 	_meter.set_counts(left, total)
 
 
-## `last_level`: no level follows, so the panel leads back to the menu.
-## `perfect`: cleared without a single crash.
-func show_win(last_level: bool, perfect := false) -> void:
+## `result`: stars, time, combo, coins, best_time, perfect and last_level
+## (no level follows in this world, so the panel leads back to the menu).
+func show_win(result: Dictionary) -> void:
 	_won = true
-	_badge.visible = perfect
+	_last_level = result.last_level
+	_badge.visible = result.perfect
 	# Behind the panel, in front of the dimmed board.
 	var confetti := Confetti.new()
 	_overlay.add_child(confetti)
 	_overlay.move_child(confetti, 0)
 	Sfx.play("celebrate", -4.0, 1.0, 0.0)
-	_last_level = last_level
 	_result_title.text = tr("WIN_TITLE")
 	_result_title.add_theme_color_override("font_color", UiStyle.GOOD_DARK)
-	_result_text.text = tr("WIN_WORLD_DONE") if last_level else tr("WIN_TEXT")
-	_primary.text = tr("HUD_MENU") if last_level else tr("WIN_NEXT")
-	_secondary.visible = not last_level
+	_result_text.visible = _last_level
+	_result_text.text = tr("WIN_WORLD_DONE")
+	_star_row.visible = true
+	_stats.visible = true
+	_time_value.text = _format_time(result.time)
+	_record_tag.visible = result.best_time
+	_combo_value.text = "x%d" % result.combo if result.combo >= 2 else "-"
+	_coin_value.text = "+0"
+	_primary.text = tr("HUD_MENU") if _last_level else tr("WIN_NEXT")
+	_secondary.visible = not _last_level
 	_primary.theme_type_variation = "GoodButton"
+	for star in _stars:
+		star.filled = false
+		star.scale = Vector2.ONE
 	_show_result()
+	_reveal(result.stars, result.coins)
 
 
 func show_lose() -> void:
 	_won = false
 	_result_title.text = tr("LOSE_TITLE")
 	_result_title.add_theme_color_override("font_color", UiStyle.DANGER)
+	_result_text.visible = true
 	_result_text.text = tr("LOSE_TEXT")
+	_star_row.visible = false
+	_stats.visible = false
 	_primary.text = tr("LOSE_RETRY")
 	_primary.theme_type_variation = ""
 	_secondary.visible = true
 	_badge.visible = false
 	_show_result()
+
+
+## Stars pop in one by one with a rising chime, then the coins count up.
+func _reveal(stars: int, coins: int) -> void:
+	await get_tree().create_timer(0.45).timeout
+	for i in stars:
+		if not _overlay.visible:
+			return
+		var star: StarIcon = _stars[i]
+		star.filled = true
+		star.pivot_offset = star.size * 0.5
+		star.scale = Vector2.ONE * 1.6
+		star.create_tween().tween_property(star, "scale", Vector2.ONE, 0.3) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		Sfx.play("combo", -6.0, pow(2.0, i * 4.0 / 12.0), 0.0)
+		Haptics.pulse(20)
+		await get_tree().create_timer(0.28).timeout
+	var t := create_tween()
+	t.tween_method(func(v: float): _coin_value.text = "+%d" % roundi(v), 0.0, float(coins), 0.6)
+	t.tween_callback(func():
+		_coin_value.pivot_offset = _coin_value.size * 0.5
+		_coin_value.scale = Vector2.ONE * 1.3
+		_coin_value.create_tween().tween_property(_coin_value, "scale", Vector2.ONE, 0.2))
+
+
+static func _format_time(seconds: float) -> String:
+	var total := int(seconds)
+	return "%d:%02d" % [total / 60, total % 60]
 
 
 ## Floating "x3 Super!" over the car that just left; `at` is a screen position.
@@ -310,6 +359,34 @@ func _build_result(root: Control) -> void:
 	_result_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_result_text)
 
+	_star_row = HBoxContainer.new()
+	_star_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	_star_row.add_theme_constant_override("separation", 14)
+	box.add_child(_star_row)
+	for i in 3:
+		var star := StarIcon.new(96 if i == 1 else 80, false)
+		star.size_flags_vertical = Control.SIZE_SHRINK_END if i != 1 else Control.SIZE_SHRINK_BEGIN
+		_stars.append(star)
+		_star_row.add_child(star)
+
+	_stats = VBoxContainer.new()
+	_stats.add_theme_constant_override("separation", 6)
+	box.add_child(_stats)
+	_time_value = _stat_row(tr("RES_TIME"))
+	_record_tag = Label.new()
+	_record_tag.text = tr("RES_RECORD")
+	_record_tag.add_theme_font_size_override("font_size", 22)
+	_record_tag.add_theme_color_override("font_color", UiStyle.ACCENT_DARK)
+	_time_value.get_parent().add_child(_record_tag)
+	_time_value.get_parent().move_child(_record_tag, 1)
+	_combo_value = _stat_row(tr("RES_COMBO"))
+	_coin_value = _stat_row(tr("RES_COINS"))
+	var coin_row := _coin_value.get_parent()
+	var coin := CoinIcon.new(34)
+	coin_row.add_child(coin)
+	coin_row.move_child(coin, 1)
+	_coin_value.add_theme_color_override("font_color", UiStyle.ACCENT_DARK)
+
 	var buttons := VBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 14)
 	box.add_child(buttons)
@@ -338,3 +415,21 @@ func _on_primary() -> void:
 		next_requested.emit()
 	else:
 		restart_requested.emit()
+
+
+## Adds "caption ........ value" to the stats block and returns the value label.
+func _stat_row(caption: String) -> Label:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	_stats.add_child(row)
+	var name_label := Label.new()
+	name_label.text = caption
+	name_label.add_theme_font_size_override("font_size", 28)
+	name_label.add_theme_color_override("font_color", UiStyle.INK.lerp(Color.WHITE, 0.3))
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(name_label)
+	var value := Label.new()
+	value.add_theme_font_override("font", UiStyle.font(800))
+	value.add_theme_font_size_override("font_size", 32)
+	row.add_child(value)
+	return value

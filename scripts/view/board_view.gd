@@ -212,10 +212,10 @@ func _add_markings(lot: Vector2, road_outer: Vector2) -> void:
 		z += dash + gap
 
 
-## "ÇIKIŞ" painted on the exit road, readable from the camera.
+## "EXIT" painted on the exit road, readable from the camera.
 func _add_exit_label(road_outer: Vector2) -> void:
 	var label := Label3D.new()
-	label.text = "ÇIKIŞ"
+	label.text = tr("ROAD_EXIT")
 	label.font = UiStyle.font(800)
 	label.font_size = 96
 	label.pixel_size = 0.0075

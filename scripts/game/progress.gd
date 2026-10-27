@@ -78,8 +78,8 @@ func has_next_level(world: int, level: int) -> bool:
 
 
 ## Stores a win, keeping the best stars / time / combo, and pays the coins.
-## Returns the coins earned.
-func record_win(world: int, level: int, stars: int, time: float, combo: int, hard: bool) -> int:
+## Returns {coins: earned, best_time: true when an earlier time was beaten}.
+func record_win(world: int, level: int, stars: int, time: float, combo: int, hard: bool) -> Dictionary:
 	var key := _key(world, level)
 	var old: Dictionary = levels.get(key, {})
 	var old_time := float(old.get("time", -1.0))
@@ -90,7 +90,7 @@ func record_win(world: int, level: int, stars: int, time: float, combo: int, har
 	}
 	var earned := Economy.level_coins(stars, combo, hard)
 	add_coins(earned)
-	return earned
+	return {"coins": earned, "best_time": old_time >= 0.0 and time < old_time}
 
 
 func add_coins(amount: int) -> void:

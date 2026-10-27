@@ -253,7 +253,13 @@ func _on_won() -> void:
 	var played := session
 	var mistakes_used := session.level.mistakes - session.mistakes_left
 	var stars := Economy.stars_for(mistakes_used)
-	var earned := Progress.record_win(world_index, level_index, stars, _clock - _level_start, _best_combo, session.level.hard)
+	var time := _clock - _level_start
+	var record := Progress.record_win(world_index, level_index, stars, time, _best_combo, session.level.hard)
+	var result := {
+		"stars": stars, "time": time, "combo": _best_combo, "coins": record.coins,
+		"best_time": record.best_time, "perfect": mistakes_used == 0,
+		"last_level": not Progress.has_next_level(world_index, level_index),
+	}
 	var waited := 0.0
 	while VehicleView.exiting_count() > 0 and waited < max_exit_wait:
 		await get_tree().process_frame
@@ -262,7 +268,7 @@ func _on_won() -> void:
 	if played == session:
 		Sfx.duck_music(2.0)
 		Sfx.play("win", -2.0, 1.0, 0.0)
-		hud.show_win(not Progress.has_next_level(world_index, level_index), mistakes_used == 0)
+		hud.show_win(result)
 
 
 func _on_lost() -> void:
