@@ -45,7 +45,7 @@ func _ready() -> void:
 	_adapt_lighting()
 	hud.restart_requested.connect(func(): Transition.cover(load_level.bind(level_index)))
 	hud.next_requested.connect(func(): Transition.cover(load_level.bind(level_index + 1)))
-	hud.menu_requested.connect(func(): Transition.change_scene(MENU_SCENE))
+	hud.menu_requested.connect(_to_menu)
 	hud.tutorial_closed.connect(func():
 		_tutorial_open = false
 		Progress.mark_tutorial_seen()
@@ -117,14 +117,14 @@ func load_level(index: int) -> void:
 
 	hud.hide_result()
 	_clear_hint()
-	hud.set_level_title(level.name)
+	hud.set_level_title(tr("LEVEL_N") % (level_index + 1))
 	hud.set_time_of_day(TimeOfDay.label(hour))
 	hud.set_mistakes(session.mistakes_left, level.mistakes)
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST: # Android back button
-		Transition.change_scene(MENU_SCENE)
+		_to_menu()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -153,7 +153,7 @@ func _process(delta: float) -> void:
 	if vehicle_views.has(_hinted_id):
 		vehicle_views[_hinted_id].flash_hint()
 		if world_index == 0 and level_index < tutorial_levels:
-			hud.show_hint("Yolu açık bir arabaya dokun!")
+			hud.show_hint(tr("HINT_TAP_FREE"))
 
 
 ## Restarts the idle timer after the player acts (or a level starts).
@@ -272,3 +272,8 @@ func _on_lost() -> void:
 		Sfx.duck_music(2.0)
 		Sfx.play("lose", -2.0, 1.0, 0.0)
 		hud.show_lose()
+
+
+func _to_menu() -> void:
+	MainMenu.return_to_world = true
+	Transition.change_scene(MENU_SCENE)

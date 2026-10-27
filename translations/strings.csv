@@ -1,0 +1,64 @@
+keys,en,tr
+MENU_PLAY,Play,Oyna
+MENU_SUBTITLE,Clear the parking lot in the right order!,Doğru sırayla otoparkı boşalt!
+MENU_SETTINGS,Settings,Ayarlar
+BACK,Back,Geri
+WORLD_N,World %d,Dünya %d
+WORLD_CITY,City Parking,Şehir Otoparkı
+WORLD_BEACH,Beach Town,Sahil Kasabası
+WORLD_SNOW,Snowy Village,Karlı Köy
+WORLD_NIGHT,Night City,Gece Şehri
+WORLD_AIRPORT,Airport,Havalimanı
+WORLD_NEEDS_STARS,%d stars to unlock,Açmak için %d yıldız
+WORLD_SOON,Coming soon,Yakında
+LEVEL_N,Level %d,Bölüm %d
+SETTINGS_TITLE,Settings,Ayarlar
+SET_SOUND,Sound,Ses
+SET_MUSIC,Music,Müzik
+SET_VIBRATION,Vibration,Titreşim
+SET_SPEED,Car speed,Araç hızı
+SET_LANGUAGE,Language,Dil
+SET_RESTORE,Restore purchases,Satın alımları geri yükle
+SET_PRIVACY,Privacy policy,Gizlilik politikası
+SET_CREDITS,Credits,Künye
+SOON_SHORT,Soon,Yakında
+ON,On,Açık
+OFF,Off,Kapalı
+LANG_AUTO,Automatic,Otomatik
+LANG_EN,English,English
+LANG_TR,Türkçe,Türkçe
+SPEED_SLOW,Slow,Yavaş
+SPEED_NORMAL,Normal,Normal
+SPEED_FAST,Fast,Hızlı
+SPEED_VERY_FAST,Very fast,Çok hızlı
+CREDITS_TITLE,Credits,Künye
+CREDITS_INTRO,Made with Godot Engine. Thank you to these artists:,Godot Engine ile yapıldı. Bu sanatçılara teşekkürler:
+HUD_MENU,Menu,Menü
+HUD_RETRY,Retry,Tekrar
+HUD_MOVES,Moves,Hamle hakkı
+TOD_MORNING,Morning,Sabah
+TOD_NOON,Noon,Öğle
+TOD_AFTERNOON,Afternoon,İkindi
+TOD_EVENING,Evening,Akşam
+HINT_TAP_FREE,Tap a car with a clear path!,Yolu açık bir arabaya dokun!
+COMBO_3,Super!,Süper!
+COMBO_4,Great!,Harika!
+COMBO_5,Amazing!,Muhteşem!
+TUT_TITLE,How to play,Nasıl oynanır?
+TUT_1,Tap a car: it drives the way its arrow points.,Bir arabaya dokun: okun gösterdiği yöne gider.
+TUT_2,"If the way is clear, it leaves the lot.",Yolu açıksa otoparktan çıkar.
+TUT_3,"If something is in front, it crashes and you lose a move.",Önü kapalıysa çarpar ve bir hamle hakkın gider.
+TUT_4,Get every car out in the right order!,Doğru sırayla tüm arabaları çıkar!
+TUT_START,Start,Başla
+WIN_TITLE,Great!,Harika!
+WIN_PERFECT,Flawless!,Hatasız!
+WIN_TEXT,Parking lot cleared.,Otopark boşaldı.
+WIN_WORLD_DONE,World complete!,Dünya tamamlandı!
+WIN_NEXT,Next Level,Sonraki Bölüm
+RES_TIME,Time,Süre
+RES_COMBO,Best combo,En iyi combo
+RES_COINS,Coins,Jeton
+RES_RECORD,New best!,Yeni rekor!
+LOSE_TITLE,Stuck!,Sıkıştın!
+LOSE_TEXT,No moves left.,Hamle hakkın bitti.
+LOSE_RETRY,Try Again,Tekrar Dene

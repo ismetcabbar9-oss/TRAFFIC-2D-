@@ -26,12 +26,12 @@ static func hour_for_level(index: int, count: int) -> float:
 
 static func label(hour: float) -> String:
 	if hour < 11.0:
-		return "Sabah"
+		return TranslationServer.translate("TOD_MORNING")
 	if hour < 14.0:
-		return "Öğle"
+		return TranslationServer.translate("TOD_NOON")
 	if hour < 17.0:
-		return "İkindi"
-	return "Akşam"
+		return TranslationServer.translate("TOD_AFTERNOON")
+	return TranslationServer.translate("TOD_EVENING")
 
 
 ## Points `sun` and tints it and the ambient light for `hour`.

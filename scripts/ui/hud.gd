@@ -61,10 +61,10 @@ func show_win(last_level: bool, perfect := false) -> void:
 	_overlay.move_child(confetti, 0)
 	Sfx.play("celebrate", -4.0, 1.0, 0.0)
 	_last_level = last_level
-	_result_title.text = "Harika!"
+	_result_title.text = tr("WIN_TITLE")
 	_result_title.add_theme_color_override("font_color", UiStyle.GOOD_DARK)
-	_result_text.text = "Tüm bölümleri bitirdin!" if last_level else "Otopark boşaldı."
-	_primary.text = "Menü" if last_level else "Sonraki Bölüm"
+	_result_text.text = tr("WIN_WORLD_DONE") if last_level else tr("WIN_TEXT")
+	_primary.text = tr("HUD_MENU") if last_level else tr("WIN_NEXT")
 	_secondary.visible = not last_level
 	_primary.theme_type_variation = "GoodButton"
 	_show_result()
@@ -72,21 +72,21 @@ func show_win(last_level: bool, perfect := false) -> void:
 
 func show_lose() -> void:
 	_won = false
-	_result_title.text = "Sıkıştın!"
+	_result_title.text = tr("LOSE_TITLE")
 	_result_title.add_theme_color_override("font_color", UiStyle.DANGER)
-	_result_text.text = "Hamle hakkın bitti."
-	_primary.text = "Tekrar Dene"
+	_result_text.text = tr("LOSE_TEXT")
+	_primary.text = tr("LOSE_RETRY")
 	_primary.theme_type_variation = ""
 	_secondary.visible = true
 	_badge.visible = false
 	_show_result()
 
 
-## Floating "x3 Süper!" over the car that just left; `at` is a screen position.
+## Floating "x3 Super!" over the car that just left; `at` is a screen position.
 func show_combo(count: int, at: Vector2) -> void:
-	var words := ["", "", "", "Süper!", "Harika!"]
+	var words := ["", "", "", "COMBO_3", "COMBO_4"]
 	var label := Label.new()
-	label.text = "x%d %s" % [count, words[count] if count < words.size() else "Muhteşem!"]
+	label.text = "x%d %s" % [count, tr(words[count] if count < words.size() else "COMBO_5")]
 	label.add_theme_font_override("font", UiStyle.font(800))
 	label.add_theme_font_size_override("font_size", 46 + mini(count, 6) * 4)
 	label.add_theme_color_override("font_color", Color.WHITE)
@@ -121,22 +121,19 @@ func show_tutorial() -> void:
 	box.add_theme_constant_override("separation", 16)
 	panel.add_child(box)
 	var title := Label.new()
-	title.text = "Nasıl oynanır?"
+	title.text = tr("TUT_TITLE")
 	title.add_theme_font_size_override("font_size", 52)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
-	for line in ["Bir arabaya dokun: okun gösterdiği yöne gider.",
-			"Yolu açıksa otoparktan çıkar.",
-			"Önü kapalıysa çarpar ve bir hamle hakkın gider.",
-			"Doğru sırayla tüm arabaları çıkar!"]:
+	for line in ["TUT_1", "TUT_2", "TUT_3", "TUT_4"]:
 		var l := Label.new()
-		l.text = line
+		l.text = tr(line)
 		l.add_theme_font_size_override("font_size", 28)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size.x = 460
 		box.add_child(l)
 	var go := Button.new()
-	go.text = "Başla"
+	go.text = tr("TUT_START")
 	go.theme_type_variation = "GoodButton"
 	box.add_child(go)
 	go.pressed.connect(func():
@@ -212,13 +209,13 @@ func _build_top_bar(root: Control) -> void:
 	var bar := HBoxContainer.new()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rows.add_child(bar)
-	bar.add_child(_small_button("Menü", menu_requested.emit))
+	bar.add_child(_small_button(tr("HUD_MENU"), menu_requested.emit))
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 42)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(_title)
-	bar.add_child(_small_button("Tekrar", restart_requested.emit))
+	bar.add_child(_small_button(tr("HUD_RETRY"), restart_requested.emit))
 
 	var meter_row := HBoxContainer.new()
 	meter_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -230,7 +227,7 @@ func _build_top_bar(root: Control) -> void:
 	_time_label.add_theme_color_override("font_color", UiStyle.ACCENT_DARK)
 	meter_row.add_child(_time_label)
 	var caption := Label.new()
-	caption.text = "Hamle hakkı"
+	caption.text = tr("HUD_MOVES")
 	caption.add_theme_font_size_override("font_size", 24)
 	caption.add_theme_color_override("font_color", UiStyle.INK.lerp(Color.WHITE, 0.25))
 	meter_row.add_child(caption)
@@ -302,7 +299,7 @@ func _build_result(root: Control) -> void:
 	box.add_child(_result_title)
 
 	_badge = Label.new()
-	_badge.text = "Hatasız bitirdin!"
+	_badge.text = tr("WIN_PERFECT")
 	_badge.add_theme_font_size_override("font_size", 30)
 	_badge.add_theme_color_override("font_color", UiStyle.ACCENT_DARK)
 	_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -320,7 +317,7 @@ func _build_result(root: Control) -> void:
 	_primary.pressed.connect(_on_primary)
 	buttons.add_child(_primary)
 	_secondary = Button.new()
-	_secondary.text = "Menü"
+	_secondary.text = tr("HUD_MENU")
 	_secondary.theme_type_variation = "IconButton"
 	_secondary.pressed.connect(func():
 		_click()

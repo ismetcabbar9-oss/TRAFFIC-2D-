@@ -48,7 +48,7 @@ func _initialize() -> void:
 				best["_report"] = "%d cars, %d waves, %d free at start" % [data.vehicles.size(), report.rounds, report.first_free]
 		var report_text: String = best["_report"]
 		best.erase("_report")
-		best["name"] = "Bölüm %d" % (i + 1)
+		best["name"] = "Level %d" % (i + 1)
 		var path := "res://levels/world_1/level_%02d.json" % (i + 1)
 		var f := FileAccess.open(path, FileAccess.WRITE)
 		f.store_string(JSON.stringify(best, " ", false) + "\n")
