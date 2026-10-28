@@ -9,7 +9,7 @@ extends RefCounted
 ## Difficulty follows a sawtooth inside each world: it climbs level by level,
 ## levels 5, 15, 25 and 35 are easy "breathers", 10, 20, 30 and 40 are marked
 ## hard. Levels 21-40 are a second act: they start a little easier than level
-## 20 and climb further, onto boards of up to 8x9.
+## 20 and climb further, onto boards of up to 8x8.
 ## Each world adds its mechanic (cargo, turn, lock, gate); the first two
 ## levels of a world introduce it on a small board, and later worlds mix in
 ## the previous mechanic now and then. Same code + seeds give the same levels.
@@ -75,7 +75,7 @@ static func spec(w: int, i: int, mechanic: String) -> Dictionary:
 		d = minf(d, 0.08 + i * 0.08)
 	d = clampf(d, 0.0, 1.0 if act == 0 else 1.25)
 	var cols := clampi(4 + roundi(d * 3.4 + 0.25), 4, 7 if act == 0 else 8)
-	var rows := clampi(cols + (1 if d > 0.35 else 0), 4, 8 if act == 0 else 9)
+	var rows := clampi(cols + (1 if d > 0.35 else 0), 4, 8) # 8x8 at most: readable on phones
 	var fill := minf(d, 1.0) # density and truck share stop growing past 1
 	var mechanic_count := 0
 	if mechanic != "":

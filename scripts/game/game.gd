@@ -35,6 +35,8 @@ var _crane_mode := false ## next tapped car is lifted out
 var _held_hint := -1 ## car glowing from a paid hint
 var _earned := 0 ## coins from the last win (for "double coins")
 var _done_at_start: Array = [] ## achievements already reached when the level began
+var _gestures := TouchGestures.new()
+var _last_empty_tap := {"time": -10.0, "pos": Vector2.ZERO} ## for double tap to zoom
 
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
@@ -50,6 +52,9 @@ func _ready() -> void:
 	hud.next_requested.connect(func(): Transition.cover(load_level.bind(level_index + 1)))
 	hud.menu_requested.connect(_to_menu)
 	hud.rescue_pressed.connect(_on_rescue)
+	_gestures.tapped.connect(_on_tap)
+	_gestures.panned.connect(func(delta: Vector2): camera.pan_by(delta))
+	_gestures.pinched.connect(func(factor: float, center: Vector2): camera.zoom_at(factor, center))
 	hud.dev_requested.connect(_show_dev_panel)
 	hud.offer_accepted.connect(_on_offer_accepted)
 	hud.continue_requested.connect(_on_continue)
@@ -148,6 +153,7 @@ func load_level(index: int) -> void:
 		TimeOfDay.apply(hour, $Sun, env, _sun_scale, _ambient_scale)
 	# Keep the exit barrier in view below the board.
 	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y)
+	camera.reset_view()
 	camera.play_intro()
 	# Cars pop in one after another, row by row.
 	for id in vehicle_views:
@@ -162,6 +168,10 @@ func load_level(index: int) -> void:
 	_refresh_rescues()
 	_show_mechanic_tip(level)
 	_maybe_gift_crane()
+	# The first big board tells how to zoom (once).
+	if level.cols * level.rows >= 49 and not Progress.flag("zoom_tip") and not _tutorial_open:
+		Progress.set_flag("zoom_tip")
+		hud.show_hint(tr("HINT_ZOOM"))
 	var title := tr("LEVEL_N") % (level_index + 1)
 	if Daily.playing:
 		title = tr("DAILY_TITLE")
@@ -199,20 +209,44 @@ func _notification(what: int) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Mouse clicks arrive as touches too (pointing/emulate_touch_from_mouse).
-	# Every finger counts, so two quick taps with two fingers both register.
-	if event is InputEventScreenTouch and event.pressed:
-		var id := _pick_vehicle(event.position)
-		if id >= 0 and session != null:
-			_clear_hint()
-			_release_held_hint()
-			if _crane_mode:
-				_set_crane_mode(false)
-				if session.state == GameSession.State.PLAYING and Progress.use_item("crane"):
-					session.lift(id)
-			else:
-				session.tap(id)
-			_refresh_rescues()
-			get_viewport().set_input_as_handled()
+	if _gestures.handle(event, get_viewport().get_visible_rect().size.y):
+		get_viewport().set_input_as_handled()
+		return
+	# Desktop: mouse wheel and trackpad pinch zoom as well.
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			camera.zoom_at(1.12, event.position)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			camera.zoom_at(1.0 / 1.12, event.position)
+	elif event is InputEventMagnifyGesture:
+		camera.zoom_at(event.factor, event.position)
+
+
+## A finger lifted without dragging: tap the car under it. Two quick taps on
+## empty ground zoom in there (or back out).
+func _on_tap(screen_pos: Vector2) -> void:
+	if session == null:
+		return
+	var id := _pick_vehicle(screen_pos)
+	if id < 0:
+		var now := _clock
+		if now - _last_empty_tap.time < 0.35 and screen_pos.distance_to(_last_empty_tap.pos) < 80.0:
+			var ground: Variant = camera.ground_point(screen_pos)
+			if ground != null:
+				camera.toggle_zoom(ground)
+			_last_empty_tap.time = -10.0
+		else:
+			_last_empty_tap = {"time": now, "pos": screen_pos}
+		return
+	_clear_hint()
+	_release_held_hint()
+	if _crane_mode:
+		_set_crane_mode(false)
+		if session.state == GameSession.State.PLAYING and Progress.use_item("crane"):
+			session.lift(id)
+	else:
+		session.tap(id)
+	_refresh_rescues()
 
 
 func _process(delta: float) -> void:
@@ -255,7 +289,28 @@ func _pick_vehicle(screen_pos: Vector2) -> int:
 	if ground == null:
 		return -1
 	var occupant := session.board.at(board.world_to_cell(ground))
-	return occupant if occupant >= 0 else -1
+	if occupant >= 0:
+		return occupant
+	return _nearest_vehicle(ground)
+
+
+## Forgiving touch for small screens: the car whose footprint is closest to
+## the finger, if within about half a cell.
+func _nearest_vehicle(ground: Vector3) -> int:
+	var cell_size := board.theme.cell_size
+	var p := (Vector2(ground.x, ground.z) + board.lot_size() * 0.5) / cell_size
+	var best := -1
+	var best_distance := 0.45
+	for id in session.board.vehicles:
+		var v: VehicleState = session.board.vehicles[id]
+		var span := Vector2(v.length, 1) if GridDir.is_horizontal(v.dir) else Vector2(1, v.length)
+		var rect := Rect2(Vector2(v.cell), span)
+		var closest := p.clamp(rect.position, rect.end)
+		var distance := p.distance_to(closest)
+		if distance < best_distance:
+			best_distance = distance
+			best = id
+	return best
 
 
 func _on_vehicle_exited(id: int, result: BoardState.MoveResult) -> void:

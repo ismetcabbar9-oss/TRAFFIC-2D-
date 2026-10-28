@@ -203,3 +203,4 @@ DEV_PREV,Previous level,Önceki bölüm
 DEV_NEXT,Next level,Sonraki bölüm
 ACH_LEVELS_200,Clear all 200 levels,200 bölümün hepsini bitir
 ACH_PERFECT_150,Clear 150 levels without a crash,150 bölümü hatasız bitir
+HINT_ZOOM,Pinch or double tap to zoom in,Yakınlaştırmak için iki parmakla aç ya da çift dokun
