@@ -36,6 +36,7 @@ var _held_hint := -1 ## car glowing from a paid hint
 var _earned := 0 ## coins from the last win (for "double coins")
 var _done_at_start: Array = [] ## achievements already reached when the level began
 var _gestures := TouchGestures.new()
+var _headlights: HeadlightPool ## night worlds: all headlight pools in one draw
 var _onboarding := false ## first session: levels 1-3 guided by a pointing hand
 var _guide_id := -1 ## car the hand points at
 var _guide_delay := 0.0 ## seconds until the hand shows
@@ -128,6 +129,9 @@ func load_level(index: int) -> void:
 	var world_theme := WorldTheme.for_world(world_index)
 	Sfx.play_music(world_theme.music)
 	VehicleView.headlights = world_theme.night
+	if world_theme.night and _headlights == null:
+		_headlights = HeadlightPool.new()
+		add_child(_headlights)
 	board.theme = world_theme.board
 	board.build(level.cols, level.rows)
 	scenery.build(board.view_half_extents(), board.theme.road_width * 0.5, level.cols * 31 + level.rows, world_theme)

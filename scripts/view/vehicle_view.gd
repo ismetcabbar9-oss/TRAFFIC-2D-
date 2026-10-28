@@ -98,7 +98,6 @@ func setup(board: BoardView, p_state: VehicleState, effects_root: Node3D) -> voi
 				part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var roof := _fit_model(cell_size)
 	_roof = roof
-	_add_contact_shadow(cell_size)
 	_add_arrow(cell_size, roof)
 	_add_pick_body(roof)
 	_add_mechanic_markers(cell_size)
@@ -428,41 +427,6 @@ func _add_pick_body(roof: float) -> void:
 	add_child(_pick_body)
 
 
-## Soft dark patch under the car so it reads as grounded on any renderer.
-func _add_contact_shadow(cell_size: float) -> void:
-	var quad := MeshInstance3D.new()
-	quad.name = "ContactShadow"
-	var mesh := PlaneMesh.new()
-	mesh.size = Vector2(cell_size - SIDE_GAP * 0.4, cell_size * length - END_GAP * 0.6)
-	quad.mesh = mesh
-	quad.material_override = _contact_shadow_material()
-	quad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	quad.position.y = 0.005
-	add_child(quad)
-
-
-static var _shadow_material: StandardMaterial3D
-
-static func _contact_shadow_material() -> StandardMaterial3D:
-	if _shadow_material == null:
-		var gradient := Gradient.new()
-		gradient.set_color(0, Color(0, 0, 0, 0.45))
-		gradient.set_color(1, Color(0, 0, 0, 0))
-		gradient.add_point(0.55, Color(0, 0, 0, 0.35))
-		var tex := GradientTexture2D.new()
-		tex.gradient = gradient
-		tex.fill = GradientTexture2D.FILL_SQUARE
-		tex.fill_from = Vector2(0.5, 0.5)
-		tex.fill_to = Vector2(1.0, 0.5)
-		tex.width = 64
-		tex.height = 64
-		_shadow_material = StandardMaterial3D.new()
-		_shadow_material.albedo_texture = tex
-		_shadow_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		_shadow_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	return _shadow_material
-
-
 static func _model_aabb(node: Node, xf: Transform3D) -> AABB:
 	var result := AABB()
 	var has := false
@@ -616,21 +580,23 @@ func unlock() -> void:
 		f.tween_callback(frame.queue_free)
 
 
-static var _headlight_material: ShaderMaterial
+## Night worlds: where this car's headlight pool lies, relative to its body
+## (drawn by HeadlightPool together with every other car's).
+var headlight_offset := Transform3D()
+static var _with_headlights: Array[VehicleView] = []
+
 
 func _add_headlights(cell_size: float) -> void:
-	if _headlight_material == null:
-		_headlight_material = ShaderMaterial.new()
-		_headlight_material.shader = preload("res://shaders/glow.gdshader")
-		_headlight_material.set_shader_parameter("glow_color", Color(1.0, 0.93, 0.72))
-		_headlight_material.set_shader_parameter("strength", 0.42)
-		_headlight_material.set_shader_parameter("stretch", 1.0)
-	var beam := MeshInstance3D.new()
-	var quad := QuadMesh.new()
-	quad.orientation = PlaneMesh.FACE_Y
-	quad.size = Vector2(cell_size * 0.95, cell_size * 1.3)
-	beam.mesh = quad
-	beam.material_override = _headlight_material
-	beam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	beam.position = Vector3(0.0, 0.06, half_length + cell_size * 0.5)
-	_body.add_child(beam)
+	headlight_offset = Transform3D(Basis().scaled(Vector3(cell_size * 0.95, 1.0, cell_size * 1.3)),
+			Vector3(0.0, 0.06, half_length + cell_size * 0.5))
+	_with_headlights.append(self)
+	tree_exiting.connect(func(): _with_headlights.erase(self))
+
+
+## Global transforms of every headlight pool on screen.
+static func headlight_transforms() -> Array[Transform3D]:
+	var result: Array[Transform3D] = []
+	for v in _with_headlights:
+		if is_instance_valid(v) and v.is_inside_tree():
+			result.append(v._body.global_transform * v.headlight_offset)
+	return result
