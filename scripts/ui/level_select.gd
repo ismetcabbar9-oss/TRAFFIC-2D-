@@ -26,6 +26,12 @@ var _world := 0 ## world shown on the world page
 ## Set by the game so leaving a level lands on that world's level grid.
 static var return_to_world := false
 static var _gift_offered := false
+static var _launched := false ## the menu has been shown (or skipped) once
+
+
+## The gift page will not pop up by itself during this launch.
+static func skip_gift_once() -> void:
+	_gift_offered = true
 var _title_taps := 0
 var _title_tap_time := 0.0
 
@@ -43,6 +49,14 @@ func _ready() -> void:
 	_pages["gift"] = _page()
 	_pages["achievements"] = _page()
 	_pages["dev"] = _page()
+	# A brand-new player goes straight into level 1: no menu before playing.
+	if not _launched and Progress.in_onboarding():
+		_launched = true
+		Progress.current_world = 0
+		Progress.current_level = Progress.next_open_level(0)
+		get_tree().change_scene_to_file.call_deferred(GAME_SCENE)
+		return
+	_launched = true
 	if return_to_world:
 		return_to_world = false
 		_world = Progress.current_world

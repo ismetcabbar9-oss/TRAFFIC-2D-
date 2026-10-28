@@ -36,6 +36,9 @@ var _held_hint := -1 ## car glowing from a paid hint
 var _earned := 0 ## coins from the last win (for "double coins")
 var _done_at_start: Array = [] ## achievements already reached when the level began
 var _gestures := TouchGestures.new()
+var _onboarding := false ## first session: levels 1-3 guided by a pointing hand
+var _guide_id := -1 ## car the hand points at
+var _guide_delay := 0.0 ## seconds until the hand shows
 var _last_empty_tap := {"time": -10.0, "pos": Vector2.ZERO} ## for double tap to zoom
 
 @onready var board: BoardView = $Board
@@ -67,12 +70,8 @@ func _ready() -> void:
 		_refresh_rescues())
 	hud.tutorial_closed.connect(func():
 		_tutorial_open = false
-		Progress.mark_tutorial_seen()
 		_clear_hint())
 	load_level(Progress.current_level)
-	if world_index == 0 and level_index == 0 and not Progress.tutorial_seen:
-		_tutorial_open = true
-		hud.show_tutorial()
 
 
 ## Devices without Vulkan fall back to the Compatibility renderer, which lights
@@ -161,6 +160,9 @@ func load_level(index: int) -> void:
 		v.pop_in(0.25 + minf((v.cell.y * level.cols + v.cell.x) * 0.012, 0.55))
 
 	hud.hide_result()
+	_onboarding = Progress.in_onboarding() and world_index == 0 and level_index < 3 and not Daily.playing
+	hud.set_onboarding(_onboarding)
+	_reset_guide()
 	_clear_hint()
 	_set_crane_mode(false)
 	_held_hint = -1
@@ -204,7 +206,8 @@ func _show_mechanic_tip(level: LevelData) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST: # Android back button
-		_to_menu()
+		if not _onboarding: # the first levels have no menu to go back to
+			_to_menu()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -240,6 +243,9 @@ func _on_tap(screen_pos: Vector2) -> void:
 		return
 	_clear_hint()
 	_release_held_hint()
+	if _onboarding:
+		_reset_guide()
+		_guide_delay = 0.9 if level_index == 0 else 4.0
 	if _crane_mode:
 		_set_crane_mode(false)
 		if session.state == GameSession.State.PLAYING and Progress.use_item("crane"):
@@ -252,6 +258,10 @@ func _on_tap(screen_pos: Vector2) -> void:
 func _process(delta: float) -> void:
 	_clock += delta
 	if session == null or session.state != GameSession.State.PLAYING or _tutorial_open:
+		hud.hide_hand()
+		return
+	if _onboarding:
+		_update_guide(delta)
 		return
 	_idle += delta
 	if _idle < _next_hint:
@@ -266,6 +276,30 @@ func _process(delta: float) -> void:
 		vehicle_views[_hinted_id].flash_hint()
 		if world_index == 0 and level_index < tutorial_levels:
 			hud.show_hint(tr("HINT_TAP_FREE"))
+
+
+## First session: a hand taps the next car of a winning line. On level 1 it
+## shows right away after every move; on levels 2 and 3 only when the player
+## hesitates.
+func _update_guide(delta: float) -> void:
+	_guide_delay -= delta
+	if _guide_delay > 0.0:
+		return
+	if not vehicle_views.has(_guide_id) or not _guide_id in session.board.vehicles:
+		_guide_id = LevelSolver.next_tap(session.board)
+	if not vehicle_views.has(_guide_id):
+		hud.hide_hand()
+		return
+	var view: VehicleView = vehicle_views[_guide_id]
+	hud.show_hand(camera.unproject_position(view.global_position + Vector3.UP * 0.8))
+	if level_index == 0 and session.taps == 0:
+		hud.show_hint(tr("HINT_TAP_FREE"))
+
+
+func _reset_guide() -> void:
+	_guide_id = -1
+	_guide_delay = 1.2 if level_index == 0 else 4.0
+	hud.hide_hand()
 
 
 ## Restarts the idle timer after the player acts (or a level starts).
@@ -458,6 +492,14 @@ func _on_won() -> void:
 	}
 	if record.has("streak"):
 		result["streak"] = record.streak
+	if _onboarding:
+		result["onboarding"] = true
+		result["double_ok"] = false
+		if level_index == 2:
+			# Third level done: the menu opens for the first time.
+			Progress.mark_tutorial_seen()
+			result["last_level"] = true
+			result["onboarding_done"] = true
 	_earned = record.coins
 	var waited := 0.0
 	while VehicleView.exiting_count() > 0 and waited < max_exit_wait:
@@ -477,7 +519,7 @@ func _on_lost() -> void:
 	if played == session and session.state == GameSession.State.LOST:
 		Sfx.duck_music(2.0)
 		Sfx.play("lose", -2.0, 1.0, 0.0)
-		hud.show_lose(_continue_offer())
+		hud.show_lose({} if _onboarding else _continue_offer())
 
 
 # --- Rescues -------------------------------------------------------------------------
@@ -684,6 +726,8 @@ func _dev_lose() -> void:
 
 ## Toasts every achievement reached since the level began (once each).
 func _announce_achievements() -> void:
+	if _onboarding:
+		return # the first levels stay free of pop-ups; trophies wait in the menu
 	var now := Achievements.done_ids(Progress)
 	var delay := 0.0
 	for id in now:
@@ -697,6 +741,8 @@ func _announce_achievements() -> void:
 
 func _to_menu() -> void:
 	Progress.save() # lifetime stats gathered during play
-	MainMenu.return_to_world = not Daily.playing
+	MainMenu.return_to_world = not Daily.playing and not _onboarding
+	if _onboarding:
+		MainMenu.skip_gift_once() # the menu's first visit should not open with a pop-up
 	Daily.stop()
 	Transition.change_scene(MENU_SCENE)

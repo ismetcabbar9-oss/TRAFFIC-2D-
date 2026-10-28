@@ -327,6 +327,12 @@ func add_coins(amount: int) -> void:
 	save()
 
 
+## First session: the first three levels play without menus, offers or
+## rescues, guided by a pointing hand.
+func in_onboarding() -> bool:
+	return not tutorial_seen and levels.size() < 3
+
+
 func mark_tutorial_seen() -> void:
 	tutorial_seen = true
 	save()

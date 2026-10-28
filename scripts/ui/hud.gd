@@ -44,6 +44,10 @@ var _continue_ad: Button
 var _continue_coins: Button
 var _double_button: Button
 var _earned := 0
+var _hand: TapHand
+var _rescue_bar: Control
+var _rescue_backdrop: Control
+var _menu_button: Button
 
 
 func _ready() -> void:
@@ -56,6 +60,9 @@ func _ready() -> void:
 	_build_top_bar(root)
 	_build_rescue_bar(root)
 	_build_hint(root)
+	_hand = TapHand.new()
+	_hand.visible = false
+	root.add_child(_hand)
 	_build_result(root)
 
 
@@ -89,7 +96,7 @@ func show_win(result: Dictionary) -> void:
 	Sfx.play("celebrate", -4.0, 1.0, 0.0)
 	_result_title.text = tr("WIN_TITLE")
 	_result_title.add_theme_color_override("font_color", UiStyle.GOOD_DARK)
-	_result_text.visible = _last_level
+	_result_text.visible = _last_level and not result.get("onboarding_done", false)
 	_result_text.text = tr("WIN_WORLD_DONE")
 	if result.has("streak"):
 		_result_text.text = tr("DAILY_STREAK") % result.streak
@@ -100,7 +107,9 @@ func show_win(result: Dictionary) -> void:
 	_combo_value.text = "x%d" % result.combo if result.combo >= 2 else "-"
 	_coin_value.text = "+0"
 	_primary.text = tr("HUD_MENU") if _last_level else tr("WIN_NEXT")
-	_secondary.visible = not _last_level
+	_secondary.visible = not _last_level and not result.get("onboarding", false)
+	if result.get("onboarding_done", false):
+		_primary.text = tr("WIN_CONTINUE")
 	_primary.theme_type_variation = "GoodButton"
 	_earned = result.coins
 	_double_button.visible = result.get("double_ok", false)
@@ -133,7 +142,7 @@ func show_lose(offer: Dictionary = {}) -> void:
 	_stats.visible = false
 	_primary.text = tr("LOSE_RETRY")
 	_primary.theme_type_variation = ""
-	_secondary.visible = true
+	_secondary.visible = _menu_button.visible # hidden in the first session
 	_badge.visible = false
 	_show_result()
 
@@ -246,6 +255,23 @@ func show_toast(title: String, text: String) -> void:
 	t.tween_callback(panel.queue_free)
 
 
+## First session: no menu button, no rescue bar; nothing but the board.
+func set_onboarding(on: bool) -> void:
+	_menu_button.visible = not on
+	_rescue_bar.visible = not on
+	_rescue_backdrop.visible = not on
+
+
+## Pointing hand tapping `screen_pos` (first-time guidance).
+func show_hand(screen_pos: Vector2) -> void:
+	_hand.target = screen_pos
+	_hand.visible = true
+
+
+func hide_hand() -> void:
+	_hand.visible = false
+
+
 # --- Rescue bar --------------------------------------------------------------------
 
 func set_coins(amount: int) -> void:
@@ -338,6 +364,7 @@ func _build_rescue_bar(root: Control) -> void:
 	backdrop.offset_top = -190 - insets.w
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(backdrop)
+	_rescue_backdrop = backdrop
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
@@ -347,6 +374,7 @@ func _build_rescue_bar(root: Control) -> void:
 	margin.add_theme_constant_override("margin_bottom", 22 + int(insets.w))
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(margin)
+	_rescue_bar = margin
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 18)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -545,7 +573,8 @@ func _build_top_bar(root: Control) -> void:
 	var bar := HBoxContainer.new()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rows.add_child(bar)
-	bar.add_child(_small_button(tr("HUD_MENU"), menu_requested.emit))
+	_menu_button = _small_button(tr("HUD_MENU"), menu_requested.emit)
+	bar.add_child(_menu_button)
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 42)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
