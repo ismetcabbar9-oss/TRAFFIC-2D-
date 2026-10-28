@@ -105,15 +105,18 @@ func record_win(world: int, level: int, stars: int, time: float, combo: int, har
 		"combo": maxi(combo, int(old.get("combo", 0))),
 	}
 	var earned := Economy.level_coins(stars, combo, hard)
-	add_coins(earned)
+	add_coins(earned, "level:world%d" % (world + 1))
 	return {"coins": earned, "best_time": old_time >= 0.0 and time < old_time}
 
 
-## Takes `amount` coins if the player has them.
-func spend_coins(amount: int) -> bool:
+## Takes `amount` coins if the player has them. `sink` ("type:item") says
+## what they were spent on (for analytics).
+func spend_coins(amount: int, sink := "other:other") -> bool:
 	if coins < amount:
 		return false
-	add_coins(-amount)
+	_change_coins(-amount)
+	var parts := sink.split(":")
+	Analytics.coins("Sink", amount, parts[0], parts[1] if parts.size() > 1 else parts[0])
 	return true
 
 
@@ -176,7 +179,7 @@ func claim_achievement(id: String) -> int:
 	for entry in Achievements.LIST:
 		if entry.id == id and Achievements.claimable(self, entry):
 			claimed.append(id)
-			add_coins(int(entry.coins))
+			add_coins(int(entry.coins), "trophy:" + id)
 			return int(entry.coins)
 	return 0
 
@@ -208,7 +211,8 @@ func claim_gift(times := 1) -> int:
 	gift = {"last_day": Daily.today(), "index": day}
 	if day == Daily.GIFT_REWARDS.size() - 1:
 		add_item(Daily.GIFT_BONUS_ITEM)
-	add_coins(coins)
+	add_coins(coins, "daily_gift:day%d" % (day + 1))
+	Analytics.design("daily_gift:day%d" % (day + 1), times)
 	return coins
 
 
@@ -232,7 +236,7 @@ func record_daily_win() -> Dictionary:
 	daily_puzzle = {"last_day": Daily.today(), "streak": streak}
 	max_stat("daily_best", streak)
 	var coins := int(Economy.value("daily_puzzle_coins")) + mini(streak - 1, 7) * int(Economy.value("daily_streak_bonus"))
-	add_coins(coins)
+	add_coins(coins, "daily_puzzle:streak")
 	return {"coins": coins, "streak": streak}
 
 
@@ -287,7 +291,7 @@ func owns(id: String) -> bool:
 
 ## Buys a garage item with coins; false if not affordable.
 func buy_cosmetic(id: String) -> bool:
-	if owns(id) or not spend_coins(int(Cosmetics.find(id).price)):
+	if owns(id) or not spend_coins(int(Cosmetics.find(id).price), "garage:" + id):
 		return false
 	owned.append(id)
 	save()
@@ -321,7 +325,14 @@ func _today() -> Dictionary:
 	return daily
 
 
-func add_coins(amount: int) -> void:
+## Pays `amount` coins; `source` ("type:item") says where they came from.
+func add_coins(amount: int, source := "other:other") -> void:
+	_change_coins(amount)
+	var parts := source.split(":")
+	Analytics.coins("Source", amount, parts[0], parts[1] if parts.size() > 1 else parts[0])
+
+
+func _change_coins(amount: int) -> void:
 	coins = maxi(coins + amount, 0)
 	coins_changed.emit(coins)
 	save()
@@ -334,6 +345,8 @@ func in_onboarding() -> bool:
 
 
 func mark_tutorial_seen() -> void:
+	if not tutorial_seen:
+		Analytics.design("onboarding:complete")
 	tutorial_seen = true
 	save()
 

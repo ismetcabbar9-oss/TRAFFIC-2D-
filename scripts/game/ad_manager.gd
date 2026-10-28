@@ -44,6 +44,7 @@ func show_rewarded(placement: String, on_reward: Callable) -> void:
 
 func _finish(placement: String, rewarded: bool, on_reward: Callable) -> void:
 	_busy = false
+	Analytics.design("ad:rewarded:%s:%s" % [placement, "watched" if rewarded else "skipped"])
 	if rewarded:
 		Progress.count_ad(placement)
 		on_reward.call()

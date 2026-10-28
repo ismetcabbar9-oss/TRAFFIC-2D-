@@ -5,6 +5,7 @@ config_version=5
 [application]
 
 config/name="Traffic Escape"
+config/version="0.5.0"
 run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 config/quit_on_go_back=false
@@ -21,6 +22,7 @@ Progress="*res://scripts/game/progress.gd"
 ScreenFit="*res://scripts/ui/screen_fit.gd"
 Transition="*res://scripts/ui/transition.gd"
 AdManager="*res://scripts/game/ad_manager.gd"
+Analytics="*res://scripts/game/analytics.gd"
 
 [display]
 

@@ -49,6 +49,7 @@ func _ready() -> void:
 	_pages["gift"] = _page()
 	_pages["achievements"] = _page()
 	_pages["dev"] = _page()
+	_pages["events"] = _page()
 	# A brand-new player goes straight into level 1: no menu before playing.
 	if not _launched and Progress.in_onboarding():
 		_launched = true
@@ -76,7 +77,7 @@ func _notification(what: int) -> void:
 			get_tree().quit()
 		else:
 			_click()
-			_show({"credits": "settings", "dev": "settings", "world": "home"}.get(_current, "home"))
+			_show({"credits": "settings", "dev": "settings", "events": "dev", "world": "home"}.get(_current, "home"))
 
 
 # --- Page plumbing -------------------------------------------------------------
@@ -128,6 +129,7 @@ func _show(page: String, animate := true) -> void:
 		"gift": _build_gift()
 		"achievements": _build_achievements()
 		"dev": _build_dev()
+		"events": _build_events()
 	for name in _pages:
 		(_pages[name] as Control).get_parent().get_parent().visible = name == page
 	var shown: Control = (_pages[page] as Control).get_parent().get_parent()
@@ -432,7 +434,7 @@ func _build_shop() -> void:
 		for item in pack.items:
 			parts.append("%s ×%d" % [tr("RESCUE_" + str(item).to_upper()), int(pack.items[item])])
 		var buy := func():
-			if Progress.spend_coins(int(pack.price)):
+			if Progress.spend_coins(int(pack.price), "shop:" + str(pack.id).to_lower()):
 				for item in pack.items:
 					Progress.add_item(item, int(pack.items[item]))
 				Sfx.play("combo", -4.0, 1.2, 0.0)
@@ -443,7 +445,7 @@ func _build_shop() -> void:
 	_shop_row(page, tr("SHOP_FREE_COINS") % free, tr("SHOP_FREE_COINS_SUB"), tr("OFFER_AD"), false,
 			AdManager.rewarded_available("free_coins"), func():
 				AdManager.show_rewarded("free_coins", func():
-					Progress.add_coins(free)
+					Progress.add_coins(free, "ad:free_coins")
 					_show("shop", false)))
 	_section(page, "SHOP_STORE")
 	for key in ["STORE_AD_FREE", "STORE_STARTER", "STORE_COINS_S", "STORE_COINS_M", "STORE_COINS_L"]:
@@ -726,7 +728,7 @@ func _build_dev() -> void:
 				func(): Progress.set_dev(flag, not Progress.dev_flag(flag)), "dev")
 
 	var actions := [
-		["DEV_COINS", func(): Progress.add_coins(1000)],
+		["DEV_COINS", func(): Progress.add_coins(1000, "dev:dev")],
 		["DEV_RESCUES", func():
 			for item in ["hint", "undo", "crane"]:
 				Progress.add_item(item, 5)],
@@ -772,12 +774,32 @@ func _build_dev() -> void:
 			await action.call()
 			_toast(tr("DEV_DONE"))
 			_show("dev", false)))
+	page.add_child(_wide_button(tr("DEV_EVENTS") % Analytics.queued(), func(): _show("events")))
 	var reset := _wide_button(tr("DEV_RESET"), func(): _confirm_reset())
 	reset.add_theme_color_override("font_color", UiStyle.DANGER)
 	page.add_child(reset)
 	page.add_child(_wide_button(tr("DEV_OFF"), func():
 		Progress.set_dev("enabled", false)
 		_show("settings")))
+
+
+## The latest analytics events, newest first, and whether they are being sent.
+func _build_events() -> void:
+	var page: VBoxContainer = _pages["events"]
+	_clear(page)
+	_page_header(page, "DEV_EVENTS_TITLE", "dev")
+	var status := tr("DEV_EVENTS_SENDING") if Analytics.sending_enabled else tr("DEV_EVENTS_LOCAL")
+	var head := _label("%s · %d" % [status, Analytics.queued()], 24, UiStyle.INK, true)
+	page.add_child(head)
+	var panel := PanelContainer.new()
+	page.add_child(panel)
+	var list := VBoxContainer.new()
+	panel.add_child(list)
+	var events: Array = Analytics.recent.duplicate()
+	events.reverse()
+	for e in events.slice(0, 60):
+		var value := "" if str(e.value) == "" else "  = %s" % str(e.value)
+		list.add_child(_label("%s  %s  %s%s" % [e.time, e.category, e.event_id, value], 20, UiStyle.INK, true))
 
 
 func _confirm_reset() -> void:

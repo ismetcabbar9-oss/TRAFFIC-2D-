@@ -205,3 +205,7 @@ ACH_LEVELS_200,Clear all 200 levels,200 bölümün hepsini bitir
 ACH_PERFECT_150,Clear 150 levels without a crash,150 bölümü hatasız bitir
 HINT_ZOOM,Pinch or double tap to zoom in,Yakınlaştırmak için iki parmakla aç ya da çift dokun
 WIN_CONTINUE,Continue,Devam
+DEV_EVENTS,Analytics events (%d queued),Ölçüm olayları (%d sırada)
+DEV_EVENTS_TITLE,Analytics events,Ölçüm olayları
+DEV_EVENTS_SENDING,Sending to GameAnalytics,GameAnalytics'e gönderiliyor
+DEV_EVENTS_LOCAL,"No keys yet: kept on the device, not sent","Anahtar yok: cihazda tutuluyor, gönderilmiyor"

@@ -63,7 +63,7 @@ func _ready() -> void:
 	hud.continue_requested.connect(_on_continue)
 	hud.double_coins_requested.connect(func():
 		AdManager.show_rewarded("double_coins", func():
-			Progress.add_coins(_earned)
+			Progress.add_coins(_earned, "ad:double_coins")
 			hud.coins_doubled()))
 	Progress.coins_changed.connect(func(total: int):
 		hud.set_coins(total)
@@ -161,6 +161,7 @@ func load_level(index: int) -> void:
 
 	hud.hide_result()
 	_onboarding = Progress.in_onboarding() and world_index == 0 and level_index < 3 and not Daily.playing
+	Analytics.level("Start", world_index, level_index, Daily.playing)
 	hud.set_onboarding(_onboarding)
 	_reset_guide()
 	_clear_hint()
@@ -249,6 +250,7 @@ func _on_tap(screen_pos: Vector2) -> void:
 	if _crane_mode:
 		_set_crane_mode(false)
 		if session.state == GameSession.State.PLAYING and Progress.use_item("crane"):
+			Analytics.design("rescue:crane:owned")
 			session.lift(id)
 	else:
 		session.tap(id)
@@ -492,6 +494,8 @@ func _on_won() -> void:
 	}
 	if record.has("streak"):
 		result["streak"] = record.streak
+	Analytics.level("Complete", world_index, level_index, Daily.playing, stars,
+			{"time": snappedf(time, 0.1), "crashes": session.crashes, "taps": session.taps, "combo": _best_combo})
 	if _onboarding:
 		result["onboarding"] = true
 		result["double_ok"] = false
@@ -515,6 +519,8 @@ func _on_won() -> void:
 
 func _on_lost() -> void:
 	var played := session
+	Analytics.level("Fail", world_index, level_index, Daily.playing, -1,
+			{"time": snappedf(_clock - _level_start, 0.1), "cars_left": session.board.vehicles.size()})
 	await get_tree().create_timer(lose_delay).timeout
 	if played == session and session.state == GameSession.State.LOST:
 		Sfx.duck_music(2.0)
@@ -546,7 +552,9 @@ func _on_rescue(kind: String) -> void:
 		return
 	match kind:
 		"hint":
-			if Progress.use_item("hint") or Progress.use_free_hint():
+			var owned := Progress.use_item("hint")
+			if owned or Progress.use_free_hint():
+				Analytics.design("rescue:hint:%s" % ("owned" if owned else "free"))
 				_give_hint()
 			else:
 				_offer("hint")
@@ -554,6 +562,7 @@ func _on_rescue(kind: String) -> void:
 			if not session.can_undo():
 				return
 			if Progress.use_item("undo"):
+				Analytics.design("rescue:undo:owned")
 				_undo()
 			else:
 				_offer("undo")
@@ -568,6 +577,7 @@ func _on_rescue(kind: String) -> void:
 
 
 func _offer(kind: String) -> void:
+	Analytics.design("offer:" + kind)
 	var price := Economy.price(kind)
 	var ad_ok := kind != "undo" and AdManager.rewarded_available(kind)
 	hud.show_offer(kind, price, Progress.coins >= price, ad_ok)
@@ -580,7 +590,7 @@ func _on_offer_accepted(kind: String, with_ad: bool) -> void:
 		_on_rescue(kind)
 	if with_ad:
 		AdManager.show_rewarded(kind, grant)
-	elif Progress.spend_coins(Economy.price(kind)):
+	elif Progress.spend_coins(Economy.price(kind), "rescue:" + kind):
 		grant.call()
 
 
@@ -646,12 +656,13 @@ func _continue_offer() -> Dictionary:
 
 func _on_continue(with_ad: bool) -> void:
 	var resume := func():
+		Analytics.design("rescue:continue:%s" % ("ad" if with_ad else "coins"))
 		session.add_mistakes(int(Economy.value("continue_moves")))
 		hud.hide_result()
 		_refresh_rescues()
 	if with_ad:
 		AdManager.show_rewarded("continue", resume)
-	elif Progress.spend_coins(Economy.price("continue")):
+	elif Progress.spend_coins(Economy.price("continue"), "rescue:continue"):
 		resume.call()
 
 
@@ -681,7 +692,7 @@ func _show_dev_panel() -> void:
 		[tr("DEV_AUTO_SOLVE"), _dev_auto_solve],
 		[tr("DEV_WIN"), _dev_win],
 		[tr("DEV_LOSE"), _dev_lose],
-		[tr("DEV_COINS"), func(): Progress.add_coins(1000)],
+		[tr("DEV_COINS"), func(): Progress.add_coins(1000, "dev:dev")],
 		[tr("DEV_RESCUES"), func():
 			for item in ["hint", "undo", "crane"]:
 				Progress.add_item(item, 5)
@@ -741,6 +752,8 @@ func _announce_achievements() -> void:
 
 func _to_menu() -> void:
 	Progress.save() # lifetime stats gathered during play
+	if session != null and session.state == GameSession.State.PLAYING:
+		Analytics.level("Fail", world_index, level_index, Daily.playing, -1, {"quit": 1})
 	MainMenu.return_to_world = not Daily.playing and not _onboarding
 	if _onboarding:
 		MainMenu.skip_gift_once() # the menu's first visit should not open with a pop-up
