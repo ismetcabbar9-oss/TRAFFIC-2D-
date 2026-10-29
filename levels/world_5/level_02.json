@@ -4,66 +4,66 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "van",
+   "type": "pickup",
    "col": 2,
-   "row": 4,
+   "row": 2,
    "dir": "left",
    "key": 0
   },
   {
-   "type": "sedan_sports",
+   "type": "police",
+   "col": 2,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
    "col": 1,
-   "row": 3,
-   "dir": "up",
+   "row": 4,
+   "dir": "right",
    "key": 1
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 1,
-   "dir": "up"
+   "col": 3,
+   "row": 4,
+   "dir": "right"
   },
   {
-   "type": "suv_luxury",
+   "type": "police",
    "col": 0,
-   "row": 3,
+   "row": 2,
    "dir": "up"
   },
   {
    "type": "sedan",
-   "col": 3,
+   "col": 2,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
    "row": 0,
-   "dir": "left"
+   "dir": "down"
   },
   {
-   "type": "hatchback",
-   "col": 3,
-   "row": 2,
-   "dir": "left"
-  },
-  {
-   "type": "suv_luxury",
+   "type": "taxi",
    "col": 2,
    "row": 1,
    "dir": "left"
-  },
-  {
-   "type": "van",
-   "col": 1,
-   "row": 0,
-   "dir": "up"
   }
  ],
  "obstacles": [
   {
    "type": "gate",
-   "col": 2,
-   "row": 3,
+   "col": 1,
+   "row": 1,
    "group": 0
   },
   {
    "type": "gate",
-   "col": 2,
+   "col": 1,
    "row": 2,
    "group": 1
   }

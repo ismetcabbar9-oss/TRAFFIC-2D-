@@ -95,8 +95,7 @@
    "type": "suv",
    "col": 3,
    "row": 6,
-   "dir": "left",
-   "key": 3
+   "dir": "left"
   },
   {
    "type": "pickup",
@@ -145,7 +144,8 @@
    "type": "hatchback",
    "col": 5,
    "row": 0,
-   "dir": "up"
+   "dir": "up",
+   "key": 3
   },
   {
    "type": "sedan_sports",
@@ -169,13 +169,13 @@
   {
    "type": "gate",
    "col": 6,
-   "row": 1,
+   "row": 4,
    "group": 2
   },
   {
    "type": "gate",
-   "col": 6,
-   "row": 4,
+   "col": 1,
+   "row": 6,
    "group": 3
   }
  ],

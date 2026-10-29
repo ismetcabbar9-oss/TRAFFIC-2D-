@@ -4,178 +4,184 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "suv_luxury",
+   "type": "sedan",
    "col": 0,
-   "row": 5,
-   "dir": "left",
-   "lock": 0
-  },
-  {
-   "type": "delivery",
-   "col": 3,
    "row": 0,
    "dir": "left"
   },
   {
+   "type": "police",
+   "col": 4,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "ambulance",
+   "col": 5,
+   "row": 7,
+   "dir": "right",
+   "lock": 0
+  },
+  {
    "type": "van",
-   "col": 7,
-   "row": 2,
+   "col": 2,
+   "row": 1,
    "dir": "up"
   },
   {
    "type": "suv",
-   "col": 2,
+   "col": 4,
    "row": 2,
-   "dir": "up",
-   "key": 3
-  },
-  {
-   "type": "sedan_sports",
-   "col": 0,
-   "row": 2,
-   "dir": "right"
+   "dir": "down"
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 5,
-   "dir": "right"
-  },
-  {
-   "type": "firetruck",
    "col": 0,
-   "row": 4,
+   "row": 3,
    "dir": "right",
+   "lock": 0,
    "key": 1
   },
   {
-   "type": "suv",
-   "col": 3,
-   "row": 2,
-   "dir": "down"
-  },
-  {
-   "type": "bus",
+   "type": "sedan_sports",
    "col": 2,
-   "row": 5,
-   "dir": "up"
-  },
-  {
-   "type": "firetruck",
-   "col": 6,
    "row": 0,
-   "dir": "down",
-   "key": 0
+   "dir": "left"
   },
   {
-   "type": "sedan_sports",
+   "type": "taxi",
    "col": 7,
-   "row": 5,
+   "row": 3,
    "dir": "down"
   },
   {
-   "type": "van",
-   "col": 6,
-   "row": 4,
-   "dir": "right"
-  },
-  {
    "type": "sedan_sports",
-   "col": 5,
-   "row": 3,
-   "dir": "right"
-  },
-  {
-   "type": "sedan",
-   "col": 0,
+   "col": 4,
    "row": 6,
    "dir": "down"
   },
   {
-   "type": "suv",
-   "col": 2,
-   "row": 1,
-   "dir": "right",
-   "key": 2
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 6,
+   "dir": "up"
   },
   {
-   "type": "taxi",
-   "col": 4,
+   "type": "pickup",
+   "col": 1,
    "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 6,
+   "row": 2,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 2,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
+   "col": 6,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "van",
+   "col": 5,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
    "col": 3,
+   "row": 4,
+   "dir": "up",
+   "key": 0
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 4,
+   "dir": "right",
+   "key": 2
+  },
+  {
+   "type": "firetruck",
+   "col": 1,
    "row": 7,
    "dir": "right"
   },
   {
    "type": "sedan_sports",
-   "col": 0,
-   "row": 3,
-   "dir": "right"
+   "col": 4,
+   "row": 1,
+   "dir": "right",
+   "key": 3
   },
   {
-   "type": "police",
-   "col": 5,
-   "row": 6,
+   "type": "taxi",
+   "col": 7,
+   "row": 0,
    "dir": "down"
   },
   {
-   "type": "van",
-   "col": 4,
-   "row": 4,
+   "type": "sedan",
+   "col": 6,
+   "row": 0,
    "dir": "up"
   },
   {
-   "type": "sedan",
-   "col": 1,
-   "row": 0,
-   "dir": "left",
-   "lock": 0
-  },
-  {
-   "type": "police",
+   "type": "suv",
    "col": 6,
-   "row": 7,
+   "row": 6,
    "dir": "right"
   },
   {
-   "type": "sedan",
+   "type": "pickup",
    "col": 0,
-   "row": 0,
-   "dir": "up"
-  },
-  {
-   "type": "hatchback",
-   "col": 7,
-   "row": 0,
+   "row": 1,
    "dir": "up"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 1,
-   "row": 1
+   "col": 2,
+   "row": 6
   },
   {
    "type": "gate",
-   "col": 3,
-   "row": 5,
+   "col": 2,
+   "row": 4,
    "group": 1
   },
   {
    "type": "gate",
-   "col": 1,
-   "row": 6,
+   "col": 5,
+   "row": 5,
    "group": 2
   },
   {
    "type": "gate",
    "col": 4,
-   "row": 3,
+   "row": 5,
    "group": 3
   }
  ],

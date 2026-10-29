@@ -17,6 +17,7 @@ extends RefCounted
 const LEVELS_PER_WORLD := 40
 const ACT_LENGTH := 20 ## a world plays as two acts of 20 (two sawtooth climbs)
 const ATTEMPTS := 90
+const HARD_ATTEMPTS := 270 ## hard levels look harder for a layout that earns the badge
 const BREATHERS := [4, 14, 24, 34]
 const HARD := [9, 19, 29, 39]
 const SMALL := ["sedan", "sedan_sports", "hatchback", "suv", "suv_luxury", "taxi", "police", "van", "pickup"]
@@ -233,6 +234,8 @@ static func _add_gates(data: Dictionary, cells: Array[Vector2i], rng: RandomNumb
 			group += 1
 		if group >= LevelData.MAX_GROUPS:
 			break
+		if not _blocks_a_path(data, c):
+			continue # a gate no car drives through would only be decoration
 		var candidates := []
 		for k in data.vehicles.size():
 			if not data.vehicles[k].has("key"):
@@ -307,23 +310,22 @@ static func _traps(level: LevelData) -> int:
 static func _gates_in_the_way(data: Dictionary) -> int:
 	var count := 0
 	for o in data.obstacles:
-		if o.type != "gate":
-			continue
-		var c := Vector2i(o.col, o.row)
-		for e in data.vehicles:
-			var v := VehicleState.new(0, e.type, Vector2i(e.col, e.row), GridDir.from_name(e.dir), VehicleCatalog.cells(e.type))
-			var step := GridDir.to_vector(v.dir)
-			var p := v.head() + step
-			var hit := false
-			while p.x >= 0 and p.y >= 0 and p.x < data.cols and p.y < data.rows:
-				if p == c:
-					hit = true
-					break
-				p += step
-			if hit:
-				count += 1
-				break
+		if o.type == "gate" and _blocks_a_path(data, Vector2i(o.col, o.row)):
+			count += 1
 	return count
+
+
+## True if some vehicle has to drive through cell `c` to leave.
+static func _blocks_a_path(data: Dictionary, c: Vector2i) -> bool:
+	for e in data.vehicles:
+		var v := VehicleState.new(0, e.type, Vector2i(e.col, e.row), GridDir.from_name(e.dir), VehicleCatalog.cells(e.type))
+		var step := GridDir.to_vector(v.dir)
+		var p := v.head() + step
+		while p.x >= 0 and p.y >= 0 and p.x < data.cols and p.y < data.rows:
+			if p == c:
+				return true
+			p += step
+	return false
 
 
 static func _mechanic_summary(data: Dictionary) -> String:

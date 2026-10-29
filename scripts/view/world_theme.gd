@@ -137,8 +137,7 @@ func _airport() -> void:
 	tall_buildings = [WORLD + "hangar.glb"]
 	building_scale = 1.0
 	building_radius = 8.5
-	landmarks = [[WORLD + "control_tower.glb", 1.0, 2.0, 1, "back"], [WORLD + "plane.glb", 0.75, 3.6, 2, "front"],
-		[WORLD + "plane.glb", 1.0, 4.2, 2, "back"]]
+	landmarks = [[WORLD + "control_tower.glb", 1.0, 2.0, 1, "back"], [WORLD + "plane.glb", 1.0, 4.2, 2, "back"]]
 	patches = [["back", 0.9, 26.0, Color("6c7079"), "flat"]]
 
 

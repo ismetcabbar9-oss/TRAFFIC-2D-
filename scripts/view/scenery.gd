@@ -58,8 +58,9 @@ func _add_lamps(inner_half: Vector2, exit_half_width: float) -> void:
 			_place(_theme.lamp[0], at, _theme.lamp[1], atan2(inward.x, inward.y), false)
 			# The lamp arm leans over the road; its light lands a little inward.
 			_lamp_spots.append(Vector3(at.x + inward.x * 0.7, 0.0, at.y + inward.y * 0.7))
-			# Now and then a bench, bin, hydrant or post box on the grass behind it.
-			if _rng.randf() < 0.45 and side != 2 and not _theme.furniture.is_empty():
+			# Now and then a bench, bin, hydrant or post box on the grass behind it
+			# (not along the top, where it would peek out behind the top bar).
+			if _rng.randf() < 0.45 and side % 2 == 1 and not _theme.furniture.is_empty():
 				var item: Array = _theme.furniture.pick_random()
 				var spot := at - inward * 1.0 + Vector2(inward.y, inward.x) * 1.2
 				_place(item[0], spot, item[1], atan2(inward.x, inward.y), true, 0.6)
@@ -126,7 +127,11 @@ func _add_landmarks(inner_half: Vector2) -> void:
 				break
 			var at: Vector2
 			if entry[4] == "back":
-				at = Vector2(_rng.randf_range(-inner_half.x, inner_half.x), -inner_half.y - entry[2] - _rng.randf_range(0.5, 4.0))
+				# Toward the corners: the middle of the top edge is behind the
+				# level title and the moves counter.
+				var side := -1.0 if _rng.randf() < 0.5 else 1.0
+				at = Vector2(side * _rng.randf_range(inner_half.x * 0.5, inner_half.x),
+						-inner_half.y - entry[2] - _rng.randf_range(0.5, 4.0))
 			elif entry[4] == "front":
 				var side := -1.0 if placed % 2 == 0 else 1.0
 				at = Vector2(side * (entry[2] + _rng.randf_range(4.0, 5.5)), inner_half.y + entry[2] + _rng.randf_range(1.5, 3.0))

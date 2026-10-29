@@ -113,8 +113,8 @@
   },
   {
    "type": "gate",
-   "col": 4,
-   "row": 5,
+   "col": 2,
+   "row": 1,
    "group": 3
   }
  ],
