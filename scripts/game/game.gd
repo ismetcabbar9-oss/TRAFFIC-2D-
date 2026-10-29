@@ -37,6 +37,7 @@ var _earned := 0 ## coins from the last win (for "double coins")
 var _done_at_start: Array = [] ## achievements already reached when the level began
 var _gestures := TouchGestures.new()
 var _headlights: HeadlightPool ## night worlds: all headlight pools in one draw
+var _paused := false ## the pause panel is open (the level clock stops)
 var _onboarding := false ## first session: levels 1-3 guided by a pointing hand
 var _guide_id := -1 ## car the hand points at
 var _guide_delay := 0.0 ## seconds until the hand shows
@@ -60,6 +61,7 @@ func _ready() -> void:
 	_gestures.panned.connect(func(delta: Vector2): camera.pan_by(delta))
 	_gestures.pinched.connect(func(factor: float, center: Vector2): camera.zoom_at(factor, center))
 	hud.dev_requested.connect(_show_dev_panel)
+	hud.paused_changed.connect(func(on: bool): _paused = on)
 	hud.offer_accepted.connect(_on_offer_accepted)
 	hud.continue_requested.connect(_on_continue)
 	hud.double_coins_requested.connect(func():
@@ -210,9 +212,9 @@ func _show_mechanic_tip(level: LevelData) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST: # Android back button
-		if not _onboarding: # the first levels have no menu to go back to
-			_to_menu()
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST: # Android back button: pause
+		if not _onboarding and not _paused and session != null and session.state == GameSession.State.PLAYING:
+			hud.show_pause()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -262,6 +264,8 @@ func _on_tap(screen_pos: Vector2) -> void:
 
 
 func _process(delta: float) -> void:
+	if _paused:
+		return
 	_clock += delta
 	if session == null or session.state != GameSession.State.PLAYING or _tutorial_open:
 		hud.hide_hand()

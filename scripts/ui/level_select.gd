@@ -26,7 +26,8 @@ var _world := 0 ## world shown on the world page
 ## Set by the game so leaving a level lands on that world's level grid.
 static var return_to_world := false
 static var _gift_offered := false
-static var _launched := false ## the menu has been shown (or skipped) once
+static var _launched := false
+var _tab_bar: Control ## bottom bar, shown on the home page only ## the menu has been shown (or skipped) once
 
 
 ## The gift page will not pop up by itself during this launch.
@@ -137,6 +138,8 @@ func _show(page: String, animate := true) -> void:
 		shown.modulate.a = 0.0
 		create_tween().tween_property(shown, "modulate:a", 1.0, 0.18)
 	_current = page
+	if is_instance_valid(_tab_bar):
+		_tab_bar.visible = page == "home"
 
 
 static func _clear(page: Control) -> void:
@@ -152,21 +155,27 @@ func _build_home() -> void:
 	_clear(page)
 
 	var bar := HBoxContainer.new()
+	bar.add_theme_constant_override("separation", 14)
 	page.add_child(bar)
 	bar.add_child(_coin_pill())
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(spacer)
-	var trophies := _small_button(tr("MENU_ACHIEVEMENTS"), func(): _show("achievements"))
+	var trophies := RoundButton.new("trophy", Color("ffc93c"), 76.0)
+	trophies.show_dot = Achievements.any_claimable(Progress)
+	trophies.pressed.connect(func():
+		_click()
+		_show("achievements"))
 	bar.add_child(trophies)
-	if Achievements.any_claimable(Progress):
-		_add_dot(trophies)
-	bar.add_child(_small_button(tr("MENU_SETTINGS"), func(): _show("settings")))
+	var gear := RoundButton.new("gear", Color("8a94a8"), 76.0)
+	gear.pressed.connect(func():
+		_click()
+		_show("settings"))
+	bar.add_child(gear)
 
 	var title := Label.new()
 	title.text = "Traffic Escape"
-	title.add_theme_font_override("font", UiStyle.font(800))
-	title.add_theme_font_size_override("font_size", 74)
+	UiStyle.style_title(title, 84)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	# Seven taps on the title switch developer mode on (debug builds only).
 	title.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -179,100 +188,273 @@ func _build_home() -> void:
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	page.add_child(subtitle)
 
-	var play := Button.new()
-	play.text = tr("MENU_PLAY")
-	play.add_theme_font_size_override("font_size", 50)
-	play.custom_minimum_size = Vector2(340, 0)
-	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	play.pressed.connect(_continue)
-	page.add_child(play)
-
-	var extras := GridContainer.new()
-	extras.columns = 2
-	extras.add_theme_constant_override("h_separation", 16)
-	extras.add_theme_constant_override("v_separation", 14)
-	page.add_child(extras)
-	var streak := Progress.daily_streak()
-	var puzzle_text := tr("MENU_DAILY_DONE") if Progress.daily_done_today() else tr("MENU_DAILY")
-	if streak > 0:
-		puzzle_text += "  ·  " + tr("STREAK_N") % streak
-	var puzzle := _wide_button(puzzle_text, _start_daily)
-	extras.add_child(puzzle)
-	var gift := _wide_button(tr("MENU_GIFT"), func(): _show("gift"))
-	extras.add_child(gift)
-	if Progress.gift_day() >= 0:
-		_add_dot(gift)
-	for entry in [["MENU_SHOP", "shop"], ["MENU_GARAGE", "garage"]]:
-		var b := _wide_button(tr(entry[0]), func(): _show(entry[1]))
-		extras.add_child(b)
-
 	for w in LevelCatalog.world_count():
 		page.add_child(_world_card(w))
+	var room := Control.new() # keeps the last card clear of the bottom bar
+	room.custom_minimum_size.y = 210
+	page.add_child(room)
+	_build_tab_bar()
 	_refresh_coins()
 
 
-## Opens the next unfinished level of the furthest unlocked world.
-func _continue() -> void:
+## Bottom bar of the home page: shop, garage, the big Play button, the daily
+## puzzle and the daily gift.
+func _build_tab_bar() -> void:
+	if is_instance_valid(_tab_bar):
+		_tab_bar.queue_free()
+	_tab_bar = Control.new()
+	_tab_bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	var insets: Vector4 = get_node("/root/ScreenFit").safe_insets()
+	_tab_bar.offset_top = -(150 + insets.w)
+	_tab_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_tab_bar)
+
+	var back := Panel.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(1, 1, 1, 0.97)
+	style.border_width_top = 5
+	style.border_color = Color("ffd9bd")
+	style.corner_radius_top_left = 28
+	style.corner_radius_top_right = 28
+	back.add_theme_stylebox_override("panel", style)
+	back.set_anchors_preset(Control.PRESET_FULL_RECT)
+	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tab_bar.add_child(back)
+
+	var row := HBoxContainer.new()
+	row.set_anchors_preset(Control.PRESET_FULL_RECT)
+	row.offset_top = 10
+	row.offset_bottom = -insets.w
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 6)
+	_tab_bar.add_child(row)
+	var tabs := [
+		["cart", Color("ff8a3d"), "TAB_SHOP", func(): _show("shop"), false],
+		["car", Color("9b6cff"), "TAB_GARAGE", func(): _show("garage"), false],
+		["", Color(), "", Callable(), false],
+		["calendar", Color("4aa3ff"), "TAB_DAILY", _start_daily, not Progress.daily_done_today()],
+		["gift", Color("ff6fa8"), "TAB_GIFT", func(): _show("gift"), Progress.gift_day() >= 0],
+	]
+	for t in tabs:
+		if t[0] == "":
+			var gap := Control.new()
+			gap.custom_minimum_size.x = 210
+			row.add_child(gap)
+			continue
+		var b := TabButton.new(t[0], t[1], tr(t[2]))
+		b.show_dot = t[4]
+		var action: Callable = t[3]
+		b.pressed.connect(func():
+			_click()
+			action.call())
+		row.add_child(b)
+
+	# The big Play button sits in the middle, standing out above the bar.
+	var world := _furthest_world()
+	var play := Button.new()
+	play.theme_type_variation = "GoodButton"
+	play.custom_minimum_size = Vector2(250, 150)
+	play.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	play.offset_left = -125
+	play.offset_right = 125
+	play.offset_top = -62
+	play.offset_bottom = 88
+	play.pressed.connect(_continue)
+	_tab_bar.add_child(play)
+	var content := HBoxContainer.new()
+	content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content.offset_bottom = -8
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.add_theme_constant_override("separation", 16)
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	play.add_child(content)
+	var light := TrafficLight.new(78.0)
+	light.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	content.add_child(light)
+	var words := VBoxContainer.new()
+	words.alignment = BoxContainer.ALIGNMENT_CENTER
+	words.add_theme_constant_override("separation", -10)
+	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(words)
+	var big := Label.new()
+	big.text = tr("MENU_PLAY")
+	UiStyle.style_title(big, 50)
+	big.add_theme_color_override("font_outline_color", UiStyle.GOOD_DARK)
+	big.add_theme_color_override("font_shadow_color", UiStyle.GOOD_DARK)
+	words.add_child(big)
+	var small := _label(tr("LEVEL_N") % (Progress.next_open_level(world) + 1), 24, Color.WHITE)
+	small.add_theme_color_override("font_outline_color", UiStyle.GOOD_DARK)
+	small.add_theme_constant_override("outline_size", 6)
+	words.add_child(small)
+	var pulse := play.create_tween().set_loops()
+	play.resized.connect(func(): play.pivot_offset = play.size * 0.5)
+	pulse.tween_property(play, "scale", Vector2.ONE * 1.04, 0.7).set_trans(Tween.TRANS_SINE)
+	pulse.tween_property(play, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_SINE)
+
+
+func _furthest_world() -> int:
 	var world := 0
 	for w in LevelCatalog.world_count():
 		if Progress.is_world_unlocked(w):
 			world = w
+	return world
+
+
+## Opens the next unfinished level of the furthest unlocked world.
+func _continue() -> void:
+	var world := _furthest_world()
 	_open_level(world, Progress.next_open_level(world))
 
 
+## World card: the world's own scenery behind its name, the stars earned and
+## a progress bar; locked worlds show a "no entry" sign and the stars needed.
 func _world_card(w: int) -> Button:
 	var info: Dictionary = LevelCatalog.world(w)
 	var has_levels := LevelCatalog.level_count(w) > 0
 	var unlocked := Progress.is_world_unlocked(w)
 	var color: Color = WORLD_COLORS[w % WORLD_COLORS.size()]
+	var edge := color.darkened(0.3)
 	if not unlocked:
-		color = color.lerp(Color("c9ced8"), 0.65)
+		color = color.lerp(Color("aab1bf"), 0.55)
+		edge = color.darkened(0.3)
 
 	var card := Button.new()
-	card.custom_minimum_size = Vector2(0, 118)
-	var style := StyleBoxFlat.new()
-	style.bg_color = color
-	style.set_corner_radius_all(26)
-	style.border_width_bottom = 8
-	style.border_color = color.darkened(0.25)
-	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-		card.add_theme_stylebox_override(state, style)
+	card.custom_minimum_size = Vector2(0, 150)
+	card.flat = true
+	card.focus_mode = Control.FOCUS_NONE
 	card.disabled = not unlocked
 	card.pressed.connect(func():
 		_click()
 		_world = w
 		_show("world"))
-
-	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	for side in ["left", "right"]:
-		margin.add_theme_constant_override("margin_" + side, 26)
-	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(margin)
-	var row := HBoxContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	margin.add_child(row)
+	# Darker base, white rim and the clipped picture inside it.
+	var base := _rounded_panel(edge, 28)
+	base.set_anchors_preset(Control.PRESET_FULL_RECT)
+	card.add_child(base)
+	var rim := _rounded_panel(Color.WHITE, 28)
+	rim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rim.offset_bottom = -7
+	card.add_child(rim)
+	var inner := _rounded_panel(color, 24)
+	inner.set_anchors_preset(Control.PRESET_FULL_RECT)
+	inner.offset_left = 4
+	inner.offset_top = 4
+	inner.offset_right = -4
+	inner.offset_bottom = -11
+	inner.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	card.add_child(inner)
+	var picture := TextureRect.new()
+	picture.texture = load("res://assets/ui/world_%s.jpg" % info.id)
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	picture.set_anchors_preset(Control.PRESET_FULL_RECT)
+	picture.anchor_left = 0.25
+	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not unlocked:
+		picture.modulate = Color(0.85, 0.85, 0.85)
+	inner.add_child(picture)
+	var fade := TextureRect.new()
+	var gradient := Gradient.new()
+	gradient.set_color(0, color)
+	gradient.set_color(1, Color(color, 0.0))
+	gradient.set_offset(1, 0.72)
+	gradient.add_point(0.28, color)
+	var tex := GradientTexture2D.new()
+	tex.gradient = gradient
+	tex.fill_to = Vector2(1, 0)
+	fade.texture = tex
+	fade.stretch_mode = TextureRect.STRETCH_SCALE
+	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(fade)
 
 	var names := VBoxContainer.new()
-	names.alignment = BoxContainer.ALIGNMENT_CENTER
-	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	names.position = Vector2(24, 12)
+	names.add_theme_constant_override("separation", -6)
 	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(names)
-	names.add_child(_label(tr("WORLD_N") % (w + 1), 24, Color(1, 1, 1, 0.85)))
-	names.add_child(_label(tr(info.name), 38, Color.WHITE))
+	inner.add_child(names)
+	var number := _label(tr("WORLD_N") % (w + 1), 22, Color.WHITE)
+	number.add_theme_color_override("font_outline_color", edge)
+	number.add_theme_constant_override("outline_size", 5)
+	names.add_child(number)
+	var title := Label.new()
+	title.text = tr(info.name)
+	UiStyle.style_title(title, 40)
+	title.add_theme_color_override("font_outline_color", edge)
+	title.add_theme_color_override("font_shadow_color", edge)
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	names.add_child(title)
 
 	var status := HBoxContainer.new()
-	status.alignment = BoxContainer.ALIGNMENT_CENTER
+	status.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	status.position = Vector2(-20, 14)
+	status.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	status.add_theme_constant_override("separation", 6)
 	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(status)
+	inner.add_child(status)
 	if not has_levels:
-		status.add_child(_label(tr("WORLD_SOON"), 26, Color.WHITE))
+		status.add_child(_label(tr("WORLD_SOON"), 24, Color.WHITE))
 	elif not unlocked:
-		status.add_child(_label(tr("WORLD_NEEDS_STARS") % int(info.stars_required), 24, Color.WHITE))
+		var stars := VBoxContainer.new()
+		stars.alignment = BoxContainer.ALIGNMENT_CENTER
+		stars.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		status.add_child(stars)
+		stars.add_child(_sign(56.0))
+		var need := HBoxContainer.new()
+		need.add_theme_constant_override("separation", 2)
+		need.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		need.add_child(StarIcon.new(24))
+		var n := _label(str(int(info.stars_required)), 22, Color.WHITE)
+		n.add_theme_color_override("font_outline_color", edge)
+		n.add_theme_constant_override("outline_size", 5)
+		need.add_child(n)
+		stars.add_child(need)
 	else:
-		status.add_child(StarIcon.new(34))
-		status.add_child(_label("%d/%d" % [Progress.world_stars(w), LevelCatalog.level_count(w) * 3], 30, Color.WHITE))
+		status.add_child(StarIcon.new(30))
+		var got := _label("%d/%d" % [Progress.world_stars(w), LevelCatalog.level_count(w) * 3], 28, Color.WHITE)
+		got.add_theme_color_override("font_outline_color", edge)
+		got.add_theme_constant_override("outline_size", 6)
+		status.add_child(got)
+		var progress := ProgressBar.new()
+		progress.max_value = LevelCatalog.level_count(w)
+		progress.value = range(LevelCatalog.level_count(w)).filter(func(i): return Progress.level_stars(w, i) > 0).size()
+		progress.show_percentage = false
+		progress.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+		progress.offset_left = 24
+		progress.offset_right = -24
+		progress.offset_top = -26
+		progress.offset_bottom = -14
+		var bg := StyleBoxFlat.new()
+		bg.bg_color = Color(0, 0, 0, 0.28)
+		bg.set_corner_radius_all(6)
+		var fill := StyleBoxFlat.new()
+		fill.bg_color = Color("ffd34d")
+		fill.set_corner_radius_all(6)
+		progress.add_theme_stylebox_override("background", bg)
+		progress.add_theme_stylebox_override("fill", fill)
+		progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		inner.add_child(progress)
 	return card
+
+
+static func _rounded_panel(color: Color, radius: int) -> Panel:
+	var panel := Panel.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.set_corner_radius_all(radius)
+	style.anti_aliasing = true
+	panel.add_theme_stylebox_override("panel", style)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return panel
+
+
+## "No entry" road sign (locked worlds).
+static func _sign(size_px: float) -> Control:
+	var sign := Control.new()
+	sign.custom_minimum_size = Vector2.ONE * size_px
+	sign.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sign.draw.connect(func(): UiIcons.draw(sign, "no_entry", sign.size * 0.5, size_px, Color.WHITE))
+	return sign
 
 
 # --- World (level grid) --------------------------------------------------------
@@ -282,7 +464,7 @@ func _build_world() -> void:
 	_clear(page)
 	var bar := HBoxContainer.new()
 	page.add_child(bar)
-	bar.add_child(_small_button(tr("BACK"), func(): _show("home")))
+	bar.add_child(_back_button(func(): _show("home")))
 	var title := _label(tr(LevelCatalog.world(_world).name), 40, UiStyle.INK)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -329,7 +511,7 @@ func _build_settings() -> void:
 	_clear(page)
 	var bar := HBoxContainer.new()
 	page.add_child(bar)
-	bar.add_child(_small_button(tr("BACK"), func(): _show("home")))
+	bar.add_child(_back_button(func(): _show("home")))
 	var title := _label(tr("SETTINGS_TITLE"), 44, UiStyle.INK)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -385,7 +567,7 @@ func _build_credits() -> void:
 	_clear(page)
 	var bar := HBoxContainer.new()
 	page.add_child(bar)
-	bar.add_child(_small_button(tr("BACK"), func(): _show("settings")))
+	bar.add_child(_back_button(func(): _show("settings")))
 	var title := _label(tr("CREDITS_TITLE"), 44, UiStyle.INK)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -405,7 +587,7 @@ func _build_credits() -> void:
 func _page_header(page: VBoxContainer, title_key: String, back_to: String) -> void:
 	var bar := HBoxContainer.new()
 	page.add_child(bar)
-	bar.add_child(_small_button(tr("BACK"), func(): _show(back_to)))
+	bar.add_child(_back_button(func(): _show(back_to)))
 	var title := _label(tr(title_key), 42, UiStyle.INK)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -871,6 +1053,14 @@ static func _label(text: String, size: int, color: Color, wrap := false) -> Labe
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size.x = 560
 	return l
+
+
+func _back_button(action: Callable) -> RoundButton:
+	var b := RoundButton.new("back", Color.WHITE, 72.0, UiStyle.INK)
+	b.pressed.connect(func():
+		_click()
+		action.call())
+	return b
 
 
 func _small_button(text: String, action: Callable) -> Button:

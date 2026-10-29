@@ -209,3 +209,10 @@ DEV_EVENTS,Analytics events (%d queued),Ölçüm olayları (%d sırada)
 DEV_EVENTS_TITLE,Analytics events,Ölçüm olayları
 DEV_EVENTS_SENDING,Sending to GameAnalytics,GameAnalytics'e gönderiliyor
 DEV_EVENTS_LOCAL,"No keys yet: kept on the device, not sent","Anahtar yok: cihazda tutuluyor, gönderilmiyor"
+PAUSE_TITLE,Paused,Duraklatıldı
+PAUSE_RESUME,Resume,Devam et
+PAUSE_RESTART,Restart,Yeniden başla
+TAB_SHOP,Shop,Mağaza
+TAB_GARAGE,Garage,Garaj
+TAB_DAILY,Puzzle,Bulmaca
+TAB_GIFT,Gift,Hediye

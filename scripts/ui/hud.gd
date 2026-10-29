@@ -13,6 +13,7 @@ signal offer_accepted(kind: String, with_ad: bool) ## pay for a rescue
 signal continue_requested(with_ad: bool) ## +2 moves after losing
 signal double_coins_requested
 signal dev_requested ## developer mode panel
+signal paused_changed(paused: bool) ## the pause panel opened or closed
 
 var _title: Label
 var _time_label: Label
@@ -69,10 +70,9 @@ func _ready() -> void:
 ## Hard levels show their title in red.
 func set_level_title(text: String, hard := false) -> void:
 	_title.text = text
-	if hard:
-		_title.add_theme_color_override("font_color", UiStyle.DANGER)
-	else:
-		_title.remove_theme_color_override("font_color")
+	_title.add_theme_color_override("font_color", Color("ffd0d1") if hard else Color.WHITE)
+	_title.add_theme_color_override("font_outline_color", Color("b8282d") if hard else UiStyle.INK)
+	_title.add_theme_color_override("font_shadow_color", Color("b8282d") if hard else UiStyle.INK)
 
 
 func set_time_of_day(text: String) -> void:
@@ -260,6 +260,75 @@ func set_onboarding(on: bool) -> void:
 	_menu_button.visible = not on
 	_rescue_bar.visible = not on
 	_rescue_backdrop.visible = not on
+
+
+## Pause panel: resume, restart, sound and music switches, back to the menu.
+func show_pause() -> void:
+	paused_changed.emit(true)
+	var dim := ColorRect.new()
+	dim.color = Color(0.1, 0.12, 0.2, 0.6)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(500, 0)
+	center.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 18)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = tr("PAUSE_TITLE")
+	UiStyle.style_title(title, 56)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var close := func():
+		dim.queue_free()
+		paused_changed.emit(false)
+	# Sound and music switches as round buttons.
+	var toggles := HBoxContainer.new()
+	toggles.alignment = BoxContainer.ALIGNMENT_CENTER
+	toggles.add_theme_constant_override("separation", 28)
+	box.add_child(toggles)
+	for kind in ["sound", "music"]:
+		var on: bool = Progress.sound_on if kind == "sound" else Progress.music_on
+		var b := RoundButton.new(kind if on else kind + "_off", UiStyle.BLUE if on else UiStyle.MUTED, 84.0)
+		b.pressed.connect(func():
+			_click()
+			if kind == "sound":
+				Progress.set_sound(not Progress.sound_on)
+			else:
+				Progress.set_music(not Progress.music_on)
+			var now: bool = Progress.sound_on if kind == "sound" else Progress.music_on
+			b.icon_name = kind if now else kind + "_off"
+			b.face = UiStyle.BLUE if now else UiStyle.MUTED
+			b.queue_redraw())
+		toggles.add_child(b)
+	var resume := Button.new()
+	resume.text = tr("PAUSE_RESUME")
+	resume.theme_type_variation = "GoodButton"
+	resume.pressed.connect(func():
+		_click()
+		close.call())
+	box.add_child(resume)
+	var restart := Button.new()
+	restart.text = tr("PAUSE_RESTART")
+	restart.pressed.connect(func():
+		_click()
+		close.call()
+		restart_requested.emit())
+	box.add_child(restart)
+	var home := Button.new()
+	home.text = tr("HUD_MENU")
+	home.theme_type_variation = "IconButton"
+	home.pressed.connect(func():
+		_click()
+		close.call()
+		menu_requested.emit())
+	box.add_child(home)
+	dim.modulate.a = 0.0
+	dim.create_tween().tween_property(dim, "modulate:a", 1.0, 0.18)
 
 
 ## Pointing hand tapping `screen_pos` (first-time guidance).
@@ -573,14 +642,20 @@ func _build_top_bar(root: Control) -> void:
 	var bar := HBoxContainer.new()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rows.add_child(bar)
-	_menu_button = _small_button(tr("HUD_MENU"), menu_requested.emit)
+	_menu_button = RoundButton.new("pause", UiStyle.BLUE, 76.0)
+	_menu_button.pressed.connect(func():
+		_click()
+		show_pause())
 	bar.add_child(_menu_button)
 	_title = Label.new()
-	_title.add_theme_font_size_override("font_size", 42)
+	UiStyle.style_title(_title, 44)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(_title)
-	_retry_button = _small_button(tr("HUD_RETRY"), restart_requested.emit)
+	_retry_button = RoundButton.new("retry", UiStyle.BLUE, 76.0)
+	_retry_button.pressed.connect(func():
+		_click()
+		restart_requested.emit())
 	bar.add_child(_retry_button)
 
 	var meter_row := HBoxContainer.new()
