@@ -247,3 +247,6 @@ RUSH_TIP_3,"Every car out scores; combos multiply it and quick exits earn a bonu
 ACH_RUSH_300,Score 300 in Rush Hour,Yoğun Trafik'te 300 puan yap
 ACH_RUSH_1000,Score 1000 in Rush Hour,Yoğun Trafik'te 1000 puan yap
 ACH_RUSH_2500,Score 2500 in Rush Hour,Yoğun Trafik'te 2500 puan yap
+CLEARED,CLEARED!,TEMİZLENDİ!
+CLEARED_HARD,HARD ONE CLEARED!,ZOR BÖLÜM BİTTİ!
+CLEARED_COMBO,Best combo x%d,En iyi combo x%d

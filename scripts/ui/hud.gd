@@ -508,6 +508,89 @@ static func _format_time(seconds: float) -> String:
 
 
 ## Floating "x3 Super!" over the car that just left; `at` is a screen position.
+var _banner: Control ## cut scene title ("CLEARED!", "BOOM!")
+
+
+## Cut scene title: a huge word slams onto the screen, `sub` (e.g. the best
+## combo) pops in under it. Stays until hide_banner. Runs in real time.
+func show_banner(text: String, color: Color, outline: Color, sub := "") -> void:
+	hide_banner()
+	_banner = VBoxContainer.new()
+	_banner.set_anchors_preset(Control.PRESET_CENTER)
+	_banner.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_banner.grow_vertical = Control.GROW_DIRECTION_BOTH
+	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	(_banner as VBoxContainer).alignment = BoxContainer.ALIGNMENT_CENTER
+	_root.add_child(_banner)
+	var title := Label.new()
+	title.text = text
+	var font := UiStyle.font(800)
+	title.add_theme_font_override("font", font)
+	# As big as fits the screen width (long titles get smaller).
+	var room := _root.size.x * 0.88 if _root.size.x > 0.0 else 640.0
+	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 108).x + 52.0
+	title.add_theme_font_size_override("font_size", int(108.0 * minf(1.0, room / width)))
+	title.add_theme_color_override("font_color", color)
+	title.add_theme_color_override("font_outline_color", outline)
+	title.add_theme_constant_override("outline_size", 26)
+	title.add_theme_color_override("font_shadow_color", Color(outline, 0.6))
+	title.add_theme_constant_override("shadow_offset_y", 10)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_banner.add_child(title)
+	if sub != "":
+		var line := Label.new()
+		line.text = sub
+		line.add_theme_font_override("font", UiStyle.font(800))
+		line.add_theme_font_size_override("font_size", 48)
+		line.add_theme_color_override("font_color", Color.WHITE)
+		line.add_theme_color_override("font_outline_color", outline)
+		line.add_theme_constant_override("outline_size", 14)
+		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		line.modulate.a = 0.0
+		_banner.add_child(line)
+		var lt := line.create_tween().set_ignore_time_scale(true)
+		lt.tween_interval(0.3)
+		lt.tween_property(line, "modulate:a", 1.0, 0.2)
+	await get_tree().process_frame
+	if not is_instance_valid(_banner):
+		return
+	_banner.pivot_offset = _banner.size * 0.5
+	_banner.scale = Vector2.ONE * 2.6
+	_banner.modulate.a = 0.0
+	var t := _banner.create_tween().set_ignore_time_scale(true).set_parallel()
+	t.tween_property(_banner, "scale", Vector2.ONE, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_property(_banner, "modulate:a", 1.0, 0.12)
+
+
+func hide_banner() -> void:
+	if not is_instance_valid(_banner):
+		return
+	var old := _banner
+	_banner = null
+	var t := old.create_tween().set_ignore_time_scale(true).set_parallel()
+	t.tween_property(old, "modulate:a", 0.0, 0.2)
+	t.tween_property(old, "scale", Vector2.ONE * 0.85, 0.2)
+	t.chain().tween_callback(old.queue_free)
+
+
+## Full-screen flash of `color` that fades out (real time).
+func flash(color: Color, duration := 0.35) -> void:
+	var rect := ColorRect.new()
+	rect.color = color
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.add_child(rect)
+	var t := rect.create_tween().set_ignore_time_scale(true)
+	t.tween_property(rect, "modulate:a", 0.0, duration).set_ease(Tween.EASE_IN)
+	t.tween_callback(rect.queue_free)
+
+
+## Paper confetti over the board (the win panel brings its own).
+func confetti() -> void:
+	var c := Confetti.new()
+	_root.add_child(c)
+
+
 ## Endless mode: shows the bar that fills up until the next car drops.
 func set_rush(on: bool) -> void:
 	_rush_bar.visible = on
@@ -646,6 +729,7 @@ func hide_hint() -> void:
 
 func hide_result() -> void:
 	_overlay.visible = false
+	hide_banner()
 	if _retry_pulse:
 		_retry_pulse.kill()
 		_retry_pulse = null

@@ -28,6 +28,7 @@ var _fit_dist := 10.0 ## camera distance of the framed pose
 var zoom := 1.0
 var pan := Vector2.ZERO ## XZ offset of the look-at point while zoomed
 var _zoom_tween: Tween
+var _cinematic := false ## a cut scene drives the view: no pan limits
 
 
 func _ready() -> void:
@@ -104,6 +105,7 @@ func is_zoomed() -> bool:
 func reset_view() -> void:
 	if _zoom_tween:
 		_zoom_tween.kill()
+	_cinematic = false
 	zoom = 1.0
 	pan = Vector2.ZERO
 	_apply_pose()
@@ -156,15 +158,53 @@ func ground_point(screen_pos: Vector2) -> Variant:
 	return Plane(Vector3.UP, 0.0).intersects_ray(project_ray_origin(screen_pos), project_ray_normal(screen_pos))
 
 
+# --- Cut scenes (run in real time, unaffected by slow motion) ---------------------
+
+## Glides to look at `point` at `to_zoom`, free to leave the board.
+func cinematic_to(point: Vector3, to_zoom: float, duration: float) -> void:
+	_cinematic = true
+	_tween_view(Vector2(point.x - _fit_target.x, point.z - _fit_target.z), to_zoom, duration)
+
+
+## Keeps easing the view toward `point` (call every frame while following).
+func cinematic_follow(point: Vector3, delta: float) -> void:
+	if _zoom_tween and _zoom_tween.is_running():
+		return
+	var goal := Vector2(point.x - _fit_target.x, point.z - _fit_target.z)
+	pan = pan.lerp(goal, minf(delta * 6.0, 1.0))
+	_apply_pose()
+
+
+## Back to the whole board; the cut scene is over.
+func cinematic_end(duration: float) -> void:
+	_tween_view(Vector2.ZERO, 1.0, duration)
+	_zoom_tween.tween_callback(func(): _cinematic = false)
+
+
+func _tween_view(to_pan: Vector2, to_zoom: float, duration: float) -> void:
+	var from_zoom := zoom
+	var from_pan := pan
+	if _zoom_tween:
+		_zoom_tween.kill()
+	_zoom_tween = create_tween()
+	_zoom_tween.set_ignore_time_scale(true)
+	_zoom_tween.tween_method(func(t: float):
+		zoom = lerpf(from_zoom, to_zoom, t)
+		pan = from_pan.lerp(to_pan, t)
+		_apply_pose(), 0.0, 1.0, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+
+
 ## Keeps the zoomed view over the board: the further in, the more it may move.
 func _clamp_pan() -> void:
+	if _cinematic:
+		return
 	var room := _half_extents * (1.0 - 1.0 / zoom)
 	pan = pan.clamp(-room, room)
 
 
 func _apply_pose() -> void:
 	var view := _fit
-	if zoom > 1.0 or pan != Vector2.ZERO:
+	if zoom != 1.0 or pan != Vector2.ZERO:
 		var forward := -_fit.basis.z
 		view = Transform3D(_fit.basis, _fit_target + Vector3(pan.x, 0.0, pan.y) - forward * (_fit_dist / zoom))
 	if _intro >= 1.0:

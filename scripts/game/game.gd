@@ -4,8 +4,6 @@ extends Node3D
 
 const MENU_SCENE := "res://scenes/menu.tscn"
 
-@export var win_delay := 0.35 ## seconds after the last car has left the screen
-@export var max_exit_wait := 3.0 ## never wait longer than this for cars to leave
 @export var lose_delay := 0.6 ## seconds between the final crash and the lose panel
 @export_range(0.0, 1.0) var horn_chance := 0.65 ## chance a bumped car honks back
 ## Hint: after this many idle seconds a car that can leave flashes its arrow.
@@ -54,6 +52,12 @@ var _rush_next := {} ## the car about to drop (its spot is marked)
 var _rush_marker: Node3D
 var _rush_landed := {} ## vehicle id -> clock time it landed (quick bonus)
 
+# Cut scenes: the level-end finale and the explosion close-up.
+var _cinematic := false ## a cut scene is running (a tap skips it)
+var _skip := false
+var _follow: VehicleView ## car the camera follows during the finale
+var _last_out: VehicleView ## the car that most recently left the lot
+
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
 @onready var effects: Node3D = $Effects
@@ -97,6 +101,10 @@ func _adapt_lighting() -> void:
 
 
 func load_level(index: int) -> void:
+	Engine.time_scale = 1.0
+	_cinematic = false
+	_follow = null
+	hud.hide_banner()
 	var level: LevelData
 	var path := "daily"
 	if Rush.playing:
@@ -291,6 +299,9 @@ func _unhandled_input(event: InputEvent) -> void:
 ## A finger lifted without dragging: tap the car under it. Two quick taps on
 ## empty ground zoom in there (or back out).
 func _on_tap(screen_pos: Vector2) -> void:
+	if _cinematic:
+		_skip = true
+		return
 	if session == null:
 		return
 	var id := _pick_vehicle(screen_pos)
@@ -324,6 +335,8 @@ func _process(delta: float) -> void:
 	if _paused:
 		return
 	_clock += delta
+	if is_instance_valid(_follow):
+		camera.cinematic_follow(_follow.global_position, delta / maxf(Engine.time_scale, 0.01))
 	if session == null or session.state != GameSession.State.PLAYING or _tutorial_open:
 		hud.hide_hand()
 		return
@@ -422,6 +435,7 @@ func _nearest_vehicle(ground: Vector3) -> int:
 func _on_vehicle_exited(id: int, result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
 	vehicle_views.erase(id)
+	_last_out = view
 	view.play_exit()
 	Progress.add_stat("cars")
 	_play_launch_sounds(view.type)
@@ -599,8 +613,10 @@ func _on_exploded(id: int, cell: Vector2i) -> void:
 
 
 ## The blast: slow motion, flash and fire, the cars caught in it burnt and
-## the ones nearby thrown aside, heavy shake and rumble.
+## the ones nearby thrown aside, heavy shake and rumble; the camera rushes in
+## on it under a red flash and a "BOOM!".
 func _explode(at: Vector3, burnt: Array) -> void:
+	_boom_cinematic(at)
 	_clear_hint()
 	_release_held_hint()
 	Effects.explosion(effects, at)
@@ -638,6 +654,71 @@ func _on_bombs_ticked() -> void:
 		Sfx.play("bomb_beep", -4.0 if lowest <= 3 else -9.0, 1.0 if lowest > 3 else 1.25, 0.0)
 		if lowest <= 3:
 			Haptics.pulse(30, 0.6)
+
+
+# --- Cut scenes --------------------------------------------------------------------
+
+## Level-end finale (about 2 s, a tap skips it): the last car leaves in slow
+## motion with the camera on its tail, sparks fly as it passes the barrier,
+## then the view pulls back, "CLEARED!" slams in with the best combo and the
+## world's own flourish plays (bigger on hard levels).
+func _win_cinematic(played: GameSession) -> void:
+	_cinematic = true
+	_skip = false
+	var car := _last_out if is_instance_valid(_last_out) and _last_out.is_processing() else null
+	if car:
+		Engine.time_scale = 0.45
+		camera.cinematic_to(car.global_position, 1.7, 0.3)
+		_follow = car
+		var gate := Vector3(0.0, 0.9, board.exit_gate_z())
+		var sparked := false
+		var start := Time.get_ticks_msec()
+		# Follow until the car is past the barrier (at most 1.5 s).
+		while Time.get_ticks_msec() - start < 1500 and not _skip and played == session and is_instance_valid(car) \
+				and car.global_position.z < gate.z + 1.5:
+			if not sparked and car.global_position.z > gate.z - 0.4:
+				sparked = true
+				Effects.impact(effects, gate, Vector3.BACK)
+				Sfx.play("gate_open", -2.0, 0.8, 0.0)
+				Haptics.pulse(20, 0.5)
+			await get_tree().process_frame
+		_follow = null
+		Engine.time_scale = 1.0
+	camera.cinematic_end(0.2 if _skip else 0.45)
+	if played != session:
+		_cinematic = false
+		return
+	if not _skip:
+		var hard := session.level.hard
+		hud.flash(Color(1, 1, 1, 0.6 if hard else 0.45))
+		var sub := tr("CLEARED_COMBO") % _best_combo if _best_combo >= 3 else ""
+		hud.show_banner(tr("CLEARED_HARD" if hard else "CLEARED"), Color("ffd34d"), Color("b5541c"), sub)
+		Sfx.play("celebrate", -2.0, 1.0, 0.0)
+		Haptics.pulse(40, 0.7)
+		var world_theme := WorldTheme.for_world(world_index)
+		var extent := maxf(board.view_half_extents().x, board.view_half_extents().y)
+		Flourish.play(effects, world_theme.id, Vector3.ZERO, extent, hard)
+		if world_theme.id == "city":
+			hud.confetti()
+		var start := Time.get_ticks_msec()
+		while Time.get_ticks_msec() - start < (1300 if hard else 1000) and not _skip and played == session:
+			await get_tree().process_frame
+	hud.hide_banner()
+	_cinematic = false
+
+
+## Explosion close-up: the camera rushes to the blast under a red flash and a
+## shaking "BOOM!", holds a moment, then pulls back for the lose panel.
+func _boom_cinematic(at: Vector3) -> void:
+	var played := session
+	camera.cinematic_to(at, 1.8, 0.25)
+	hud.flash(Color(1.0, 0.18, 0.1, 0.55), 0.7)
+	hud.show_banner(tr("LOSE_BOOM_TITLE"), Color("ff4433"), Color("4a0b07"))
+	await get_tree().create_timer(1.3, true, false, true).timeout
+	if played != session:
+		return
+	hud.hide_banner()
+	camera.cinematic_end(0.5)
 
 
 # --- Rush hour (endless mode) -----------------------------------------------------
@@ -758,11 +839,7 @@ func _on_won() -> void:
 			result["last_level"] = true
 			result["onboarding_done"] = true
 	_earned = record.coins
-	var waited := 0.0
-	while VehicleView.exiting_count() > 0 and waited < max_exit_wait:
-		await get_tree().process_frame
-		waited += get_process_delta_time()
-	await get_tree().create_timer(win_delay).timeout
+	await _win_cinematic(played)
 	if played == session:
 		Sfx.duck_music(2.0)
 		Sfx.play("win", -2.0, 1.0, 0.0)
