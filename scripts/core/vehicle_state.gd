@@ -1,7 +1,7 @@
 class_name VehicleState
 extends RefCounted
 ## One vehicle on the grid: identity, footprint, the direction it drives and
-## the world mechanics it carries (cargo, turn, key, lock).
+## the world mechanics it carries (cargo, turn, key, lock, bomb).
 
 var id := -1
 var type := ""
@@ -12,6 +12,7 @@ var cargo := false ## loaded: a tap only pulls it forward one cell, then it driv
 var turn := 0 ## turn still to make: 1 = clockwise, -1 = counter-clockwise, 0 = none
 var key := -1 ## group it unlocks (locked cars, gates) once it has left
 var lock := -1 ## group whose key vehicle has to leave before this one can move
+var bomb := 0 ## taps left before it explodes while still parked; 0 = no bomb
 
 
 func _init(p_id: int, p_type: String, p_cell: Vector2i, p_dir: int, p_length: int) -> void:
@@ -28,6 +29,7 @@ func duplicate() -> VehicleState:
 	v.turn = turn
 	v.key = key
 	v.lock = lock
+	v.bomb = bomb
 	return v
 
 

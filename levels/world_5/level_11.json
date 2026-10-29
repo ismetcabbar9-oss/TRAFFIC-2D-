@@ -1,157 +1,158 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "firetruck",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "bus",
-   "col": 4,
-   "row": 7,
+   "col": 4.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "suv_luxury",
-   "col": 4,
-   "row": 1,
+   "col": 4.0,
+   "row": 1.0,
    "dir": "down"
   },
   {
    "type": "taxi",
-   "col": 2,
-   "row": 6,
+   "col": 2.0,
+   "row": 6.0,
    "dir": "up"
   },
   {
    "type": "sedan_sports",
-   "col": 1,
-   "row": 6,
-   "dir": "up"
+   "col": 1.0,
+   "row": 6.0,
+   "dir": "up",
+   "bomb": 8
   },
   {
    "type": "sedan_sports",
-   "col": 4,
-   "row": 3,
+   "col": 4.0,
+   "row": 3.0,
    "dir": "left",
-   "key": 2
+   "key": 2.0
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "up"
   },
   {
    "type": "van",
-   "col": 5,
-   "row": 0,
+   "col": 5.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "sedan",
-   "col": 5,
-   "row": 4,
+   "col": 5.0,
+   "row": 4.0,
    "dir": "down"
   },
   {
    "type": "pickup",
-   "col": 6,
-   "row": 1,
+   "col": 6.0,
+   "row": 1.0,
    "dir": "up"
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 5,
+   "col": 0.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "bus",
-   "col": 2,
-   "row": 1,
+   "col": 2.0,
+   "row": 1.0,
    "dir": "up"
   },
   {
    "type": "bus",
-   "col": 6,
-   "row": 3,
+   "col": 6.0,
+   "row": 3.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 3,
-   "row": 6,
+   "col": 3.0,
+   "row": 6.0,
    "dir": "left",
-   "key": 0
+   "key": 0.0
   },
   {
    "type": "police",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "left",
-   "key": 1
+   "key": 1.0
   },
   {
    "type": "police",
-   "col": 3,
-   "row": 2,
+   "col": 3.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
-   "col": 2,
-   "row": 4,
+   "col": 2.0,
+   "row": 4.0,
    "dir": "up",
-   "key": 3
+   "key": 3.0
   },
   {
    "type": "suv",
-   "col": 3,
-   "row": 0,
+   "col": 3.0,
+   "row": 0.0,
    "dir": "left",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "suv_luxury",
-   "col": 3,
-   "row": 4,
+   "col": 3.0,
+   "row": 4.0,
    "dir": "right"
   },
   {
    "type": "sedan",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "up"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 3,
-   "row": 5
+   "col": 3.0,
+   "row": 5.0
   },
   {
    "type": "gate",
-   "col": 1,
-   "row": 4,
-   "group": 1
+   "col": 1.0,
+   "row": 4.0,
+   "group": 1.0
   },
   {
    "type": "gate",
-   "col": 5,
-   "row": 6,
-   "group": 2
+   "col": 5.0,
+   "row": 6.0,
+   "group": 2.0
   },
   {
    "type": "gate",
-   "col": 1,
-   "row": 3,
-   "group": 3
+   "col": 1.0,
+   "row": 3.0,
+   "group": 3.0
   }
  ],
  "name": "Level 11"

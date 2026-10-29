@@ -1,116 +1,122 @@
 {
- "cols": 6,
- "rows": 7,
- "mistakes": 3,
+ "cols": 6.0,
+ "rows": 7.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "sedan",
-   "col": 3,
-   "row": 0,
-   "dir": "down"
+   "col": 3.0,
+   "row": 0.0,
+   "dir": "down",
+   "bomb": 6
   },
   {
    "type": "hatchback",
-   "col": 2,
-   "row": 3,
+   "col": 2.0,
+   "row": 3.0,
    "dir": "down",
    "turn": "cw"
   },
   {
    "type": "sedan_sports",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "left",
    "turn": "ccw"
   },
   {
    "type": "pickup",
-   "col": 5,
-   "row": 4,
+   "col": 5.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "sedan_sports",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "right"
   },
   {
    "type": "police",
-   "col": 4,
-   "row": 2,
+   "col": 4.0,
+   "row": 2.0,
    "dir": "up",
    "turn": "ccw"
   },
   {
    "type": "suv_luxury",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 1,
-   "row": 3,
+   "col": 1.0,
+   "row": 3.0,
    "dir": "up",
    "cargo": true
   },
   {
    "type": "sedan_sports",
-   "col": 5,
-   "row": 2,
+   "col": 5.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "pickup",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "up",
    "cargo": true
   },
   {
    "type": "police",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "left"
   },
   {
    "type": "delivery",
-   "col": 2,
-   "row": 6,
+   "col": 2.0,
+   "row": 6.0,
    "dir": "left"
   },
   {
    "type": "bus",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "down"
   },
   {
    "type": "van",
-   "col": 4,
-   "row": 4,
+   "col": 4.0,
+   "row": 4.0,
    "dir": "up",
    "turn": "cw"
   },
   {
    "type": "van",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "right"
   },
   {
    "type": "firetruck",
-   "col": 3,
-   "row": 3,
+   "col": 3.0,
+   "row": 3.0,
    "dir": "down"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 1,
-   "row": 5
+   "col": 1.0,
+   "row": 5.0
+  },
+  {
+   "type": "pit",
+   "col": 5,
+   "row": 1
   }
  ],
  "name": "Level 13"

@@ -109,7 +109,9 @@ func load_level(index: int) -> void:
 	if not report.solvable:
 		push_warning("Level %s cannot be cleared; stuck vehicles: %s" % [path, report.stuck])
 
-	level.mistakes = Economy.mistakes_for(world_index, level_index, level.hard, Daily.playing)
+	# Each pit costs a move when something falls in: it comes with one extra.
+	level.mistakes = Economy.mistakes_for(world_index, level_index, level.hard, Daily.playing) \
+			+ level.obstacles.filter(func(o): return o.type == "pit").size()
 	session = GameSession.new(level)
 	_combo = 0
 	_best_combo = 0
@@ -288,7 +290,8 @@ func _process(delta: float) -> void:
 	# the solver for the next move of a winning line.
 	var free := session.board.free_vehicles()
 	if not _hinted_id in free:
-		_hinted_id = free[0] if not free.is_empty() else LevelSolver.next_tap(session.board)
+		var risky := session.board.has_bombs() or not session.board.pits.is_empty()
+		_hinted_id = free[0] if not free.is_empty() and not risky else LevelSolver.next_tap(session.board, session.fall_budget())
 	if vehicle_views.has(_hinted_id):
 		vehicle_views[_hinted_id].flash_hint()
 		if world_index == 0 and level_index < tutorial_levels:
@@ -302,7 +305,7 @@ func _update_guide(delta: float) -> void:
 	if _guide_delay > 0.0:
 		return
 	if not vehicle_views.has(_guide_id) or not _guide_id in session.board.vehicles:
-		_guide_id = LevelSolver.next_tap(session.board)
+		_guide_id = LevelSolver.next_tap(session.board, session.fall_budget())
 	if not vehicle_views.has(_guide_id):
 		hud.hide_hand()
 		return
@@ -611,7 +614,7 @@ func _on_offer_accepted(kind: String, with_ad: bool) -> void:
 
 ## Lights up the next car of a winning line until it is tapped.
 func _give_hint() -> void:
-	var id := LevelSolver.next_tap(session.board)
+	var id := LevelSolver.next_tap(session.board, session.fall_budget())
 	if id < 0:
 		hud.show_hint(tr("HINT_DEADLOCK_UNDO"))
 		return
@@ -725,7 +728,7 @@ func _show_dev_panel() -> void:
 ## Plays the solver's winning line, one tap at a time.
 func _dev_auto_solve() -> void:
 	var played := session
-	var report := LevelSolver.solve_board(session.board)
+	var report := LevelSolver.solve_board(session.board, session.fall_budget())
 	if not report.solvable:
 		hud.show_hint(tr("HINT_DEADLOCK_UNDO"))
 		return

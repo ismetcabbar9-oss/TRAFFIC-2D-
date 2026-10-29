@@ -17,8 +17,13 @@ extends RefCounted
 ##   vehicle "key": 0                unlocks group 0 when it leaves
 ##   vehicle "lock": 0               waits for the key of group 0
 ##   obstacle {"type": "gate", "group": 0, ...}  opens with the key of group 0
+##
+## Hazards (see BoardState):
+##   obstacle {"type": "pit", ...}   the first vehicle driving over it falls in
+##   vehicle type "tanker"           any crash with it is an explosion
+##   vehicle "bomb": 6               explodes unless it has left within 6 taps
 
-const OBSTACLE_TYPES: Array[String] = ["cone", "box", "gate"]
+const OBSTACLE_TYPES: Array[String] = ["cone", "box", "gate", "pit"]
 const TURNS := {"cw": 1, "ccw": -1}
 const MAX_GROUPS := 4
 
@@ -63,6 +68,8 @@ func to_dict() -> Dictionary:
 		for field in ["key", "lock"]:
 			if e.get(field, -1) >= 0:
 				d[field] = e[field]
+		if e.get("bomb", 0) > 0:
+			d["bomb"] = e.bomb
 		v.append(d)
 	var o := []
 	for e in obstacles:
@@ -111,6 +118,11 @@ func _parse(data: Dictionary) -> void:
 		for field in ["key", "lock"]:
 			if e.has(field):
 				entry[field] = _group(e[field], "vehicle %d %s" % [i, field])
+		if e.has("bomb"):
+			if int(e.bomb) < 1:
+				errors.append("vehicle %d: bomb needs at least 1 tap" % i)
+			else:
+				entry["bomb"] = int(e.bomb)
 		vehicles.append(entry)
 
 	for i in data.get("obstacles", []).size():

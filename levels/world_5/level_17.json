@@ -1,170 +1,171 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "pickup",
-   "col": 2,
-   "row": 5,
+   "col": 2.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "bus",
-   "col": 0,
-   "row": 0,
-   "dir": "right"
+   "col": 0.0,
+   "row": 0.0,
+   "dir": "right",
+   "bomb": 8
   },
   {
    "type": "hatchback",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "down",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "suv_luxury",
-   "col": 5,
-   "row": 2,
+   "col": 5.0,
+   "row": 2.0,
    "dir": "left"
   },
   {
    "type": "pickup",
-   "col": 4,
-   "row": 4,
+   "col": 4.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "down",
-   "key": 0
+   "key": 0.0
   },
   {
    "type": "suv_luxury",
-   "col": 5,
-   "row": 7,
+   "col": 5.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "sedan",
-   "col": 6,
-   "row": 3,
+   "col": 6.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "sedan",
-   "col": 3,
-   "row": 5,
+   "col": 3.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 4,
-   "row": 3,
+   "col": 4.0,
+   "row": 3.0,
    "dir": "left",
-   "key": 2
+   "key": 2.0
   },
   {
    "type": "suv_luxury",
-   "col": 3,
-   "row": 1,
+   "col": 3.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "down"
   },
   {
    "type": "suv",
-   "col": 5,
-   "row": 4,
+   "col": 5.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "bus",
-   "col": 3,
-   "row": 0,
+   "col": 3.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 3,
-   "row": 7,
+   "col": 3.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 6,
-   "row": 5,
+   "col": 6.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "sedan",
-   "col": 3,
-   "row": 2,
+   "col": 3.0,
+   "row": 2.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 4,
+   "col": 0.0,
+   "row": 4.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 2,
-   "row": 2,
+   "col": 2.0,
+   "row": 2.0,
    "dir": "up",
-   "key": 1
+   "key": 1.0
   },
   {
    "type": "sedan",
-   "col": 1,
-   "row": 6,
+   "col": 1.0,
+   "row": 6.0,
    "dir": "down"
   },
   {
    "type": "sedan",
-   "col": 6,
-   "row": 0,
+   "col": 6.0,
+   "row": 0.0,
    "dir": "up",
-   "lock": 0,
-   "key": 3
+   "lock": 0.0,
+   "key": 3.0
   },
   {
    "type": "suv",
-   "col": 2,
-   "row": 4,
+   "col": 2.0,
+   "row": 4.0,
    "dir": "right"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 5,
-   "row": 6
+   "col": 5.0,
+   "row": 6.0
   },
   {
    "type": "gate",
-   "col": 1,
-   "row": 5,
-   "group": 1
+   "col": 1.0,
+   "row": 5.0,
+   "group": 1.0
   },
   {
    "type": "gate",
-   "col": 5,
-   "row": 1,
-   "group": 2
+   "col": 5.0,
+   "row": 1.0,
+   "group": 2.0
   },
   {
    "type": "gate",
-   "col": 2,
-   "row": 1,
-   "group": 3
+   "col": 2.0,
+   "row": 1.0,
+   "group": 3.0
   }
  ],
  "name": "Level 17"

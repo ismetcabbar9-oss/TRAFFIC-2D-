@@ -1,114 +1,119 @@
 {
- "cols": 6,
- "rows": 7,
- "mistakes": 3,
+ "cols": 6.0,
+ "rows": 7.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "taxi",
-   "col": 2,
-   "row": 3,
+   "col": 2.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "delivery",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 4,
-   "row": 1,
+   "col": 4.0,
+   "row": 1.0,
    "dir": "up",
    "cargo": true
   },
   {
    "type": "delivery",
-   "col": 3,
-   "row": 3,
+   "col": 3.0,
+   "row": 3.0,
    "dir": "left",
    "cargo": true
   },
   {
    "type": "suv_luxury",
-   "col": 2,
-   "row": 2,
+   "col": 2.0,
+   "row": 2.0,
    "dir": "right"
   },
   {
    "type": "firetruck",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 1,
+   "col": 0.0,
+   "row": 1.0,
    "dir": "up",
    "cargo": true
   },
   {
    "type": "police",
-   "col": 1,
-   "row": 6,
+   "col": 1.0,
+   "row": 6.0,
    "dir": "right"
   },
   {
    "type": "firetruck",
-   "col": 5,
-   "row": 4,
+   "col": 5.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 5,
+   "col": 0.0,
+   "row": 5.0,
    "dir": "up",
    "cargo": true
   },
   {
    "type": "pickup",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "sedan",
-   "col": 4,
-   "row": 5,
+   "col": 4.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "police",
-   "col": 3,
-   "row": 4,
+   "col": 3.0,
+   "row": 4.0,
    "dir": "right"
   },
   {
    "type": "delivery",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "police",
-   "col": 2,
-   "row": 5,
+   "col": 2.0,
+   "row": 5.0,
    "dir": "right"
   },
   {
    "type": "suv",
-   "col": 0,
-   "row": 3,
+   "col": 0.0,
+   "row": 3.0,
    "dir": "up"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 1,
-   "row": 5
+   "col": 1.0,
+   "row": 5.0
+  },
+  {
+   "type": "pit",
+   "col": 0,
+   "row": 0
   }
  ],
  "name": "Level 13"

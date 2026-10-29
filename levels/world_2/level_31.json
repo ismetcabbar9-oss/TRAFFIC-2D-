@@ -1,150 +1,160 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "delivery",
-   "col": 1,
-   "row": 3,
+   "col": 1.0,
+   "row": 3.0,
    "dir": "right"
   },
   {
-   "type": "firetruck",
-   "col": 0,
-   "row": 5,
+   "type": "tanker",
+   "col": 0.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "suv",
-   "col": 5,
-   "row": 0,
+   "col": 5.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 6,
-   "row": 5,
+   "col": 6.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "taxi",
-   "col": 1,
-   "row": 5,
+   "col": 1.0,
+   "row": 5.0,
    "dir": "right"
   },
   {
    "type": "hatchback",
-   "col": 6,
-   "row": 2,
+   "col": 6.0,
+   "row": 2.0,
    "dir": "down"
   },
   {
    "type": "pickup",
-   "col": 1,
-   "row": 7,
+   "col": 1.0,
+   "row": 7.0,
    "dir": "left",
    "cargo": true
   },
   {
    "type": "ambulance",
-   "col": 0,
-   "row": 1,
+   "col": 0.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "sedan",
-   "col": 6,
-   "row": 0,
+   "col": 6.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "sedan",
-   "col": 5,
-   "row": 5,
+   "col": 5.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "hatchback",
-   "col": 3,
-   "row": 0,
+   "col": 3.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "suv_luxury",
-   "col": 4,
-   "row": 7,
+   "col": 4.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "sedan",
-   "col": 0,
-   "row": 4,
+   "col": 0.0,
+   "row": 4.0,
    "dir": "right"
   },
   {
    "type": "suv_luxury",
-   "col": 2,
-   "row": 2,
+   "col": 2.0,
+   "row": 2.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 4,
-   "row": 4,
+   "col": 4.0,
+   "row": 4.0,
    "dir": "down",
    "cargo": true
   },
   {
    "type": "suv_luxury",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "bus",
-   "col": 4,
-   "row": 1,
+   "col": 4.0,
+   "row": 1.0,
    "dir": "down"
   },
   {
    "type": "hatchback",
-   "col": 3,
-   "row": 5,
+   "col": 3.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "van",
-   "col": 5,
-   "row": 2,
+   "col": 5.0,
+   "row": 2.0,
    "dir": "down",
    "cargo": true
   },
   {
    "type": "van",
-   "col": 5,
-   "row": 4,
+   "col": 5.0,
+   "row": 4.0,
    "dir": "right",
    "cargo": true
   },
   {
    "type": "hatchback",
-   "col": 2,
-   "row": 4,
+   "col": 2.0,
+   "row": 4.0,
    "dir": "right"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 1,
-   "row": 6
+   "col": 1.0,
+   "row": 6.0
+  },
+  {
+   "type": "pit",
+   "col": 6,
+   "row": 7
+  },
+  {
+   "type": "pit",
+   "col": 0,
+   "row": 0
   }
  ],
  "name": "Level 31"

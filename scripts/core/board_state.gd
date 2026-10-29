@@ -9,12 +9,19 @@ extends RefCounted
 ## - turn: the first tap swings the nose 90 degrees around the rear cell;
 ## - lock: nothing happens until the key vehicle of its group has left;
 ## - gate: a barrier cell that opens when the key vehicle of its group leaves.
+## Hazards:
+## - pit: the first vehicle to drive over it falls in (it is gone, as if it
+##   had left, but it costs a wrong move); the pit is filled afterwards;
+## - tanker: a crash with a tanker, either way round, is an explosion;
+## - bomb: counts down on every tap (locked taps aside) and explodes at zero
+##   while the vehicle is still parked.
 
 const EMPTY := -1
 const OBSTACLE := -2
 const GATE := -3
+const PIT := -4
 
-enum Action { EXIT, CRASH, ADVANCE, TURN, LOCKED }
+enum Action { EXIT, CRASH, ADVANCE, TURN, LOCKED, FALL }
 
 ## What one tap does (see probe) and, after apply, what changed.
 class MoveResult:
@@ -24,13 +31,15 @@ class MoveResult:
 	var steps := 0 ## empty cells driven before contact (or before the lot edge)
 	var contact_cell := Vector2i.ZERO ## cell of the blocker when it crashes
 	var turning := false ## the crash happened while swinging round
-	var opened: Array[Vector2i] = [] ## gate cells opened by this exit
+	var opened: Array[Vector2i] = [] ## gate cells opened by this exit (or fall)
+	var explodes := false ## a tanker is involved: the crash (or fall) blows up
 
 var cols := 0
 var rows := 0
 var vehicles := {} ## id -> VehicleState
 var gates := {} ## cell -> group of a closed gate
 var keys := {} ## group -> id of the vehicle that unlocks it
+var pits := {} ## cell -> true for a pit nobody has fallen into yet
 var errors: PackedStringArray = [] ## layout problems (overlap, out of bounds)
 
 var _grid := PackedInt32Array()
@@ -46,6 +55,9 @@ static func from_level(level: LevelData) -> BoardState:
 		if e.type == "gate":
 			board._place(e.cell, GATE, "gate at %s" % e.cell)
 			board.gates[e.cell] = e.group
+		elif e.type == "pit":
+			board._place(e.cell, PIT, "pit at %s" % e.cell)
+			board.pits[e.cell] = true
 		else:
 			board._place(e.cell, OBSTACLE, "obstacle at %s" % e.cell)
 	for i in level.vehicles.size():
@@ -55,6 +67,7 @@ static func from_level(level: LevelData) -> BoardState:
 		v.turn = e.get("turn", 0)
 		v.key = e.get("key", -1)
 		v.lock = e.get("lock", -1)
+		v.bomb = e.get("bomb", 0)
 		board.vehicles[i] = v
 		if v.key >= 0:
 			board.keys[v.key] = i
@@ -73,6 +86,7 @@ func clone() -> BoardState:
 		b.vehicles[id] = (vehicles[id] as VehicleState).duplicate()
 	b.gates = gates.duplicate()
 	b.keys = keys.duplicate()
+	b.pits = pits.duplicate()
 	b._grid = _grid.duplicate()
 	return b
 
@@ -102,18 +116,30 @@ func probe(id: int) -> MoveResult:
 		var nose := v.turn_cell()
 		if at(nose) == EMPTY:
 			result.action = Action.TURN
+		elif at(nose) == PIT:
+			result.action = Action.FALL
+			result.contact_cell = nose
+			result.turning = true
+			result.explodes = v.type == "tanker"
 		else:
 			result.blocker = at(nose)
 			result.contact_cell = nose
 			result.turning = true
+			result.explodes = _is_tanker(id) or _is_tanker(result.blocker)
 		return result
 	var forward := GridDir.to_vector(v.dir)
 	var c := v.head() + forward
 	while in_bounds(c):
 		var occupant := at(c)
+		if occupant == PIT:
+			result.action = Action.FALL
+			result.contact_cell = c
+			result.explodes = v.type == "tanker"
+			return result
 		if occupant != EMPTY:
 			result.blocker = occupant
 			result.contact_cell = c
+			result.explodes = _is_tanker(id) or _is_tanker(occupant)
 			return result
 		result.steps += 1
 		if v.cargo:
@@ -131,6 +157,12 @@ func apply(id: int, result: MoveResult) -> void:
 	match result.action:
 		Action.EXIT:
 			result.opened = remove_vehicle(id)
+		Action.FALL:
+			if result.explodes:
+				return # a tanker blows up at the rim: the game is over anyway
+			result.opened = remove_vehicle(id)
+			pits.erase(result.contact_cell)
+			_grid[result.contact_cell.y * cols + result.contact_cell.x] = EMPTY
 		Action.ADVANCE:
 			_set_cells(v, EMPTY)
 			v.cell += GridDir.to_vector(v.dir)
@@ -200,6 +232,48 @@ func is_cleared() -> bool:
 	return vehicles.is_empty()
 
 
+## One tap has passed: every parked bomb counts down. Returns the id of a
+## bomb that reached zero (it explodes), or -1.
+func tick_bombs() -> int:
+	var boom := -1
+	var ids := vehicles.keys()
+	ids.sort()
+	for id in ids:
+		var v: VehicleState = vehicles[id]
+		if v.bomb > 0:
+			v.bomb -= 1
+			if v.bomb == 0 and boom < 0:
+				boom = id
+	return boom
+
+
+func has_bombs() -> bool:
+	for id in vehicles:
+		if (vehicles[id] as VehicleState).bomb > 0:
+			return true
+	return false
+
+
+## Bomb counters by vehicle id (for undo).
+func bomb_counts() -> Dictionary:
+	var out := {}
+	for id in vehicles:
+		var v: VehicleState = vehicles[id]
+		if v.bomb > 0:
+			out[id] = v.bomb
+	return out
+
+
+func set_bomb_counts(counts: Dictionary) -> void:
+	for id in counts:
+		if vehicles.has(id):
+			(vehicles[id] as VehicleState).bomb = counts[id]
+
+
+func _is_tanker(id: int) -> bool:
+	return id >= 0 and vehicles.has(id) and (vehicles[id] as VehicleState).type == "tanker"
+
+
 ## Compact description of the position, for the solver's memo.
 func state_key() -> String:
 	var ids := vehicles.keys()
@@ -207,7 +281,10 @@ func state_key() -> String:
 	var parts := PackedStringArray()
 	for id in ids:
 		var v: VehicleState = vehicles[id]
-		parts.append("%d:%d,%d,%d%s%d" % [id, v.cell.x, v.cell.y, v.dir, "c" if v.cargo else "", v.turn])
+		parts.append("%d:%d,%d,%d%s%d%s" % [id, v.cell.x, v.cell.y, v.dir, "c" if v.cargo else "", v.turn,
+			("b%d" % v.bomb) if v.bomb > 0 else ""])
+	for c in pits:
+		parts.append("p%d,%d" % [c.x, c.y])
 	return " ".join(parts)
 
 

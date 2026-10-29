@@ -1,146 +1,147 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "police",
-   "col": 2,
-   "row": 7,
-   "dir": "right"
+   "col": 2.0,
+   "row": 7.0,
+   "dir": "right",
+   "bomb": 8
   },
   {
    "type": "firetruck",
-   "col": 1,
-   "row": 3,
+   "col": 1.0,
+   "row": 3.0,
    "dir": "down"
   },
   {
    "type": "bus",
-   "col": 2,
-   "row": 1,
+   "col": 2.0,
+   "row": 1.0,
    "dir": "right"
   },
   {
    "type": "police",
-   "col": 0,
-   "row": 3,
+   "col": 0.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "bus",
-   "col": 3,
-   "row": 4,
+   "col": 3.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 1,
+   "col": 0.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "suv",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "delivery",
-   "col": 5,
-   "row": 5,
+   "col": 5.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "pickup",
-   "col": 2,
-   "row": 3,
+   "col": 2.0,
+   "row": 3.0,
    "dir": "left",
    "cargo": true
   },
   {
    "type": "pickup",
-   "col": 6,
-   "row": 5,
+   "col": 6.0,
+   "row": 5.0,
    "dir": "up",
    "cargo": true
   },
   {
    "type": "police",
-   "col": 3,
-   "row": 2,
+   "col": 3.0,
+   "row": 2.0,
    "dir": "left"
   },
   {
    "type": "taxi",
-   "col": 1,
-   "row": 6,
+   "col": 1.0,
+   "row": 6.0,
    "dir": "up",
    "turn": "cw"
   },
   {
    "type": "taxi",
-   "col": 6,
-   "row": 1,
+   "col": 6.0,
+   "row": 1.0,
    "dir": "up",
    "turn": "ccw"
   },
   {
    "type": "delivery",
-   "col": 5,
-   "row": 1,
+   "col": 5.0,
+   "row": 1.0,
    "dir": "up"
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 5,
+   "col": 0.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "hatchback",
-   "col": 4,
-   "row": 4,
+   "col": 4.0,
+   "row": 4.0,
    "dir": "left",
    "turn": "cw"
   },
   {
    "type": "pickup",
-   "col": 6,
-   "row": 3,
+   "col": 6.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "firetruck",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "taxi",
-   "col": 2,
-   "row": 0,
+   "col": 2.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "police",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "left",
    "turn": "ccw"
   },
   {
    "type": "sedan",
-   "col": 2,
-   "row": 5,
+   "col": 2.0,
+   "row": 5.0,
    "dir": "down"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 4,
-   "row": 6
+   "col": 4.0,
+   "row": 6.0
   }
  ],
  "name": "Level 17"

@@ -1,164 +1,165 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "sedan_sports",
-   "col": 1,
-   "row": 4,
+   "col": 1.0,
+   "row": 4.0,
    "dir": "right",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "sedan",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "down"
   },
   {
    "type": "van",
-   "col": 5,
-   "row": 7,
+   "col": 5.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "suv",
-   "col": 5,
-   "row": 2,
+   "col": 5.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
-   "col": 5,
-   "row": 1,
+   "col": 5.0,
+   "row": 1.0,
    "dir": "right",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "hatchback",
-   "col": 4,
-   "row": 5,
+   "col": 4.0,
+   "row": 5.0,
    "dir": "up",
-   "key": 0
+   "key": 0.0
   },
   {
    "type": "suv_luxury",
-   "col": 3,
-   "row": 3,
+   "col": 3.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
-   "type": "firetruck",
-   "col": 0,
-   "row": 0,
+   "type": "tanker",
+   "col": 0.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 5,
-   "row": 0,
-   "dir": "left"
+   "col": 5.0,
+   "row": 0.0,
+   "dir": "left",
+   "bomb": 8
   },
   {
    "type": "pickup",
-   "col": 5,
-   "row": 5,
+   "col": 5.0,
+   "row": 5.0,
    "dir": "down",
-   "key": 2
+   "key": 2.0
   },
   {
    "type": "taxi",
-   "col": 2,
-   "row": 7,
+   "col": 2.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "ambulance",
-   "col": 1,
-   "row": 5,
+   "col": 1.0,
+   "row": 5.0,
    "dir": "right"
   },
   {
    "type": "sedan",
-   "col": 3,
-   "row": 1,
+   "col": 3.0,
+   "row": 1.0,
    "dir": "left",
-   "key": 3
+   "key": 3.0
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 5,
+   "col": 0.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "sedan_sports",
-   "col": 3,
-   "row": 0,
+   "col": 3.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "taxi",
-   "col": 4,
-   "row": 3,
+   "col": 4.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "van",
-   "col": 6,
-   "row": 2,
+   "col": 6.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "suv",
-   "col": 6,
-   "row": 4,
+   "col": 6.0,
+   "row": 4.0,
    "dir": "down"
   },
   {
    "type": "sedan",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "left",
-   "key": 1
+   "key": 1.0
   },
   {
    "type": "suv",
-   "col": 2,
-   "row": 2,
+   "col": 2.0,
+   "row": 2.0,
    "dir": "right"
   },
   {
    "type": "suv",
-   "col": 0,
-   "row": 7,
+   "col": 0.0,
+   "row": 7.0,
    "dir": "left"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 2,
-   "row": 3
+   "col": 2.0,
+   "row": 3.0
   },
   {
    "type": "gate",
-   "col": 1,
-   "row": 1,
-   "group": 1
+   "col": 1.0,
+   "row": 1.0,
+   "group": 1.0
   },
   {
    "type": "gate",
-   "col": 5,
-   "row": 4,
-   "group": 2
+   "col": 5.0,
+   "row": 4.0,
+   "group": 2.0
   },
   {
    "type": "gate",
-   "col": 1,
-   "row": 6,
-   "group": 3
+   "col": 1.0,
+   "row": 6.0,
+   "group": 3.0
   }
  ],
  "name": "Level 23"

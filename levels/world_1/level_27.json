@@ -1,145 +1,145 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "sedan",
-   "col": 1,
-   "row": 3,
+   "col": 1.0,
+   "row": 3.0,
    "dir": "right"
   },
   {
    "type": "taxi",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "right"
   },
   {
-   "type": "delivery",
-   "col": 4,
-   "row": 7,
+   "type": "tanker",
+   "col": 4.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "suv",
-   "col": 3,
-   "row": 4,
+   "col": 3.0,
+   "row": 4.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "right"
   },
   {
    "type": "van",
-   "col": 2,
-   "row": 5,
+   "col": 2.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "pickup",
-   "col": 6,
-   "row": 2,
+   "col": 6.0,
+   "row": 2.0,
    "dir": "down"
   },
   {
    "type": "delivery",
-   "col": 2,
-   "row": 0,
+   "col": 2.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "suv",
-   "col": 0,
-   "row": 3,
+   "col": 0.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "taxi",
-   "col": 2,
-   "row": 7,
+   "col": 2.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 4,
-   "row": 5,
+   "col": 4.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "suv",
-   "col": 3,
-   "row": 1,
+   "col": 3.0,
+   "row": 1.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 1,
-   "row": 4,
+   "col": 1.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
-   "col": 6,
-   "row": 0,
+   "col": 6.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "sedan",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
-   "col": 5,
-   "row": 4,
+   "col": 5.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 1,
+   "col": 5.0,
+   "row": 1.0,
    "dir": "up"
   },
   {
    "type": "sedan_sports",
-   "col": 4,
-   "row": 2,
+   "col": 4.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "suv",
-   "col": 3,
-   "row": 5,
+   "col": 3.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "sedan",
-   "col": 0,
-   "row": 1,
+   "col": 0.0,
+   "row": 1.0,
    "dir": "up"
   },
   {
    "type": "police",
-   "col": 6,
-   "row": 5,
+   "col": 6.0,
+   "row": 5.0,
    "dir": "down"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 1,
-   "row": 6
+   "col": 1.0,
+   "row": 6.0
   },
   {
    "type": "cone",
-   "col": 5,
-   "row": 6
+   "col": 5.0,
+   "row": 6.0
   }
  ],
  "name": "Level 27"

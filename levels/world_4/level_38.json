@@ -1,183 +1,184 @@
 {
- "cols": 8,
- "rows": 8,
- "mistakes": 3,
+ "cols": 8.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "bus",
-   "col": 1,
-   "row": 5,
+   "col": 1.0,
+   "row": 5.0,
    "dir": "up",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "taxi",
-   "col": 7,
-   "row": 0,
+   "col": 7.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "sedan_sports",
-   "col": 6,
-   "row": 5,
+   "col": 6.0,
+   "row": 5.0,
    "dir": "right"
   },
   {
    "type": "police",
-   "col": 1,
-   "row": 3,
+   "col": 1.0,
+   "row": 3.0,
    "dir": "left",
-   "turn": "cw"
+   "turn": "cw",
+   "bomb": 9
   },
   {
    "type": "suv_luxury",
-   "col": 0,
-   "row": 3,
+   "col": 0.0,
+   "row": 3.0,
    "dir": "down"
   },
   {
    "type": "hatchback",
-   "col": 5,
-   "row": 2,
+   "col": 5.0,
+   "row": 2.0,
    "dir": "down",
-   "lock": 1
+   "lock": 1.0
   },
   {
    "type": "pickup",
-   "col": 3,
-   "row": 3,
+   "col": 3.0,
+   "row": 3.0,
    "dir": "left",
-   "key": 0
+   "key": 0.0
   },
   {
    "type": "hatchback",
-   "col": 3,
-   "row": 0,
+   "col": 3.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "firetruck",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "sedan",
-   "col": 2,
-   "row": 1,
+   "col": 2.0,
+   "row": 1.0,
    "dir": "up"
   },
   {
    "type": "suv",
-   "col": 3,
-   "row": 5,
+   "col": 3.0,
+   "row": 5.0,
    "dir": "left",
    "turn": "cw"
   },
   {
    "type": "pickup",
-   "col": 4,
-   "row": 1,
+   "col": 4.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 3,
-   "row": 2,
+   "col": 3.0,
+   "row": 2.0,
    "dir": "left",
-   "lock": 1
+   "lock": 1.0
   },
   {
    "type": "taxi",
-   "col": 3,
-   "row": 7,
+   "col": 3.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "pickup",
-   "col": 2,
-   "row": 4,
+   "col": 2.0,
+   "row": 4.0,
    "dir": "right"
   },
   {
    "type": "sedan_sports",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "suv_luxury",
-   "col": 7,
-   "row": 3,
+   "col": 7.0,
+   "row": 3.0,
    "dir": "down"
   },
   {
    "type": "suv",
-   "col": 4,
-   "row": 6,
+   "col": 4.0,
+   "row": 6.0,
    "dir": "left"
   },
   {
    "type": "pickup",
-   "col": 7,
-   "row": 6,
+   "col": 7.0,
+   "row": 6.0,
    "dir": "down",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "taxi",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 7,
+   "col": 5.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "sedan",
-   "col": 0,
-   "row": 5,
+   "col": 0.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "taxi",
-   "col": 6,
-   "row": 2,
+   "col": 6.0,
+   "row": 2.0,
    "dir": "left"
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 4,
+   "col": 5.0,
+   "row": 4.0,
    "dir": "down"
   },
   {
    "type": "van",
-   "col": 2,
-   "row": 5,
+   "col": 2.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "van",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "up",
-   "key": 1
+   "key": 1.0
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 6,
-   "row": 6
+   "col": 6.0,
+   "row": 6.0
   },
   {
    "type": "cone",
-   "col": 6,
-   "row": 1
+   "col": 6.0,
+   "row": 1.0
   }
  ],
  "name": "Level 38"

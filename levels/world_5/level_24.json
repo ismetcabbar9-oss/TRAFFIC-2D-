@@ -1,164 +1,169 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "sedan_sports",
-   "col": 2,
-   "row": 1,
+   "col": 2.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "pickup",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "left",
-   "key": 0
+   "key": 0.0
   },
   {
    "type": "suv_luxury",
-   "col": 1,
-   "row": 3,
+   "col": 1.0,
+   "row": 3.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 5,
-   "row": 0,
+   "col": 5.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "suv_luxury",
-   "col": 4,
-   "row": 5,
+   "col": 4.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "ambulance",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "left"
   },
   {
    "type": "suv",
-   "col": 4,
-   "row": 3,
+   "col": 4.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "bus",
-   "col": 5,
-   "row": 1,
+   "col": 5.0,
+   "row": 1.0,
    "dir": "up",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "taxi",
-   "col": 2,
-   "row": 7,
+   "col": 2.0,
+   "row": 7.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 6,
-   "row": 3,
+   "col": 6.0,
+   "row": 3.0,
    "dir": "up",
-   "key": 1
+   "key": 1.0
   },
   {
    "type": "police",
-   "col": 2,
-   "row": 4,
+   "col": 2.0,
+   "row": 4.0,
    "dir": "right"
   },
   {
    "type": "taxi",
-   "col": 5,
-   "row": 7,
+   "col": 5.0,
+   "row": 7.0,
    "dir": "right",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "pickup",
-   "col": 5,
-   "row": 5,
+   "col": 5.0,
+   "row": 5.0,
    "dir": "up",
-   "key": 2
+   "key": 2.0
   },
   {
    "type": "hatchback",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "sedan",
-   "col": 3,
-   "row": 2,
+   "col": 3.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
-   "col": 0,
-   "row": 7,
+   "col": 0.0,
+   "row": 7.0,
    "dir": "right"
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 4,
+   "col": 0.0,
+   "row": 4.0,
    "dir": "down",
-   "key": 3
+   "key": 3.0
   },
   {
    "type": "police",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "pickup",
-   "col": 1,
-   "row": 4,
+   "col": 1.0,
+   "row": 4.0,
    "dir": "down"
   },
   {
    "type": "police",
-   "col": 6,
-   "row": 1,
+   "col": 6.0,
+   "row": 1.0,
    "dir": "up"
   },
   {
    "type": "taxi",
-   "col": 3,
-   "row": 5,
+   "col": 3.0,
+   "row": 5.0,
    "dir": "down"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 2,
-   "row": 6
+   "col": 2.0,
+   "row": 6.0
   },
   {
    "type": "gate",
-   "col": 5,
-   "row": 4,
-   "group": 1
+   "col": 5.0,
+   "row": 4.0,
+   "group": 1.0
   },
   {
    "type": "gate",
-   "col": 4,
-   "row": 1,
-   "group": 2
+   "col": 4.0,
+   "row": 1.0,
+   "group": 2.0
   },
   {
    "type": "gate",
-   "col": 4,
-   "row": 2,
-   "group": 3
+   "col": 4.0,
+   "row": 2.0,
+   "group": 3.0
+  },
+  {
+   "type": "pit",
+   "col": 0,
+   "row": 3
   }
  ],
  "name": "Level 24"

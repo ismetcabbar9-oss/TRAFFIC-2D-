@@ -1,177 +1,178 @@
 {
- "cols": 8,
- "rows": 8,
- "mistakes": 3,
+ "cols": 8.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "suv",
-   "col": 6,
-   "row": 5,
-   "dir": "down"
+   "col": 6.0,
+   "row": 5.0,
+   "dir": "down",
+   "bomb": 8
   },
   {
    "type": "taxi",
-   "col": 2,
-   "row": 4,
+   "col": 2.0,
+   "row": 4.0,
    "dir": "up",
    "turn": "cw"
   },
   {
    "type": "suv_luxury",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "right"
   },
   {
    "type": "taxi",
-   "col": 4,
-   "row": 5,
+   "col": 4.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "suv",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "down",
    "turn": "ccw"
   },
   {
    "type": "van",
-   "col": 7,
-   "row": 2,
+   "col": 7.0,
+   "row": 2.0,
    "dir": "down",
    "cargo": true
   },
   {
    "type": "suv",
-   "col": 6,
-   "row": 7,
+   "col": 6.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "suv_luxury",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "down",
    "turn": "cw"
   },
   {
    "type": "police",
-   "col": 4,
-   "row": 3,
+   "col": 4.0,
+   "row": 3.0,
    "dir": "down",
    "turn": "cw"
   },
   {
    "type": "delivery",
-   "col": 3,
-   "row": 2,
+   "col": 3.0,
+   "row": 2.0,
    "dir": "down",
    "cargo": true
   },
   {
    "type": "van",
-   "col": 3,
-   "row": 6,
+   "col": 3.0,
+   "row": 6.0,
    "dir": "up",
    "turn": "ccw"
   },
   {
    "type": "suv_luxury",
-   "col": 1,
-   "row": 4,
+   "col": 1.0,
+   "row": 4.0,
    "dir": "down",
    "turn": "cw"
   },
   {
    "type": "sedan",
-   "col": 6,
-   "row": 3,
+   "col": 6.0,
+   "row": 3.0,
    "dir": "down"
   },
   {
    "type": "police",
-   "col": 7,
-   "row": 0,
+   "col": 7.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "hatchback",
-   "col": 4,
-   "row": 2,
+   "col": 4.0,
+   "row": 2.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 2,
-   "row": 2,
+   "col": 2.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "ambulance",
-   "col": 3,
-   "row": 0,
+   "col": 3.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "taxi",
-   "col": 0,
-   "row": 3,
+   "col": 0.0,
+   "row": 3.0,
    "dir": "left"
   },
   {
    "type": "suv",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "suv",
-   "col": 7,
-   "row": 5,
+   "col": 7.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "hatchback",
-   "col": 1,
-   "row": 7,
+   "col": 1.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "taxi",
-   "col": 6,
-   "row": 0,
+   "col": 6.0,
+   "row": 0.0,
    "dir": "up"
   },
   {
    "type": "police",
-   "col": 0,
-   "row": 4,
+   "col": 0.0,
+   "row": 4.0,
    "dir": "down"
   },
   {
    "type": "police",
-   "col": 4,
-   "row": 7,
+   "col": 4.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "suv",
-   "col": 2,
-   "row": 1,
+   "col": 2.0,
+   "row": 1.0,
    "dir": "left"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 5,
-   "row": 1
+   "col": 5.0,
+   "row": 1.0
   },
   {
    "type": "cone",
-   "col": 5,
-   "row": 4
+   "col": 5.0,
+   "row": 4.0
   }
  ],
  "name": "Level 38"

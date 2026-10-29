@@ -52,6 +52,10 @@ func _initialize() -> void:
 			for m in r.counts:
 				if r.counts[m] > 0:
 					mech.append("%s %d" % [m, r.counts[m]])
+			var hz := HazardPlacer.count(r.data)
+			for m in hz:
+				if hz[m] > 0:
+					mech.append("%s %d" % [m, hz[m]])
 			var tag := " (breather)" if r.breather else (" (hard)" if r.hard else "")
 			lines.append("| %d%s | %s | %d | %d (%d) | %d | %d | %s | %s |" % [r.i + 1, tag, r.size, r.cars, r.depth,
 				r.target, r.free, r.traps, ", ".join(mech), ", ".join(r.flags)])

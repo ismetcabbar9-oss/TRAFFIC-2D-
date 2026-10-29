@@ -1,160 +1,161 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "pickup",
-   "col": 5,
-   "row": 7,
+   "col": 5.0,
+   "row": 7.0,
    "dir": "right"
   },
   {
    "type": "police",
-   "col": 4,
-   "row": 5,
+   "col": 4.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "hatchback",
-   "col": 6,
-   "row": 5,
+   "col": 6.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "van",
-   "col": 4,
-   "row": 3,
+   "col": 4.0,
+   "row": 3.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 1,
-   "row": 7,
+   "col": 1.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "suv_luxury",
-   "col": 3,
-   "row": 3,
+   "col": 3.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "police",
-   "col": 4,
-   "row": 4,
+   "col": 4.0,
+   "row": 4.0,
    "dir": "right",
    "turn": "cw"
   },
   {
    "type": "hatchback",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "down",
    "turn": "cw"
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "down",
-   "lock": 1
+   "lock": 1.0
   },
   {
    "type": "sedan",
-   "col": 1,
-   "row": 5,
+   "col": 1.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "bus",
-   "col": 0,
-   "row": 1,
-   "dir": "up"
+   "col": 0.0,
+   "row": 1.0,
+   "dir": "up",
+   "bomb": 8
   },
   {
    "type": "van",
-   "col": 5,
-   "row": 1,
+   "col": 5.0,
+   "row": 1.0,
    "dir": "down"
   },
   {
    "type": "suv",
-   "col": 3,
-   "row": 1,
+   "col": 3.0,
+   "row": 1.0,
    "dir": "up",
-   "key": 1
+   "key": 1.0
   },
   {
    "type": "suv_luxury",
-   "col": 1,
-   "row": 4,
+   "col": 1.0,
+   "row": 4.0,
    "dir": "right"
   },
   {
    "type": "delivery",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "left",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "hatchback",
-   "col": 2,
-   "row": 6,
+   "col": 2.0,
+   "row": 6.0,
    "dir": "left",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "van",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 6,
-   "row": 3,
+   "col": 6.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "sedan_sports",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "pickup",
-   "col": 0,
-   "row": 4,
+   "col": 0.0,
+   "row": 4.0,
    "dir": "down",
-   "lock": 1
+   "lock": 1.0
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 0,
+   "col": 5.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 3,
-   "row": 7,
+   "col": 3.0,
+   "row": 7.0,
    "dir": "left",
-   "key": 0
+   "key": 0.0
   },
   {
    "type": "van",
-   "col": 6,
-   "row": 1,
+   "col": 6.0,
+   "row": 1.0,
    "dir": "up"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 2,
-   "row": 2
+   "col": 2.0,
+   "row": 2.0
   }
  ],
  "name": "Level 14"

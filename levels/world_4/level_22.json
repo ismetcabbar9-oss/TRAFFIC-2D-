@@ -1,154 +1,160 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "sedan",
-   "col": 2,
-   "row": 1,
+   "col": 2.0,
+   "row": 1.0,
    "dir": "down",
    "turn": "cw"
   },
   {
    "type": "sedan",
-   "col": 5,
-   "row": 7,
+   "col": 5.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "suv_luxury",
-   "col": 5,
-   "row": 5,
+   "col": 5.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "sedan_sports",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "down"
   },
   {
    "type": "suv",
-   "col": 4,
-   "row": 1,
+   "col": 4.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "suv",
-   "col": 2,
-   "row": 3,
+   "col": 2.0,
+   "row": 3.0,
    "dir": "down"
   },
   {
    "type": "sedan_sports",
-   "col": 3,
-   "row": 3,
+   "col": 3.0,
+   "row": 3.0,
    "dir": "right",
-   "turn": "cw"
+   "turn": "cw",
+   "bomb": 7
   },
   {
    "type": "sedan_sports",
-   "col": 0,
-   "row": 3,
+   "col": 0.0,
+   "row": 3.0,
    "dir": "down"
   },
   {
    "type": "ambulance",
-   "col": 3,
-   "row": 4,
+   "col": 3.0,
+   "row": 4.0,
    "dir": "down"
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 3,
+   "col": 5.0,
+   "row": 3.0,
    "dir": "left"
   },
   {
    "type": "firetruck",
-   "col": 2,
-   "row": 7,
+   "col": 2.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "police",
-   "col": 0,
-   "row": 1,
+   "col": 0.0,
+   "row": 1.0,
    "dir": "up",
-   "lock": 1
+   "lock": 1.0
   },
   {
    "type": "delivery",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 1,
-   "row": 6,
+   "col": 1.0,
+   "row": 6.0,
    "dir": "left",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "suv_luxury",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "up",
-   "key": 1
+   "key": 1.0
   },
   {
    "type": "sedan",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "taxi",
-   "col": 6,
-   "row": 5,
+   "col": 6.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "taxi",
-   "col": 4,
-   "row": 4,
+   "col": 4.0,
+   "row": 4.0,
    "dir": "up",
-   "lock": 1
+   "lock": 1.0
   },
   {
    "type": "suv",
-   "col": 5,
-   "row": 4,
+   "col": 5.0,
+   "row": 4.0,
    "dir": "left"
   },
   {
    "type": "police",
-   "col": 3,
-   "row": 2,
+   "col": 3.0,
+   "row": 2.0,
    "dir": "left",
-   "key": 0
+   "key": 0.0
   },
   {
    "type": "suv_luxury",
-   "col": 3,
-   "row": 0,
+   "col": 3.0,
+   "row": 0.0,
    "dir": "up",
-   "lock": 0
+   "lock": 0.0
   },
   {
    "type": "taxi",
-   "col": 5,
-   "row": 2,
+   "col": 5.0,
+   "row": 2.0,
    "dir": "left"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
+   "col": 1.0,
+   "row": 5.0
+  },
+  {
+   "type": "pit",
    "col": 1,
-   "row": 5
+   "row": 1
   }
  ],
  "name": "Level 22"

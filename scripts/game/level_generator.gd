@@ -60,6 +60,12 @@ static func generate(level_spec: Dictionary, seed_parts: Array, attempts := ATTE
 				data.vehicles.size(), report.rounds, level_spec.depth, report.first_free, _traps(level, report.order), _mechanic_summary(data)]
 	if best.is_empty():
 		return {}
+	var hazards: Dictionary = level_spec.get("hazards", {})
+	if not hazards.is_empty():
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash(seed_parts + ["hazards"])
+		best = HazardPlacer.add(best, hazards, level_spec.get("hard", false), rng)
+		best_note += ", hazards %s" % HazardPlacer.count(best)
 	return {"data": best, "note": best_note}
 
 
@@ -95,6 +101,8 @@ static func spec(w: int, i: int, mechanic: String) -> Dictionary:
 		"cars": roundi(cols * rows * lerpf(0.3, 0.44, fill)),
 		"depth": roundi(lerpf(2.0, 11.0, d) * (SHARP_DEPTH if i >= SHARP_FROM else 1.0)) + (1 if i in HARD else 0),
 		"sharp": i >= SHARP_FROM and not i in BREATHERS,
+		"hard": i in HARD,
+		"hazards": HazardPlacer.plan(w, i),
 		"cones": roundi(d * (2.5 if mechanic == "" else 1.2)) if not intro else 0,
 		"trucks": lerpf(0.0, 0.25, fill),
 		"breather": i in BREATHERS,

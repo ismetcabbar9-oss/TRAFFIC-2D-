@@ -1,99 +1,100 @@
 {
- "cols": 6,
- "rows": 7,
- "mistakes": 3,
+ "cols": 6.0,
+ "rows": 7.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "police",
-   "col": 1,
-   "row": 4,
+   "col": 1.0,
+   "row": 4.0,
    "dir": "down"
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 3,
+   "col": 5.0,
+   "row": 3.0,
    "dir": "down",
    "turn": "cw"
   },
   {
    "type": "police",
-   "col": 4,
-   "row": 5,
+   "col": 4.0,
+   "row": 5.0,
    "dir": "right"
   },
   {
    "type": "ambulance",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "right"
   },
   {
    "type": "sedan_sports",
-   "col": 2,
-   "row": 5,
+   "col": 2.0,
+   "row": 5.0,
    "dir": "right"
   },
   {
    "type": "van",
-   "col": 2,
-   "row": 0,
+   "col": 2.0,
+   "row": 0.0,
    "dir": "right",
    "cargo": true
   },
   {
    "type": "bus",
-   "col": 3,
-   "row": 2,
-   "dir": "left"
+   "col": 3.0,
+   "row": 2.0,
+   "dir": "left",
+   "bomb": 7
   },
   {
    "type": "sedan_sports",
-   "col": 3,
-   "row": 3,
+   "col": 3.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "firetruck",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "right"
   },
   {
    "type": "firetruck",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "down"
   },
   {
    "type": "sedan",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "pickup",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "right",
    "cargo": true
   },
   {
    "type": "taxi",
-   "col": 3,
-   "row": 6,
+   "col": 3.0,
+   "row": 6.0,
    "dir": "right"
   },
   {
    "type": "sedan",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 1,
-   "row": 3,
+   "col": 1.0,
+   "row": 3.0,
    "dir": "right",
    "turn": "ccw"
   }
@@ -101,8 +102,8 @@
  "obstacles": [
   {
    "type": "cone",
-   "col": 2,
-   "row": 4
+   "col": 2.0,
+   "row": 4.0
   }
  ],
  "name": "Level 14"

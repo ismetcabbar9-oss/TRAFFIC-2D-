@@ -1,145 +1,145 @@
 {
- "cols": 7,
- "rows": 8,
- "mistakes": 3,
+ "cols": 7.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
-   "type": "firetruck",
-   "col": 3,
-   "row": 4,
+   "type": "tanker",
+   "col": 3.0,
+   "row": 4.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "hatchback",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "right"
   },
   {
    "type": "taxi",
-   "col": 4,
-   "row": 7,
+   "col": 4.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "pickup",
-   "col": 0,
-   "row": 6,
+   "col": 0.0,
+   "row": 6.0,
    "dir": "up"
   },
   {
    "type": "pickup",
-   "col": 4,
-   "row": 3,
+   "col": 4.0,
+   "row": 3.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 1,
+   "col": 0.0,
+   "row": 1.0,
    "dir": "up"
   },
   {
    "type": "police",
-   "col": 1,
-   "row": 6,
+   "col": 1.0,
+   "row": 6.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 5,
-   "row": 2,
+   "col": 5.0,
+   "row": 2.0,
    "dir": "right"
   },
   {
    "type": "police",
-   "col": 2,
-   "row": 0,
+   "col": 2.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "pickup",
-   "col": 4,
-   "row": 1,
+   "col": 4.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "taxi",
-   "col": 3,
-   "row": 2,
+   "col": 3.0,
+   "row": 2.0,
    "dir": "down"
   },
   {
    "type": "delivery",
-   "col": 2,
-   "row": 5,
+   "col": 2.0,
+   "row": 5.0,
    "dir": "right"
   },
   {
    "type": "police",
-   "col": 6,
-   "row": 6,
+   "col": 6.0,
+   "row": 6.0,
    "dir": "down"
   },
   {
    "type": "suv",
-   "col": 6,
-   "row": 0,
+   "col": 6.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 0,
-   "row": 3,
+   "col": 0.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "van",
-   "col": 2,
-   "row": 7,
+   "col": 2.0,
+   "row": 7.0,
    "dir": "left"
   },
   {
    "type": "police",
-   "col": 1,
-   "row": 1,
+   "col": 1.0,
+   "row": 1.0,
    "dir": "left"
   },
   {
    "type": "taxi",
-   "col": 5,
-   "row": 5,
+   "col": 5.0,
+   "row": 5.0,
    "dir": "down"
   },
   {
    "type": "pickup",
-   "col": 0,
-   "row": 0,
+   "col": 0.0,
+   "row": 0.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 2,
-   "row": 3,
+   "col": 2.0,
+   "row": 3.0,
    "dir": "down"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 2,
-   "row": 2
+   "col": 2.0,
+   "row": 2.0
   },
   {
    "type": "cone",
-   "col": 1,
-   "row": 5
+   "col": 1.0,
+   "row": 5.0
   }
  ],
  "name": "Level 31"

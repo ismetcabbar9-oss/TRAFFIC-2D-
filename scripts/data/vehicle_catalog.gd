@@ -36,6 +36,9 @@ const TYPES := {
 		"engine": "engine_truck", "horn": "horn_air", "siren": "horn_air", "pitch": 0.85},
 	"bus": {"model": "bus.glb", "cells": 3, "max_stretch": 1.5,
 		"engine": "engine_truck", "horn": "horn_truck", "pitch": 0.82},
+	# Hazard: any crash with it is an explosion. Built in code (TankerModel).
+	"tanker": {"model": "", "cells": 3, "max_stretch": 1.5,
+		"engine": "engine_truck", "horn": "horn_air", "pitch": 0.8},
 }
 
 

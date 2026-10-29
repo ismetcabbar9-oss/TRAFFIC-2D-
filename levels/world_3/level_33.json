@@ -1,165 +1,170 @@
 {
- "cols": 8,
- "rows": 8,
- "mistakes": 3,
+ "cols": 8.0,
+ "rows": 8.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "van",
-   "col": 6,
-   "row": 0,
+   "col": 6.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
    "type": "delivery",
-   "col": 5,
-   "row": 7,
+   "col": 5.0,
+   "row": 7.0,
    "dir": "right"
   },
   {
    "type": "suv_luxury",
-   "col": 7,
-   "row": 2,
+   "col": 7.0,
+   "row": 2.0,
    "dir": "up",
    "turn": "ccw"
   },
   {
    "type": "sedan_sports",
-   "col": 0,
-   "row": 1,
+   "col": 0.0,
+   "row": 1.0,
    "dir": "left",
    "turn": "ccw"
   },
   {
    "type": "taxi",
-   "col": 3,
-   "row": 6,
+   "col": 3.0,
+   "row": 6.0,
    "dir": "left",
    "turn": "cw"
   },
   {
    "type": "sedan",
-   "col": 5,
-   "row": 0,
+   "col": 5.0,
+   "row": 0.0,
    "dir": "down"
   },
   {
-   "type": "ambulance",
-   "col": 6,
-   "row": 3,
+   "type": "tanker",
+   "col": 6.0,
+   "row": 3.0,
    "dir": "down"
   },
   {
    "type": "suv_luxury",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "up"
   },
   {
    "type": "sedan",
-   "col": 2,
-   "row": 2,
+   "col": 2.0,
+   "row": 2.0,
    "dir": "right",
    "turn": "cw"
   },
   {
    "type": "firetruck",
-   "col": 0,
-   "row": 4,
+   "col": 0.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "suv",
-   "col": 1,
-   "row": 0,
+   "col": 1.0,
+   "row": 0.0,
    "dir": "left",
    "turn": "ccw"
   },
   {
    "type": "bus",
-   "col": 2,
-   "row": 1,
+   "col": 2.0,
+   "row": 1.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 5,
-   "row": 3,
+   "col": 5.0,
+   "row": 3.0,
    "dir": "down",
    "cargo": true
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 6,
+   "col": 5.0,
+   "row": 6.0,
    "dir": "right"
   },
   {
    "type": "taxi",
-   "col": 2,
-   "row": 7,
+   "col": 2.0,
+   "row": 7.0,
    "dir": "right"
   },
   {
    "type": "bus",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "down"
   },
   {
    "type": "pickup",
-   "col": 2,
-   "row": 5,
+   "col": 2.0,
+   "row": 5.0,
    "dir": "left",
    "cargo": true
   },
   {
    "type": "van",
-   "col": 0,
-   "row": 7,
+   "col": 0.0,
+   "row": 7.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 7,
-   "row": 4,
+   "col": 7.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "sedan",
-   "col": 4,
-   "row": 2,
+   "col": 4.0,
+   "row": 2.0,
    "dir": "right"
   },
   {
    "type": "sedan_sports",
-   "col": 1,
-   "row": 6,
+   "col": 1.0,
+   "row": 6.0,
    "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 4,
-   "row": 3,
+   "col": 4.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
-   "col": 2,
-   "row": 3,
+   "col": 2.0,
+   "row": 3.0,
    "dir": "left"
   },
   {
    "type": "police",
-   "col": 3,
-   "row": 0,
+   "col": 3.0,
+   "row": 0.0,
    "dir": "right"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 3,
-   "row": 4
+   "col": 3.0,
+   "row": 4.0
+  },
+  {
+   "type": "pit",
+   "col": 7,
+   "row": 6
   }
  ],
  "name": "Level 33"

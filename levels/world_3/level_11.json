@@ -1,115 +1,116 @@
 {
- "cols": 6,
- "rows": 7,
- "mistakes": 3,
+ "cols": 6.0,
+ "rows": 7.0,
+ "mistakes": 3.0,
  "vehicles": [
   {
    "type": "hatchback",
-   "col": 3,
-   "row": 4,
+   "col": 3.0,
+   "row": 4.0,
    "dir": "up"
   },
   {
    "type": "hatchback",
-   "col": 3,
-   "row": 1,
+   "col": 3.0,
+   "row": 1.0,
    "dir": "up",
    "turn": "cw"
   },
   {
    "type": "sedan",
-   "col": 0,
-   "row": 2,
+   "col": 0.0,
+   "row": 2.0,
    "dir": "up",
    "turn": "cw"
   },
   {
    "type": "firetruck",
-   "col": 2,
-   "row": 3,
-   "dir": "right"
+   "col": 2.0,
+   "row": 3.0,
+   "dir": "right",
+   "bomb": 8
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 5,
+   "col": 0.0,
+   "row": 5.0,
    "dir": "up"
   },
   {
    "type": "pickup",
-   "col": 4,
-   "row": 0,
+   "col": 4.0,
+   "row": 0.0,
    "dir": "left",
    "cargo": true
   },
   {
    "type": "police",
-   "col": 5,
-   "row": 3,
+   "col": 5.0,
+   "row": 3.0,
    "dir": "up"
   },
   {
    "type": "pickup",
-   "col": 4,
-   "row": 6,
+   "col": 4.0,
+   "row": 6.0,
    "dir": "left"
   },
   {
    "type": "van",
-   "col": 1,
-   "row": 2,
+   "col": 1.0,
+   "row": 2.0,
    "dir": "left",
    "turn": "ccw"
   },
   {
    "type": "taxi",
-   "col": 4,
-   "row": 5,
+   "col": 4.0,
+   "row": 5.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 4,
+   "col": 0.0,
+   "row": 4.0,
    "dir": "left",
    "turn": "cw"
   },
   {
    "type": "van",
-   "col": 2,
-   "row": 0,
+   "col": 2.0,
+   "row": 0.0,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
-   "col": 1,
-   "row": 5,
+   "col": 1.0,
+   "row": 5.0,
    "dir": "left"
   },
   {
    "type": "taxi",
-   "col": 1,
-   "row": 6,
+   "col": 1.0,
+   "row": 6.0,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 4,
-   "row": 2,
+   "col": 4.0,
+   "row": 2.0,
    "dir": "right"
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 1,
+   "col": 0.0,
+   "row": 1.0,
    "dir": "left"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 4,
-   "row": 1
+   "col": 4.0,
+   "row": 1.0
   }
  ],
  "name": "Level 11"
