@@ -691,7 +691,7 @@ func _build_hint(root: Control) -> void:
 	anchor.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	anchor.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	var insets: Vector4 = get_node("/root/ScreenFit").safe_insets()
-	anchor.add_theme_constant_override("margin_bottom", 175 + int(insets.w)) # above the rescue bar
+	anchor.add_theme_constant_override("margin_bottom", 200 + int(insets.w)) # above the rescue bar
 	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(anchor)
 	var center := CenterContainer.new()
