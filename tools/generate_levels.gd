@@ -29,7 +29,7 @@ func _initialize() -> void:
 func _generate(w: int, i: int, info: Dictionary) -> void:
 	var attempts := LevelGenerator.HARD_ATTEMPTS if i in LevelGenerator.HARD else LevelGenerator.ATTEMPTS
 	if i >= LevelGenerator.SHARP_FROM:
-		attempts *= 2 # sharper levels need more tries to find few free cars and traps
+		attempts *= 6 # sharper levels need more tries to find few free cars and traps
 	var result := LevelGenerator.generate(LevelGenerator.spec(w, i, info.mechanic), [w, i], attempts)
 	if result.is_empty():
 		push_error("world %d level %d: no solvable layout" % [w + 1, i + 1])

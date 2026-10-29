@@ -10,7 +10,7 @@ func _initialize() -> void:
 	var info := LevelCatalog.world(w)
 	var attempts := LevelGenerator.HARD_ATTEMPTS if i in LevelGenerator.HARD else LevelGenerator.ATTEMPTS
 	if i >= LevelGenerator.SHARP_FROM:
-		attempts *= 2
+		attempts *= 6
 	var start := Time.get_ticks_msec()
 	var result := LevelGenerator.generate(LevelGenerator.spec(w, i, info.mechanic), [w, i], attempts)
 	print("W%d L%d: %s  (%.1f s)" % [w + 1, i + 1, result.get("note", "none"), (Time.get_ticks_msec() - start) / 1000.0])
