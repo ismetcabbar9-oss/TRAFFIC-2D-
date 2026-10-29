@@ -315,7 +315,7 @@ static func _traps(level: LevelData, line: Array = []) -> int:
 			var r := board.probe(id)
 			if r.action != BoardState.Action.ADVANCE and r.action != BoardState.Action.TURN:
 				continue
-			var state_key := [id, (board.vehicles[id] as VehicleState).cell, board._grid.hash()]
+			var state_key := [id, (board.vehicles[id] as VehicleState).cell, hash(board._grid)]
 			if checked.has(state_key):
 				continue
 			checked[state_key] = true
