@@ -231,3 +231,19 @@ MECH_TANKER_2,One crash and it explodes: the level is lost at once.,Tek bir çar
 MECH_BOMB_TITLE,Time bomb,Saatli bomba
 MECH_BOMB_1,The number on the car counts down with every tap.,Aracın üstündeki sayı her dokunuşta bir azalır.
 MECH_BOMB_2,Get it out before it reaches zero or it explodes.,Sıfıra inmeden onu dışarı çıkar; yoksa patlar.
+RUSH_TITLE,Rush Hour,Yoğun Trafik
+RUSH_SUBTITLE,Endless mode,Sonsuz mod
+RUSH_LOCKED,Clear City level 10,Şehir 10. bölümü bitir
+RUSH_BEST,Best %d,En iyi %d
+RUSH_SCORE,Score %d,Skor %d
+RUSH_FULL,Lot full!,Otopark doldu!
+RUSH_OUT,Out of moves,Hakların bitti
+RUSH_SCORE_LINE,Score %d  ·  Best %d,Skor %d  ·  En iyi %d
+RUSH_NEW_BEST,New best!,Yeni rekor!
+RUSH_AGAIN,Play again,Tekrar Oyna
+RUSH_TIP_1,"New cars keep dropping into the lot, faster and faster.","Otoparka sürekli yeni araçlar düşer, giderek daha hızlı."
+RUSH_TIP_2,"The orange frame shows where the next one lands. If there is no room left, the lot is full and the run ends.","Turuncu çerçeve bir sonrakinin nereye ineceğini gösterir. Yer kalmazsa otopark dolar ve oyun biter."
+RUSH_TIP_3,"Every car out scores; combos multiply it and quick exits earn a bonus. You have 3 lives.","Çıkan her araç puan kazandırır; combo çarpar, hızlı çıkış bonus verir. 3 hakkın var."
+ACH_RUSH_300,Score 300 in Rush Hour,Yoğun Trafik'te 300 puan yap
+ACH_RUSH_1000,Score 1000 in Rush Hour,Yoğun Trafik'te 1000 puan yap
+ACH_RUSH_2500,Score 2500 in Rush Hour,Yoğun Trafik'te 2500 puan yap

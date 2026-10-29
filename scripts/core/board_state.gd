@@ -254,6 +254,23 @@ func has_bombs() -> bool:
 	return false
 
 
+## Puts a new vehicle on the board (endless mode). False if it does not fit:
+## outside the board, on something, or a turn swinging off the board.
+func add_vehicle(v: VehicleState) -> bool:
+	if not fits(v):
+		return false
+	vehicles[v.id] = v
+	_set_cells(v, v.id)
+	return true
+
+
+func fits(v: VehicleState) -> bool:
+	for c in v.cells():
+		if not in_bounds(c) or at(c) != EMPTY:
+			return false
+	return v.turn == 0 or in_bounds(v.turn_cell())
+
+
 ## Bomb counters by vehicle id (for undo).
 func bomb_counts() -> Dictionary:
 	var out := {}

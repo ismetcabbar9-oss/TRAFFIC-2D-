@@ -160,6 +160,19 @@ func pop_in(delay: float) -> void:
 	t.tween_property(self, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
+## Endless mode: drops onto the lot from above, lands with a squash and a
+## puff of dust; `on_landed` runs on touch-down.
+func drop_in(on_landed: Callable) -> void:
+	_kill_tween()
+	position = _home + Vector3.UP * 7.0
+	_tween = create_tween()
+	_tween.tween_property(self, "position", _home, 0.38).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_callback(func():
+		_squash(Vector3(1.1, 0.8, 1.06), 0.06, 0.45)
+		Effects.dust_burst(_fx, global_position + Vector3.UP * 0.1, Color(0.9, 0.9, 0.88, 0.85))
+		on_landed.call())
+
+
 ## Briefly lights up the roof arrow to point the player at this car.
 func flash_hint() -> void:
 	_arrow.flash_hint()

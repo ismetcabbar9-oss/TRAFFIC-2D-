@@ -45,6 +45,15 @@ var _guide_id := -1 ## car the hand points at
 var _guide_delay := 0.0 ## seconds until the hand shows
 var _last_empty_tap := {"time": -10.0, "pos": Vector2.ZERO} ## for double tap to zoom
 
+# Endless "rush hour" mode (see Rush).
+var _rush_rng := RandomNumberGenerator.new()
+var _rush_score := 0
+var _rush_arrived := 0 ## cars dropped in so far
+var _rush_timer := 0.0 ## seconds until the next car drops
+var _rush_next := {} ## the car about to drop (its spot is marked)
+var _rush_marker: Node3D
+var _rush_landed := {} ## vehicle id -> clock time it landed (quick bonus)
+
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
 @onready var effects: Node3D = $Effects
@@ -90,7 +99,13 @@ func _adapt_lighting() -> void:
 func load_level(index: int) -> void:
 	var level: LevelData
 	var path := "daily"
-	if Daily.playing:
+	if Rush.playing:
+		world_index = Rush.world_index
+		level_index = 0
+		path = "rush"
+		_rush_rng.randomize()
+		level = Rush.start_level(_rush_rng)
+	elif Daily.playing:
 		# The daily puzzle borrows the look of the world its mechanic comes from.
 		world_index = Daily.world_index
 		level_index = 0
@@ -110,9 +125,18 @@ func load_level(index: int) -> void:
 		push_warning("Level %s cannot be cleared; stuck vehicles: %s" % [path, report.stuck])
 
 	# Each pit costs a move when something falls in: it comes with one extra.
-	level.mistakes = Economy.mistakes_for(world_index, level_index, level.hard, Daily.playing) \
-			+ level.obstacles.filter(func(o): return o.type == "pit").size()
+	if not Rush.playing:
+		level.mistakes = Economy.mistakes_for(world_index, level_index, level.hard, Daily.playing) \
+				+ level.obstacles.filter(func(o): return o.type == "pit").size()
 	session = GameSession.new(level)
+	session.endless = Rush.playing
+	session.vehicle_added.connect(_on_vehicle_added)
+	_rush_score = 0
+	_rush_arrived = 0
+	_rush_timer = Rush.interval(0) + 1.0 # a moment to look before the first drop
+	_rush_next = {}
+	_rush_landed = {}
+	_rush_marker = null
 	_combo = 0
 	_best_combo = 0
 	_level_start = _clock
@@ -174,9 +198,13 @@ func load_level(index: int) -> void:
 		v.pop_in(0.25 + minf((v.cell.y * level.cols + v.cell.x) * 0.012, 0.55))
 
 	hud.hide_result()
-	_onboarding = Progress.in_onboarding() and world_index == 0 and level_index < 3 and not Daily.playing
+	_onboarding = Progress.in_onboarding() and world_index == 0 and level_index < 3 and not Daily.playing \
+			and not Rush.playing
 	_rescued = false
-	Analytics.level("Start", world_index, level_index, Daily.playing)
+	if Rush.playing:
+		Analytics.design("rush:start")
+	else:
+		Analytics.level("Start", world_index, level_index, Daily.playing)
 	hud.set_onboarding(_onboarding)
 	_reset_guide()
 	_clear_hint()
@@ -185,7 +213,8 @@ func load_level(index: int) -> void:
 	hud.set_coins(Progress.coins)
 	_refresh_rescues()
 	_show_mechanic_tip(level)
-	_maybe_gift_crane()
+	if not Rush.playing:
+		_maybe_gift_crane()
 	# The first big board tells how to zoom (once).
 	if level.cols * level.rows >= 49 and not Progress.flag("zoom_tip") and not _tutorial_open:
 		Progress.set_flag("zoom_tip")
@@ -197,12 +226,21 @@ func load_level(index: int) -> void:
 		title += "  ·  " + tr("LEVEL_ONE_CHANCE" if level.mistakes == 1 else "LEVEL_HARD")
 	hud.set_level_title(title, level.hard)
 	hud.set_time_of_day(TimeOfDay.label(hour))
+	hud.set_rush(Rush.playing)
+	if Rush.playing:
+		_show_rush_score()
 	hud.set_mistakes(session.mistakes_left, level.mistakes)
 
 
 ## The first level with a new mechanic explains it once.
 func _show_mechanic_tip(level: LevelData) -> void:
 	var tip := ""
+	if Rush.playing:
+		if not "RUSH" in Progress.tips_seen:
+			Progress.mark_tip_seen("RUSH")
+			_tutorial_open = true
+			hud.show_tutorial("RUSH_TITLE", ["RUSH_TIP_1", "RUSH_TIP_2", "RUSH_TIP_3"])
+		return
 	for e in level.vehicles:
 		if e.get("cargo", false):
 			tip = "CARGO"
@@ -291,6 +329,9 @@ func _process(delta: float) -> void:
 		return
 	if _onboarding and level_index == 0:
 		_update_guide(delta)
+		return
+	if Rush.playing:
+		_rush_tick(delta)
 		return
 	if level_index >= idle_hint_levels and not Daily.playing:
 		return
@@ -388,6 +429,12 @@ func _on_vehicle_exited(id: int, result: BoardState.MoveResult) -> void:
 	_count_combo(view)
 	if view.state.key >= 0:
 		_open_group(view.state.key, result.opened)
+	if Rush.playing:
+		var quick := _clock - float(_rush_landed.get(id, _level_start)) <= Rush.FAST_TIME
+		var points := Rush.points(_combo, quick)
+		_rush_score += points
+		_show_rush_score()
+		hud.show_points(points, camera.unproject_position(view.global_position + Vector3.UP * 0.8))
 
 
 ## The key car of `group` has left: its locked cars and gates open.
@@ -593,6 +640,92 @@ func _on_bombs_ticked() -> void:
 			Haptics.pulse(30, 0.6)
 
 
+# --- Rush hour (endless mode) -----------------------------------------------------
+
+func _rush_tick(delta: float) -> void:
+	_rush_timer -= delta
+	hud.set_rush_progress(1.0 - _rush_timer / Rush.interval(_rush_arrived))
+	if _rush_next.is_empty() and _rush_timer <= Rush.WARNING:
+		_rush_next = Rush.pick(session.board, _rush_rng, _rush_arrived)
+		if _rush_next.is_empty():
+			session.end("full")
+			return
+		_mark_drop(_rush_next)
+	if _rush_timer > 0.0:
+		return
+	var entry := _rush_next
+	_rush_next = {}
+	if is_instance_valid(_rush_marker):
+		_rush_marker.queue_free()
+	# The marked spot may have been taken in the meantime (a pull-forward).
+	if session.add_vehicle(entry) < 0:
+		entry = Rush.pick(session.board, _rush_rng, _rush_arrived)
+		if entry.is_empty() or session.add_vehicle(entry) < 0:
+			session.end("full")
+			return
+	_rush_arrived += 1
+	_rush_timer = Rush.interval(_rush_arrived)
+
+
+## Pulsing outline where the next car is about to land.
+func _mark_drop(entry: Dictionary) -> void:
+	var length := VehicleCatalog.cells(entry.type)
+	var cell_size := board.theme.cell_size
+	var span := Vector2(length - 1, 0) if GridDir.is_horizontal(entry.dir) else Vector2(0, length - 1)
+	var area := Vector2(cell_size - 0.1, cell_size * length - 0.1)
+	_rush_marker = FlatIcon.create(FlatIcon.frame_shapes(area, 0.1), Color("ff8a3d"), 0.03)
+	_rush_marker.position = board.cell_to_world(Vector2(entry.cell) + span * 0.5) + Vector3.UP * 0.02
+	_rush_marker.rotation.y = GridDir.to_yaw(entry.dir)
+	effects.add_child(_rush_marker)
+	var t := _rush_marker.create_tween().set_loops()
+	t.tween_property(_rush_marker, "scale", Vector3(1.08, 1.0, 1.05), 0.2)
+	t.tween_property(_rush_marker, "scale", Vector3.ONE, 0.2)
+
+
+func _on_vehicle_added(id: int) -> void:
+	var view := VehicleView.new()
+	pieces.add_child(view)
+	view.setup(board, session.board.vehicles[id], effects)
+	vehicle_views[id] = view
+	view.drop_in(func():
+		_rush_landed[id] = _clock
+		Sfx.play("crash", -10.0, 0.7, 0.1)
+		camera.shake(0.15)
+		Haptics.pulse(15, 0.4))
+	_refresh_rescues()
+
+
+func _show_rush_score() -> void:
+	hud.set_level_title(tr("RUSH_SCORE") % _rush_score)
+	hud.set_time_of_day(tr("RUSH_BEST") % int(Progress.stats.get("rush_best", 0)))
+
+
+## The run is over: keep the best score, pay out coins and show the panel.
+func _on_rush_over() -> void:
+	var played := session
+	if is_instance_valid(_rush_marker):
+		_rush_marker.queue_free()
+	var best_before := int(Progress.stats.get("rush_best", 0))
+	Progress.max_stat("rush_best", _rush_score)
+	Progress.add_stat("rush_runs")
+	var coins := _rush_score / int(Economy.value("rush_points_per_coin"))
+	if coins > 0:
+		Progress.add_coins(coins, "rush")
+	Progress.save()
+	var time := _clock - _level_start
+	Analytics.design("rush:score", _rush_score)
+	Analytics.design("rush:over:%s" % (session.lose_reason if session.lose_reason != "" else "moves"), time)
+	await get_tree().create_timer(lose_delay + (1.6 if session.lose_reason in ["explosion", "bomb"] else 0.4)).timeout
+	if played != session:
+		return
+	Sfx.duck_music(2.0)
+	Sfx.play("lose", -2.0, 1.0, 0.0)
+	hud.show_rush_over({"score": _rush_score, "best": maxi(best_before, _rush_score),
+		"new_best": _rush_score > best_before and _rush_score > 0, "time": time, "combo": _best_combo,
+		"coins": coins, "reason": session.lose_reason})
+	_announce_achievements()
+
+
 func _on_won() -> void:
 	var played := session
 	_set_crane_mode(false)
@@ -638,6 +771,9 @@ func _on_won() -> void:
 
 
 func _on_lost() -> void:
+	if Rush.playing:
+		_on_rush_over()
+		return
 	var played := session
 	var reason := session.lose_reason
 	Analytics.level("Fail", world_index, level_index, Daily.playing, -1,
@@ -879,10 +1015,11 @@ func _announce_achievements() -> void:
 
 func _to_menu() -> void:
 	Progress.save() # lifetime stats gathered during play
-	if session != null and session.state == GameSession.State.PLAYING:
+	if session != null and session.state == GameSession.State.PLAYING and not Rush.playing:
 		Analytics.level("Fail", world_index, level_index, Daily.playing, -1, {"quit": 1})
-	MainMenu.return_to_world = not Daily.playing and not _onboarding
+	MainMenu.return_to_world = not Daily.playing and not Rush.playing and not _onboarding
 	if _onboarding:
 		MainMenu.skip_gift_once() # the menu's first visit should not open with a pop-up
 	Daily.stop()
+	Rush.stop()
 	Transition.change_scene(MENU_SCENE)

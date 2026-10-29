@@ -41,6 +41,8 @@ var _combo_value: Label
 var _coin_value: Label
 var _rescue_buttons := {} ## kind -> RescueButton
 var _star_note: Label ## why the third star was missed
+var _rush_bar: ProgressBar ## endless mode: time until the next car arrives
+var _rush_fill: StyleBoxFlat
 var _coin_label: Label
 var _continue_ad: Button
 var _continue_coins: Button
@@ -89,6 +91,7 @@ func set_mistakes(left: int, total: int) -> void:
 func show_win(result: Dictionary) -> void:
 	_won = true
 	_last_level = result.last_level
+	_badge.text = tr("WIN_PERFECT")
 	_badge.visible = result.perfect
 	# Behind the panel, in front of the dimmed board.
 	var confetti := Confetti.new()
@@ -505,6 +508,65 @@ static func _format_time(seconds: float) -> String:
 
 
 ## Floating "x3 Super!" over the car that just left; `at` is a screen position.
+## Endless mode: shows the bar that fills up until the next car drops.
+func set_rush(on: bool) -> void:
+	_rush_bar.visible = on
+
+
+## `fraction` of the wait for the next car that has passed; turns from green
+## to red as the drop nears.
+func set_rush_progress(fraction: float) -> void:
+	_rush_bar.value = fraction
+	_rush_fill.bg_color = UiStyle.GOOD.lerp(UiStyle.DANGER, smoothstep(0.55, 0.95, fraction))
+
+
+## Score pop-up ("+35") rising from a screen point.
+func show_points(points: int, at: Vector2) -> void:
+	var label := Label.new()
+	label.text = "+%d" % points
+	label.add_theme_font_override("font", UiStyle.font(800))
+	label.add_theme_font_size_override("font_size", 38)
+	label.add_theme_color_override("font_color", Color("ffd34d"))
+	label.add_theme_color_override("font_outline_color", UiStyle.INK)
+	label.add_theme_constant_override("outline_size", 10)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.add_child(label)
+	await get_tree().process_frame
+	label.position = _root.get_global_transform_with_canvas().affine_inverse() * at - label.size * 0.5
+	var t := label.create_tween().set_parallel()
+	t.tween_property(label, "position:y", label.position.y - 70.0, 0.7).set_ease(Tween.EASE_OUT)
+	t.tween_property(label, "modulate:a", 0.0, 0.3).set_delay(0.45)
+	t.chain().tween_callback(label.queue_free)
+
+
+## End of an endless run: why it ended, the score against the best, how
+## long it lasted, the best combo and the coins earned.
+## `result`: {score, best, new_best, time, combo, coins, reason}.
+func show_rush_over(result: Dictionary) -> void:
+	_won = false
+	_double_button.visible = false
+	_continue_ad.visible = false
+	_continue_coins.visible = false
+	var titles := {"full": "RUSH_FULL", "explosion": "LOSE_BOOM_TITLE", "bomb": "LOSE_BOOM_TITLE"}
+	_result_title.text = tr(titles.get(result.reason, "RUSH_OUT"))
+	_result_title.add_theme_color_override("font_color", UiStyle.DANGER)
+	_result_text.visible = true
+	_result_text.text = tr("RUSH_SCORE_LINE") % [result.score, result.best]
+	_badge.text = tr("RUSH_NEW_BEST")
+	_badge.visible = result.new_best
+	_star_row.visible = false
+	_star_note.visible = false
+	_stats.visible = true
+	_time_value.text = _format_time(result.time)
+	_record_tag.visible = false
+	_combo_value.text = "x%d" % result.combo if result.combo >= 2 else "-"
+	_coin_value.text = "+%d" % result.coins
+	_primary.text = tr("RUSH_AGAIN")
+	_primary.theme_type_variation = "GoodButton"
+	_secondary.visible = true
+	_show_result()
+
+
 func show_combo(count: int, at: Vector2) -> void:
 	var words := ["", "", "", "COMBO_3", "COMBO_4"]
 	var label := Label.new()
@@ -678,6 +740,24 @@ func _build_top_bar(root: Control) -> void:
 	meter_row.add_child(caption)
 	_meter = MistakeMeter.new()
 	meter_row.add_child(_meter)
+
+	_rush_bar = ProgressBar.new()
+	_rush_bar.max_value = 1.0
+	_rush_bar.step = 0.0
+	_rush_bar.show_percentage = false
+	_rush_bar.custom_minimum_size = Vector2(360, 14)
+	_rush_bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_rush_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(UiStyle.INK, 0.25)
+	bg.set_corner_radius_all(7)
+	_rush_fill = StyleBoxFlat.new()
+	_rush_fill.bg_color = UiStyle.GOOD
+	_rush_fill.set_corner_radius_all(7)
+	_rush_bar.add_theme_stylebox_override("background", bg)
+	_rush_bar.add_theme_stylebox_override("fill", _rush_fill)
+	_rush_bar.visible = false
+	rows.add_child(_rush_bar)
 
 
 func _small_button(text: String, action: Callable) -> Button:

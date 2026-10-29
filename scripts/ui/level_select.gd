@@ -188,6 +188,7 @@ func _build_home() -> void:
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	page.add_child(subtitle)
 
+	page.add_child(_rush_card())
 	for w in LevelCatalog.world_count():
 		page.add_child(_world_card(w))
 	var room := Control.new() # keeps the last card clear of the bottom bar
@@ -434,6 +435,96 @@ func _world_card(w: int) -> Button:
 		progress.add_theme_stylebox_override("fill", fill)
 		progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		inner.add_child(progress)
+	return card
+
+
+## "Rush hour" endless mode: a fiery card above the worlds with the best
+## score; locked (with what unlocks it) until City level 10 is cleared.
+func _rush_card() -> Button:
+	var unlocked := Rush.unlocked(Progress)
+	var color := Color("ff5a36") if unlocked else Color("c9a49b")
+	var edge := color.darkened(0.35)
+	var card := Button.new()
+	card.custom_minimum_size = Vector2(0, 130)
+	card.flat = true
+	card.focus_mode = Control.FOCUS_NONE
+	card.disabled = not unlocked
+	card.pressed.connect(func():
+		_click()
+		Rush.start(_furthest_world())
+		Transition.change_scene(GAME_SCENE))
+	var base := _rounded_panel(edge, 28)
+	base.set_anchors_preset(Control.PRESET_FULL_RECT)
+	card.add_child(base)
+	var rim := _rounded_panel(Color.WHITE, 28)
+	rim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rim.offset_bottom = -7
+	card.add_child(rim)
+	var inner := _rounded_panel(color, 24)
+	inner.set_anchors_preset(Control.PRESET_FULL_RECT)
+	inner.offset_left = 4
+	inner.offset_top = 4
+	inner.offset_right = -4
+	inner.offset_bottom = -11
+	inner.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	card.add_child(inner)
+	var picture := TextureRect.new()
+	picture.texture = load("res://assets/ui/world_night.jpg")
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	picture.set_anchors_preset(Control.PRESET_FULL_RECT)
+	picture.anchor_left = 0.35
+	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	picture.modulate = Color(1.0, 0.85, 0.75) if unlocked else Color(0.8, 0.8, 0.8)
+	inner.add_child(picture)
+	var fade := TextureRect.new()
+	var gradient := Gradient.new()
+	gradient.set_color(0, color)
+	gradient.set_color(1, Color(color, 0.0))
+	gradient.set_offset(1, 0.75)
+	gradient.add_point(0.4, color)
+	var tex := GradientTexture2D.new()
+	tex.gradient = gradient
+	tex.fill_to = Vector2(1, 0)
+	fade.texture = tex
+	fade.stretch_mode = TextureRect.STRETCH_SCALE
+	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(fade)
+	var names := VBoxContainer.new()
+	names.position = Vector2(24, 12)
+	names.add_theme_constant_override("separation", -6)
+	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(names)
+	var kind := _label(tr("RUSH_SUBTITLE"), 22, Color.WHITE)
+	kind.add_theme_color_override("font_outline_color", edge)
+	kind.add_theme_constant_override("outline_size", 5)
+	names.add_child(kind)
+	var title := Label.new()
+	title.text = tr("RUSH_TITLE")
+	UiStyle.style_title(title, 42)
+	title.add_theme_color_override("font_outline_color", edge)
+	title.add_theme_color_override("font_shadow_color", edge)
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	names.add_child(title)
+	var status := VBoxContainer.new()
+	status.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	status.position = Vector2(-20, 18)
+	status.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	status.alignment = BoxContainer.ALIGNMENT_CENTER
+	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(status)
+	if unlocked:
+		var best := _label(tr("RUSH_BEST") % int(Progress.stats.get("rush_best", 0)), 26, Color.WHITE)
+		best.add_theme_color_override("font_outline_color", edge)
+		best.add_theme_constant_override("outline_size", 6)
+		status.add_child(best)
+	else:
+		status.add_child(_sign(50.0))
+		var need := _label(tr("RUSH_LOCKED"), 20, Color.WHITE)
+		need.add_theme_color_override("font_outline_color", edge)
+		need.add_theme_constant_override("outline_size", 5)
+		status.add_child(need)
 	return card
 
 

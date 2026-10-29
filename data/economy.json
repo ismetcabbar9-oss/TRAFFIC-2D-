@@ -78,5 +78,6 @@
     "normal": 2,
     "hard": 1,
     "daily": 2
-  }
+  },
+  "rush_points_per_coin": 25
 }

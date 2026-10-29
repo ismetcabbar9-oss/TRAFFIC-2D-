@@ -25,6 +25,9 @@ const LIST := [
 	{"id": "worlds_3", "stat": "worlds", "goal": 3, "coins": 200},
 	{"id": "worlds_5", "stat": "worlds", "goal": 5, "coins": 400},
 	{"id": "garage_1", "stat": "cosmetics", "goal": 1, "coins": 40},
+	{"id": "rush_300", "stat": "rush_best", "goal": 300, "coins": 60},
+	{"id": "rush_1000", "stat": "rush_best", "goal": 1000, "coins": 150},
+	{"id": "rush_2500", "stat": "rush_best", "goal": 2500, "coins": 400},
 ]
 
 
