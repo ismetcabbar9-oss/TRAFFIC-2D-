@@ -22,7 +22,7 @@ const TANKER_FROM := 20
 const BOMB_FROM := 35
 const BOMB_SLACK := 4
 const UNLOCK := [0, 9] ## clear City level 10 to unlock the mode
-const TRIES := 40
+const TRIES := 80 ## random spots tried before the lot counts as full
 const SMALL := ["sedan", "sedan_sports", "hatchback", "suv", "suv_luxury", "taxi", "police", "van", "pickup"]
 const LARGE := ["ambulance", "delivery", "firetruck", "bus"]
 
