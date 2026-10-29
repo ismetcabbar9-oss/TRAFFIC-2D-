@@ -71,5 +71,12 @@
     ]
   },
   "daily_puzzle_coins": 30,
-  "daily_streak_bonus": 5
+  "daily_streak_bonus": 5,
+  "mistakes_per_level": {
+    "learning": 3,
+    "learning_levels": 10,
+    "normal": 2,
+    "hard": 1,
+    "daily": 2
+  }
 }

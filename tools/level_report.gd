@@ -10,6 +10,9 @@ extends SceneTree
 ## - SIMILAR: shares most of its vehicle placements with another level
 ## - NO_MECHANIC: a mechanic world level (after the intro) without it
 ## - IDLE_GATE: a gate no car has to drive through
+## - OPEN: from level 11 on (not a breather), more than 3 cars free at the start
+## - NO_TRAP: from level 11 on, cargo or turn vehicles but no move that can
+##   lose the level
 
 const SIMILARITY := 0.6
 
@@ -28,10 +31,12 @@ func _initialize() -> void:
 			var report := LevelSolver.solve(level)
 			var spec := LevelGenerator.spec(w, i, mechanic)
 			var counts := LevelGenerator._count_mechanics(data)
+			var traps := LevelGenerator._traps(level, report.order) if counts.cargo + counts.turn > 0 else 0
 			rows.append({"w": w, "i": i, "data": data, "cars": data.vehicles.size(), "depth": report.rounds,
 				"target": spec.depth, "free": report.first_free, "breather": i in LevelGenerator.BREATHERS,
 				"hard": i in LevelGenerator.HARD, "counts": counts, "sig": _signature(data),
-				"size": "%dx%d" % [data.cols, data.rows], "flags": []})
+				"size": "%dx%d" % [data.cols, data.rows], "flags": [],
+				"sharp": spec.get("sharp", false), "traps": traps})
 		_flag(rows, mechanic)
 		all.append(rows)
 
@@ -40,16 +45,16 @@ func _initialize() -> void:
 	for rows in all:
 		var w: int = rows[0].w
 		lines.append("\n## World %d (%s)\n" % [w + 1, LevelCatalog.world(w).id])
-		lines.append("| Lvl | Board | Cars | Waves (target) | Free at start | Mechanics | Flags |")
-		lines.append("|---|---|---|---|---|---|---|")
+		lines.append("| Lvl | Board | Cars | Waves (target) | Free at start | Traps | Mechanics | Flags |")
+		lines.append("|---|---|---|---|---|---|---|---|")
 		for r in rows:
 			var mech := PackedStringArray()
 			for m in r.counts:
 				if r.counts[m] > 0:
 					mech.append("%s %d" % [m, r.counts[m]])
 			var tag := " (breather)" if r.breather else (" (hard)" if r.hard else "")
-			lines.append("| %d%s | %s | %d | %d (%d) | %d | %s | %s |" % [r.i + 1, tag, r.size, r.cars, r.depth,
-				r.target, r.free, ", ".join(mech), ", ".join(r.flags)])
+			lines.append("| %d%s | %s | %d | %d (%d) | %d | %d | %s | %s |" % [r.i + 1, tag, r.size, r.cars, r.depth,
+				r.target, r.free, r.traps, ", ".join(mech), ", ".join(r.flags)])
 			if not r.flags.is_empty():
 				flagged += 1
 	var text := "# Level quality report\n\n%d of %d levels flagged.\n" % [flagged, all.reduce(func(a, r): return a + r.size(), 0)] + "\n".join(lines) + "\n"
@@ -67,6 +72,10 @@ func _flag(rows: Array, mechanic: String) -> void:
 		if not r.breather:
 			if r.free * 2 > r.cars or r.depth <= r.target - 2:
 				r.flags.append("EASY")
+			if r.sharp and r.free > 3:
+				r.flags.append("OPEN")
+			if r.sharp and r.traps == 0 and r.counts.cargo + r.counts.turn > 0:
+				r.flags.append("NO_TRAP")
 			if last_depth >= 0 and r.depth < last_depth - 2 and r.i % LevelGenerator.ACT_LENGTH != 0:
 				r.flags.append("DIP")
 			if r.hard and not recent.is_empty() and r.depth <= recent.max():

@@ -23,6 +23,8 @@ const HARD := [9, 19, 29, 39]
 const SMALL := ["sedan", "sedan_sports", "hatchback", "suv", "suv_luxury", "taxi", "police", "van", "pickup"]
 const LARGE := ["ambulance", "delivery", "firetruck", "bus"]
 const CARGO_TYPES := ["pickup", "van", "delivery"]
+const SHARP_FROM := 10 ## from this level on: deeper boards, few free cars, more traps
+const SHARP_DEPTH := 1.3
 
 ## Per world: starting difficulty and an earlier mechanic mixed in later on.
 const WORLD_TUNING := [
@@ -55,7 +57,7 @@ static func generate(level_spec: Dictionary, seed_parts: Array, attempts := ATTE
 			best_score = score
 			best = data
 			best_note = "%d cars, %d waves (target %d), %d free at start, %d traps, %s" % [
-				data.vehicles.size(), report.rounds, level_spec.depth, report.first_free, _traps(level), _mechanic_summary(data)]
+				data.vehicles.size(), report.rounds, level_spec.depth, report.first_free, _traps(level, report.order), _mechanic_summary(data)]
 	if best.is_empty():
 		return {}
 	return {"data": best, "note": best_note}
@@ -91,7 +93,8 @@ static func spec(w: int, i: int, mechanic: String) -> Dictionary:
 	return {
 		"cols": cols, "rows": rows,
 		"cars": roundi(cols * rows * lerpf(0.3, 0.44, fill)),
-		"depth": roundi(lerpf(2.0, 11.0, d)) + (1 if i in HARD else 0),
+		"depth": roundi(lerpf(2.0, 11.0, d) * (SHARP_DEPTH if i >= SHARP_FROM else 1.0)) + (1 if i in HARD else 0),
+		"sharp": i >= SHARP_FROM and not i in BREATHERS,
 		"cones": roundi(d * (2.5 if mechanic == "" else 1.2)) if not intro else 0,
 		"trucks": lerpf(0.0, 0.25, fill),
 		"breather": i in BREATHERS,
@@ -272,7 +275,16 @@ static func _score(spec: Dictionary, data: Dictionary, level: LevelData, report:
 	var have := _count_mechanics(data)
 	for m in want:
 		score -= maxi(want[m] - have[m], 0) * 12.0
-	score += mini(_traps(level), 3) * 6.0
+	var sharp: bool = spec.get("sharp", false)
+	var traps := _traps(level, report.order if sharp else [])
+	if sharp:
+		# Few cars free at the start, and wrong moves that cost the level.
+		score -= maxi(report.first_free - 2, 0) * 12.0
+		score += mini(traps, 4) * 14.0
+		if traps == 0 and (want.cargo > 0 or want.turn > 0):
+			score -= 15.0
+	else:
+		score += mini(traps, 3) * 6.0
 	score += _gates_in_the_way(data) * 5.0
 	return score
 
@@ -289,20 +301,32 @@ static func _count_mechanics(data: Dictionary) -> Dictionary:
 	return have
 
 
-## Pull-forwards and turns that, made at the start, leave the board unsolvable:
-## the moves a careless player can get wrong.
-static func _traps(level: LevelData) -> int:
+## Pull-forwards and turns that leave the board unsolvable: the moves a
+## careless player can get wrong. Checked at the start and, when a winning
+## line is given, at every step along it (each vehicle counts once).
+static func _traps(level: LevelData, line: Array = []) -> int:
 	var board := BoardState.from_level(level)
-	var traps := 0
-	for id in board.vehicles:
-		var r := board.probe(id)
-		if r.action != BoardState.Action.ADVANCE and r.action != BoardState.Action.TURN:
-			continue
-		var next := board.clone()
-		next.apply(id, r)
-		if not LevelSolver.solve_board(next).solvable:
-			traps += 1
-	return traps
+	var trapped := {}
+	var checked := {}
+	for step in line.size() + 1:
+		for id in board.vehicles:
+			if trapped.has(id):
+				continue
+			var r := board.probe(id)
+			if r.action != BoardState.Action.ADVANCE and r.action != BoardState.Action.TURN:
+				continue
+			var state_key := [id, (board.vehicles[id] as VehicleState).cell, board._grid.hash()]
+			if checked.has(state_key):
+				continue
+			checked[state_key] = true
+			var next := board.clone()
+			next.apply(id, r)
+			if not LevelSolver.solve_board(next).solvable:
+				trapped[id] = true
+		if step < line.size():
+			var id: int = line[step]
+			board.apply(id, board.probe(id))
+	return trapped.size()
 
 
 ## Gates some vehicle drives through on its way out (otherwise the gate is

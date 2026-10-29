@@ -40,6 +40,7 @@ var _record_tag: Label
 var _combo_value: Label
 var _coin_value: Label
 var _rescue_buttons := {} ## kind -> RescueButton
+var _star_note: Label ## why the third star was missed
 var _coin_label: Label
 var _continue_ad: Button
 var _continue_coins: Button
@@ -102,6 +103,8 @@ func show_win(result: Dictionary) -> void:
 		_result_text.text = tr("DAILY_STREAK") % result.streak
 	_star_row.visible = true
 	_stats.visible = true
+	_star_note.text = tr(result.get("star_note", "")) if result.get("star_note", "") != "" else ""
+	_star_note.visible = _star_note.text != ""
 	_time_value.text = _format_time(result.time)
 	_record_tag.visible = result.best_time
 	_combo_value.text = "x%d" % result.combo if result.combo >= 2 else "-"
@@ -140,6 +143,7 @@ func show_lose(offer: Dictionary = {}) -> void:
 	_result_text.text = tr("LOSE_TEXT")
 	_star_row.visible = false
 	_stats.visible = false
+	_star_note.visible = false
 	_primary.text = tr("LOSE_RETRY")
 	_primary.theme_type_variation = ""
 	_secondary.visible = _menu_button.visible # hidden in the first session
@@ -760,6 +764,13 @@ func _build_result(root: Control) -> void:
 		star.size_flags_vertical = Control.SIZE_SHRINK_END if i != 1 else Control.SIZE_SHRINK_BEGIN
 		_stars.append(star)
 		_star_row.add_child(star)
+
+	_star_note = Label.new()
+	_star_note.add_theme_font_size_override("font_size", 22)
+	_star_note.add_theme_color_override("font_color", UiStyle.INK.lerp(Color.WHITE, 0.35))
+	_star_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_star_note.visible = false
+	box.add_child(_star_note)
 
 	_stats = VBoxContainer.new()
 	_stats.add_theme_constant_override("separation", 6)

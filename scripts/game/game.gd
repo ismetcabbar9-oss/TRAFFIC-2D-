@@ -9,7 +9,8 @@ const MENU_SCENE := "res://scenes/menu.tscn"
 @export var lose_delay := 0.6 ## seconds between the final crash and the lose panel
 @export_range(0.0, 1.0) var horn_chance := 0.65 ## chance a bumped car honks back
 ## Hint: after this many idle seconds a car that can leave flashes its arrow.
-@export var hint_delay := 7.0
+@export var hint_delay := 15.0
+@export var idle_hint_levels := 30 ## no idle hint from this level on (Daily included)
 @export var first_level_hint_delay := 2.5 ## quicker on the very first level
 @export var hint_repeat := 4.0 ## flash again this often while still idle
 @export var tutorial_levels := 1 ## the first N levels also show a text tip
@@ -37,6 +38,7 @@ var _earned := 0 ## coins from the last win (for "double coins")
 var _done_at_start: Array = [] ## achievements already reached when the level began
 var _gestures := TouchGestures.new()
 var _headlights: HeadlightPool ## night worlds: all headlight pools in one draw
+var _rescued := false ## a rescue was used in this attempt (no third star)
 var _paused := false ## the pause panel is open (the level clock stops)
 var _onboarding := false ## first session: levels 1-3 guided by a pointing hand
 var _guide_id := -1 ## car the hand points at
@@ -107,6 +109,7 @@ func load_level(index: int) -> void:
 	if not report.solvable:
 		push_warning("Level %s cannot be cleared; stuck vehicles: %s" % [path, report.stuck])
 
+	level.mistakes = Economy.mistakes_for(world_index, level_index, level.hard, Daily.playing)
 	session = GameSession.new(level)
 	_combo = 0
 	_best_combo = 0
@@ -167,6 +170,7 @@ func load_level(index: int) -> void:
 
 	hud.hide_result()
 	_onboarding = Progress.in_onboarding() and world_index == 0 and level_index < 3 and not Daily.playing
+	_rescued = false
 	Analytics.level("Start", world_index, level_index, Daily.playing)
 	hud.set_onboarding(_onboarding)
 	_reset_guide()
@@ -185,7 +189,7 @@ func load_level(index: int) -> void:
 	if Daily.playing:
 		title = tr("DAILY_TITLE")
 	elif level.hard:
-		title += "  ·  " + tr("LEVEL_HARD")
+		title += "  ·  " + tr("LEVEL_ONE_CHANCE" if level.mistakes == 1 else "LEVEL_HARD")
 	hud.set_level_title(title, level.hard)
 	hud.set_time_of_day(TimeOfDay.label(hour))
 	hud.set_mistakes(session.mistakes_left, level.mistakes)
@@ -250,13 +254,14 @@ func _on_tap(screen_pos: Vector2) -> void:
 		return
 	_clear_hint()
 	_release_held_hint()
-	if _onboarding:
+	if _onboarding and level_index == 0:
 		_reset_guide()
-		_guide_delay = 0.9 if level_index == 0 else 4.0
+		_guide_delay = 0.9
 	if _crane_mode:
 		_set_crane_mode(false)
 		if session.state == GameSession.State.PLAYING and Progress.use_item("crane"):
 			Analytics.design("rescue:crane:owned")
+			_rescued = true
 			session.lift(id)
 	else:
 		session.tap(id)
@@ -270,8 +275,10 @@ func _process(delta: float) -> void:
 	if session == null or session.state != GameSession.State.PLAYING or _tutorial_open:
 		hud.hide_hand()
 		return
-	if _onboarding:
+	if _onboarding and level_index == 0:
 		_update_guide(delta)
+		return
+	if level_index >= idle_hint_levels and not Daily.playing:
 		return
 	_idle += delta
 	if _idle < _next_hint:
@@ -288,9 +295,8 @@ func _process(delta: float) -> void:
 			hud.show_hint(tr("HINT_TAP_FREE"))
 
 
-## First session: a hand taps the next car of a winning line. On level 1 it
-## shows right away after every move; on levels 2 and 3 only when the player
-## hesitates.
+## First level: a hand taps the next car of a winning line, right after
+## every move.
 func _update_guide(delta: float) -> void:
 	_guide_delay -= delta
 	if _guide_delay > 0.0:
@@ -308,7 +314,7 @@ func _update_guide(delta: float) -> void:
 
 func _reset_guide() -> void:
 	_guide_id = -1
-	_guide_delay = 1.2 if level_index == 0 else 4.0
+	_guide_delay = 1.2
 	hud.hide_hand()
 
 
@@ -486,7 +492,7 @@ func _on_won() -> void:
 	var played := session
 	_set_crane_mode(false)
 	var mistakes_used := session.crashes
-	var stars := Economy.stars_for(mistakes_used)
+	var stars := Economy.stars_for(mistakes_used, _rescued)
 	var time := _clock - _level_start
 	var record: Dictionary
 	if Daily.playing:
@@ -496,7 +502,8 @@ func _on_won() -> void:
 		record = Progress.record_win(world_index, level_index, stars, time, _best_combo, session.level.hard)
 	var result := {
 		"stars": stars, "time": time, "combo": _best_combo, "coins": record.coins,
-		"best_time": record.best_time, "perfect": mistakes_used == 0,
+		"best_time": record.best_time, "perfect": stars == 3,
+		"star_note": "" if stars == 3 else ("STAR_NOTE_RESCUE" if _rescued and mistakes_used == 0 else "STAR_NOTE_CRASH"),
 		"last_level": Daily.playing or not Progress.has_next_level(world_index, level_index),
 		"double_ok": record.coins > 0 and AdManager.rewarded_available("double_coins"),
 	}
@@ -610,6 +617,7 @@ func _give_hint() -> void:
 		return
 	_release_held_hint()
 	_held_hint = id
+	_rescued = true
 	vehicle_views[id].hold_hint()
 	hud.show_hint(tr("HINT_GLOWING"))
 	Sfx.play("combo", -8.0, 1.3, 0.0)
@@ -626,6 +634,7 @@ func _undo() -> void:
 	if was < 0:
 		Progress.add_item("undo") # nothing to take back: keep it
 		return
+	_rescued = true
 	Sfx.play("ui_click", -2.0, 0.8, 0.0)
 	hud.hide_hint()
 	if was == BoardState.Action.CRASH:
@@ -665,6 +674,7 @@ func _continue_offer() -> Dictionary:
 func _on_continue(with_ad: bool) -> void:
 	var resume := func():
 		Analytics.design("rescue:continue:%s" % ("ad" if with_ad else "coins"))
+		_rescued = true
 		session.add_mistakes(int(Economy.value("continue_moves")))
 		hud.hide_result()
 		_refresh_rescues()

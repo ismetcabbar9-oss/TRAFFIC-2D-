@@ -216,3 +216,6 @@ TAB_SHOP,Shop,Mağaza
 TAB_GARAGE,Garage,Garaj
 TAB_DAILY,Puzzle,Bulmaca
 TAB_GIFT,Gift,Hediye
+STAR_NOTE_RESCUE,Third star: solve it without any rescue,3. yıldız için kurtarma kullanmadan çöz
+STAR_NOTE_CRASH,Third star: solve it without a crash,3. yıldız için hiç çarpmadan çöz
+LEVEL_ONE_CHANCE,One chance,Tek şans

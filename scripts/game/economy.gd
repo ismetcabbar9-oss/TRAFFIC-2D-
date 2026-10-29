@@ -14,10 +14,24 @@ static func value(key: String) -> Variant:
 	return _data[key]
 
 
-## Stars for a cleared level: 3 without a crash, then one less per crash (min 1).
-static func stars_for(mistakes_used: int) -> int:
+## Stars for a cleared level: 3 only for a clean solve (no crash and no
+## rescue: hint, undo, crane or extra moves), 2 with at most one crash,
+## otherwise 1.
+static func stars_for(crashes: int, rescued := false) -> int:
 	var table: Array = value("stars_by_mistakes_used")
-	return int(table[clampi(mistakes_used, 0, table.size() - 1)])
+	var stars := int(table[clampi(crashes, 0, table.size() - 1)])
+	return mini(stars, 2) if rescued else stars
+
+
+## Crashes allowed on a level: generous while World 1 teaches the rules,
+## tighter afterwards and a single chance on hard levels.
+static func mistakes_for(world: int, index: int, hard: bool, daily := false) -> int:
+	var table: Dictionary = value("mistakes_per_level")
+	if daily:
+		return int(table.daily)
+	if world == 0 and index < int(table.learning_levels):
+		return int(table.learning)
+	return int(table.hard) if hard else int(table.normal)
 
 
 ## Coins for a cleared level; hard levels pay more.

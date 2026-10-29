@@ -20,6 +20,12 @@ func test_stars_by_mistakes() -> void:
 	check_eq(Economy.stars_for(1), 2, "one crash")
 	check_eq(Economy.stars_for(2), 1, "two crashes")
 	check_eq(Economy.stars_for(7), 1, "never below one")
+	check_eq(Economy.mistakes_for(0, 3, false), 3, "World 1 teaches with three")
+	check_eq(Economy.mistakes_for(0, 9, true), 3, "World 1 level 10 is still learning")
+	check_eq(Economy.mistakes_for(0, 15, false), 2, "normal levels allow two")
+	check_eq(Economy.mistakes_for(2, 19, true), 1, "hard levels: one chance")
+	check_eq(Economy.stars_for(0, true), 2, "a rescue costs the third star")
+	check_eq(Economy.stars_for(2, true), 1, "rescue and crashes")
 
 
 func test_level_coins() -> void:
