@@ -14,7 +14,7 @@ func _initialize() -> void:
 	await process_frame
 	var progress := root.get_node("Progress")
 	progress.tutorial_seen = true
-	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE"]
+	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB"]
 	progress.flags["crane_gift"] = true
 	progress.current_world = int(args[1]) - 1
 	progress.current_level = int(args[2]) - 1

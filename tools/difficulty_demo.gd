@@ -17,7 +17,7 @@ func _initialize() -> void:
 		TranslationServer.set_locale(args[1])
 	var progress := root.get_node("Progress")
 	progress.tutorial_seen = true
-	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE"]
+	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB"]
 	progress.inventory = {"hint": 1}
 	progress.current_world = 1
 	progress.current_level = 19

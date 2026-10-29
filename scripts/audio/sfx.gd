@@ -28,6 +28,10 @@ const SOUNDS := {
 	"lock_rattle": ["res://assets/audio/sfx/lock_rattle.ogg"],
 	"unlock": ["res://assets/audio/sfx/unlock.ogg"],
 	"gate_open": ["res://assets/audio/sfx/gate_open.ogg"],
+	"explosion": ["res://assets/audio/sfx/explosion.ogg"],
+	"bomb_beep": ["res://assets/audio/sfx/bomb_beep.ogg"],
+	"pit_fall": ["res://assets/audio/sfx/pit_fall.ogg"],
+	"glass_break": ["res://assets/audio/sfx/glass_break.ogg"],
 	"win": ["res://assets/audio/music/win.ogg"],
 	"lose": ["res://assets/audio/music/lose.ogg"],
 }

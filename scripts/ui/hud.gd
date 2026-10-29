@@ -128,7 +128,7 @@ func show_win(result: Dictionary) -> void:
 
 ## `offer`: {moves, price, can_afford, ad_ok}; empty when continuing is not
 ## possible (e.g. the board is boxed in).
-func show_lose(offer: Dictionary = {}) -> void:
+func show_lose(offer: Dictionary = {}, reason := "") -> void:
 	_won = false
 	_double_button.visible = false
 	_continue_ad.visible = offer.get("ad_ok", false)
@@ -137,10 +137,10 @@ func show_lose(offer: Dictionary = {}) -> void:
 		_continue_ad.text = tr("CONTINUE_AD") % offer.moves
 		_continue_coins.text = tr("CONTINUE_COINS") % [offer.moves, offer.price]
 		_continue_coins.disabled = not offer.can_afford
-	_result_title.text = tr("LOSE_TITLE")
+	_result_title.text = tr("LOSE_BOOM_TITLE" if reason != "" else "LOSE_TITLE")
 	_result_title.add_theme_color_override("font_color", UiStyle.DANGER)
 	_result_text.visible = true
-	_result_text.text = tr("LOSE_TEXT")
+	_result_text.text = tr({"explosion": "LOSE_TANKER_TEXT", "bomb": "LOSE_BOMB_TEXT"}.get(reason, "LOSE_TEXT"))
 	_star_row.visible = false
 	_stats.visible = false
 	_star_note.visible = false
@@ -753,6 +753,8 @@ func _build_result(root: Control) -> void:
 
 	_result_text = Label.new()
 	_result_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_result_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_result_text.custom_minimum_size.x = 460
 	box.add_child(_result_text)
 
 	_star_row = HBoxContainer.new()

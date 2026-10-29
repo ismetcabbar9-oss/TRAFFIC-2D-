@@ -219,3 +219,15 @@ TAB_GIFT,Gift,Hediye
 STAR_NOTE_RESCUE,Third star: solve it without any rescue,3. yıldız için kurtarma kullanmadan çöz
 STAR_NOTE_CRASH,Third star: solve it without a crash,3. yıldız için hiç çarpmadan çöz
 LEVEL_ONE_CHANCE,One chance,Tek şans
+LOSE_BOOM_TITLE,BOOM!,BOOM!
+LOSE_TANKER_TEXT,The fuel tanker blew up. Nothing may touch it.,Yakıt tankeri patladı. Ona hiçbir şey çarpmamalı.
+LOSE_BOMB_TEXT,The bomb went off before its car got out.,"Bomba, araç çıkamadan patladı."
+MECH_PIT_TITLE,Sinkhole!,Çukur!
+MECH_PIT_1,The first car driving over a sinkhole falls in. It is gone and costs a move.,Çukurun üzerinden geçen ilk araç içine düşer. Araç gider ve bir hamle hakkı yanar.
+MECH_PIT_2,"Then the hole is patched. Pick wisely which car to sacrifice: you get one extra move per hole.","Sonra çukur kapanır. Hangi aracı feda edeceğini iyi seç: her çukur için bir ek hak alırsın."
+MECH_TANKER_TITLE,Fuel tanker,Yakıt tankeri
+MECH_TANKER_1,Nothing may hit the tanker and it may hit nothing.,Tankere hiçbir şey çarpmamalı; o da hiçbir şeye çarpmamalı.
+MECH_TANKER_2,One crash and it explodes: the level is lost at once.,Tek bir çarpışmada patlar ve bölüm anında kaybedilir.
+MECH_BOMB_TITLE,Time bomb,Saatli bomba
+MECH_BOMB_1,The number on the car counts down with every tap.,Aracın üstündeki sayı her dokunuşta bir azalır.
+MECH_BOMB_2,Get it out before it reaches zero or it explodes.,Sıfıra inmeden onu dışarı çıkar; yoksa patlar.

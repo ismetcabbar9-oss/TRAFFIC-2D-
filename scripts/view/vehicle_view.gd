@@ -65,6 +65,9 @@ var _crate: Node3D ## cargo marker on the roof
 var _badge: FlatIcon ## padlock (locked) or key (key holder) above the roof
 var _frame: FlatIcon ## group-colored outline on the ground
 var _hint_ring: FlatIcon ## paid hint marker
+var _bomb: Node3D ## time bomb on the roof
+var _bomb_label: Label3D
+var _fuse_spark: MeshInstance3D
 
 
 static func exiting_count() -> int:
@@ -464,6 +467,8 @@ func _add_crate(cell_size: float) -> void:
 func _add_mechanic_markers(cell_size: float) -> void:
 	if state.cargo:
 		_add_crate(cell_size)
+	if state.bomb > 0:
+		_add_bomb(cell_size)
 	var group := state.lock if state.lock >= 0 else state.key
 	if group < 0:
 		return
@@ -483,6 +488,169 @@ func _add_mechanic_markers(cell_size: float) -> void:
 	_frame = FlatIcon.create(FlatIcon.frame_shapes(area, 0.08), Color(color, 0.85), 0.025)
 	_frame.position.y = 0.012
 	add_child(_frame)
+
+
+# --- Hazards --------------------------------------------------------------------
+
+## Black bomb with a burning fuse on the roof and its countdown above it.
+func _add_bomb(cell_size: float) -> void:
+	_bomb = Node3D.new()
+	_bomb.position = Vector3(0.0, _roof, -half_length * 0.42)
+	_body.add_child(_bomb)
+	var r := cell_size * 0.25
+	var ball := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = r
+	sphere.height = r * 2.0
+	sphere.radial_segments = 12
+	sphere.rings = 6
+	ball.mesh = sphere
+	var black := StandardMaterial3D.new()
+	black.albedo_color = Color("22252c")
+	black.roughness = 0.3
+	ball.material_override = black
+	ball.position.y = r * 0.9
+	_bomb.add_child(ball)
+	var fuse := MeshInstance3D.new()
+	var rope := CylinderMesh.new()
+	rope.top_radius = r * 0.12
+	rope.bottom_radius = r * 0.12
+	rope.height = r * 0.7
+	fuse.mesh = rope
+	var cord := StandardMaterial3D.new()
+	cord.albedo_color = Color("c9a46a")
+	fuse.material_override = cord
+	fuse.position = Vector3(0.0, r * 2.0, 0.0)
+	fuse.rotation.z = 0.4
+	_bomb.add_child(fuse)
+	_fuse_spark = MeshInstance3D.new()
+	var spark := SphereMesh.new()
+	spark.radius = r * 0.28
+	spark.height = r * 0.56
+	_fuse_spark.mesh = spark
+	var glow := StandardMaterial3D.new()
+	glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	glow.albedo_color = Color("ffd23f")
+	_fuse_spark.material_override = glow
+	_fuse_spark.position = Vector3(-r * 0.15, r * 2.35, 0.0)
+	_bomb.add_child(_fuse_spark)
+	var flicker := _fuse_spark.create_tween().set_loops()
+	flicker.tween_property(_fuse_spark, "scale", Vector3.ONE * 1.5, 0.09)
+	flicker.tween_property(_fuse_spark, "scale", Vector3.ONE * 0.8, 0.11)
+	# The count sits in a round red badge floating above the bomb.
+	var badge := Node3D.new()
+	badge.position = Vector3(0.0, r * 2.2 + cell_size * 0.55, 0.0)
+	_bomb.add_child(badge)
+	for rim in [false, true]: # colored disc first (updated by update_bomb), white rim behind
+		var disc := Sprite3D.new()
+		disc.texture = _badge_texture()
+		disc.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		disc.no_depth_test = true
+		disc.render_priority = 3 if rim else 4
+		disc.pixel_size = cell_size * (0.74 if rim else 0.62) / 128.0
+		badge.add_child(disc)
+	_bomb_label = Label3D.new()
+	_bomb_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_bomb_label.no_depth_test = true
+	_bomb_label.render_priority = 5
+	_bomb_label.font = UiStyle.font(800)
+	_bomb_label.font_size = 96
+	_bomb_label.outline_size = 0
+	_bomb_label.pixel_size = cell_size * 0.0055
+	badge.add_child(_bomb_label)
+	for part in _bomb.find_children("*", "GeometryInstance3D", true, false):
+		(part as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	update_bomb(false)
+
+
+## Shows the bomb's count; red and shaking for the last three taps.
+func update_bomb(bump := true) -> void:
+	if _bomb_label == null:
+		return
+	_bomb_label.text = str(state.bomb)
+	var urgent := state.bomb <= 3
+	var badge := _bomb_label.get_parent() as Node3D
+	(badge.get_child(0) as Sprite3D).modulate = Color("ff2d20") if urgent else Color("2b2f38")
+	if not bump:
+		return
+	var t := badge.create_tween()
+	badge.scale = Vector3.ONE * (1.7 if urgent else 1.35)
+	t.tween_property(badge, "scale", Vector3.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if urgent:
+		play_locked() # a nervous shake
+
+
+static var _badge_tex: ImageTexture
+
+
+## Plain white disc, tinted by the sprites that use it.
+static func _badge_texture() -> ImageTexture:
+	if _badge_tex == null:
+		var size := 128
+		var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
+		var c := Vector2(size, size) * 0.5
+		for y in size:
+			for x in size:
+				var d := Vector2(x + 0.5, y + 0.5).distance_to(c)
+				img.set_pixel(x, y, Color(1, 1, 1, clampf(62.0 - d, 0.0, 1.0)))
+		_badge_tex = ImageTexture.create_from_image(img)
+	return _badge_tex
+
+
+## Explosion: the car is thrown up a little, tips over and is left charred.
+func play_burnt(push: Vector3) -> void:
+	_kill_tween()
+	clear_hint()
+	_arrow.visible = false
+	if _bomb:
+		_bomb.queue_free()
+		_bomb = null
+		_bomb_label = null
+	var soot := StandardMaterial3D.new()
+	soot.albedo_color = Color(0.05, 0.04, 0.035, 0.82)
+	soot.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	for mesh in _model.find_children("*", "GeometryInstance3D", true, false):
+		(mesh as GeometryInstance3D).material_overlay = soot
+	var local := global_transform.basis.inverse() * push
+	var tilt := Vector3(local.z, 0.0, -local.x).normalized() * 0.45 if local.length() > 0.01 else Vector3(0.3, 0, 0)
+	_tween = create_tween()
+	_tween.tween_property(self, "position", position + Vector3.UP * 1.2 + push * 0.4, 0.22).set_ease(Tween.EASE_OUT)
+	_tween.parallel().tween_property(_body, "rotation", tilt, 0.35)
+	_tween.tween_property(self, "position", position + push * 0.6, 0.25).set_ease(Tween.EASE_IN)
+	_tween.tween_callback(_squash.bind(Vector3(1.08, 0.85, 1.05), 0.06, 0.4))
+
+
+## Drives over the pit edge, tips nose first into it and disappears;
+## `on_fallen` runs as it vanishes.
+func play_fall(pit: Vector3, on_fallen: Callable) -> void:
+	_kill_tween()
+	clear_hint()
+	_arrow.visible = false
+	if _frame:
+		_frame.visible = false
+	_pick_body.queue_free()
+	var reach := (pit - position)
+	reach.y = 0.0
+	var drive := maxf(reach.length() - half_length * 0.6, 0.05)
+	var edge := position + reach.normalized() * drive
+	_tween = create_tween()
+	_tween.tween_property(self, "position", edge, sqrt(2.0 * drive / crash_acceleration) + 0.05) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_property(_body, "rotation:x", 1.0, 0.18).set_ease(Tween.EASE_IN)
+	_tween.parallel().tween_property(self, "position", Vector3(pit.x, position.y - 0.5, pit.z), 0.18)
+	_tween.tween_property(self, "position:y", position.y - 2.5, 0.25).set_ease(Tween.EASE_IN)
+	_tween.parallel().tween_property(self, "scale", Vector3.ONE * 0.2, 0.25).set_ease(Tween.EASE_IN)
+	_tween.tween_callback(on_fallen)
+	_tween.tween_callback(func():
+		exit_finished.emit()
+		queue_free())
+
+
+## A hard knock: the body twists a little and springs back.
+func jolt(amount: float) -> void:
+	var t := create_tween()
+	t.tween_property(_body, "rotation:y", amount, 0.06).set_ease(Tween.EASE_OUT)
+	t.tween_property(_body, "rotation:y", 0.0, 0.45).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 
 ## Cargo: drives one cell forward to its new footprint and drops the crate.

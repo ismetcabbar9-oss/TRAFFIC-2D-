@@ -28,3 +28,7 @@ All audio is CC0 1.0 (public domain dedication); edited (trimmed, mixed, normali
 | music/snow_theme.ogg | OpenGameArt "Happy synths loop with slight christmas feeling" by 3xBlast (https://opengameart.org/content/happy-synths-loop-with-slight-christmas-feeling), CC0 |
 | music/night_theme.ogg | OpenGameArt "Chill lofi inspired [loop edit]" by qubodup (https://opengameart.org/content/chill-lofi-inspired-loop-edit), CC0 |
 | music/airport_theme.ogg | OpenGameArt "City Loop" by wipics (https://opengameart.org/content/city-loop-0), CC0 |
+| sfx/explosion.ogg | OpenGameArt "25 CC0 bang / firework SFX" (bang_03, cannon_01) and "100 CC0 SFX" (explosion) by rubberduck, CC0, layered with a synthesized rumble |
+| sfx/pit_fall.ogg | OpenGameArt "100 CC0 SFX" by rubberduck (slam_02), CC0, with a synthesized whoosh |
+| sfx/glass_break.ogg | OpenGameArt "100 CC0 SFX" by rubberduck (glass_04), CC0 |
+| sfx/bomb_beep.ogg | Synthesized for this game |

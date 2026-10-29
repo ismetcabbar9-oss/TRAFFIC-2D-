@@ -1,7 +1,8 @@
 class_name ObstacleView
 extends Node3D
-## Static prop that blocks one cell: a cone, a box, or a gate (barrier in its
-## group color) that opens when the group's key car leaves.
+## Static prop on one cell: a cone, a box, a gate (barrier in its group
+## color) that opens when the group's key car leaves, or a pit that swallows
+## the first car driving over it and is then patched.
 
 const MODELS := {
 	"cone": {"path": "res://assets/models/props/cone.glb", "scale": 1.6, "footprint": 0.476},
@@ -23,6 +24,9 @@ func setup(board: BoardView, type: String, p_cell: Vector2i, group := -1) -> voi
 	position = board.cell_to_world(Vector2(cell))
 	if type == "gate":
 		_build_gate(MechanicStyle.group_color(group))
+		return
+	if type == "pit":
+		_build_pit(board.theme.lot)
 		return
 	var info: Dictionary = MODELS[type]
 	var s: float = _cell_size * info.scale
@@ -104,6 +108,84 @@ func open() -> void:
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_tween.tween_property(_model, "scale", Vector3(1.0, 0.01, 1.0), 0.25).set_ease(Tween.EASE_IN)
 	_tween.tween_callback(queue_free)
+
+
+# --- Pit -------------------------------------------------------------------------
+
+var _hole: Node3D
+
+
+## A collapsed patch of the lot: broken rim, cracks and a dark hole.
+func _build_pit(lot: Color) -> void:
+	_model = Node3D.new()
+	add_child(_model)
+	_model.rotation.y = randf() * TAU
+	var r := _cell_size * 0.48
+	_half_size = r
+	_disc(_model, r, lot.lightened(0.18), 0.004, 9) # broken edge
+	for i in 5: # cracks running out into the asphalt
+		var crack := MeshInstance3D.new()
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3(0.05, 0.01, r * randf_range(0.45, 0.7))
+		crack.mesh = mesh
+		crack.material_override = _material(lot.darkened(0.5))
+		var a := TAU * (i + randf_range(-0.2, 0.2)) / 5.0
+		crack.position = Vector3(sin(a), 0.0, cos(a)) * (r + mesh.size.z * 0.4) + Vector3.UP * 0.006
+		crack.rotation.y = a
+		_model.add_child(crack)
+	var rim := Node3D.new()
+	_model.add_child(rim)
+	for part in _model.get_children():
+		if part != rim:
+			part.reparent(rim, false)
+	_hole = Node3D.new()
+	_model.add_child(_hole)
+	_disc(_hole, r * 0.86, Color("3a2d22"), 0.01, 10)
+	_disc(_hole, r * 0.68, Color("17110d"), 0.014, 10)
+	_disc(_hole, r * 0.42, Color("030202"), 0.018, 8)
+	for i in 5: # chunks of asphalt on the rim
+		var chunk := MeshInstance3D.new()
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3(randf_range(0.1, 0.18), 0.06, randf_range(0.08, 0.14))
+		chunk.mesh = mesh
+		chunk.material_override = _material(lot.lightened(0.08))
+		var a := TAU * (i + 0.5) / 5.0 + randf_range(-0.3, 0.3)
+		chunk.position = Vector3(sin(a), 0.0, cos(a)) * r * 0.9 + Vector3.UP * 0.03
+		chunk.rotation = Vector3(randf_range(-0.3, 0.3), randf() * TAU, randf_range(-0.3, 0.3))
+		rim.add_child(chunk)
+	MeshMerge.merge(rim, false)
+	MeshMerge.merge(_hole, false)
+
+
+## Something fell in: rubble fills the hole and a patch of fresh asphalt
+## closes it.
+func fill() -> void:
+	if _hole == null:
+		return
+	var patch := Node3D.new()
+	_model.add_child(patch)
+	_disc(patch, _half_size * 0.86, Color("3d424c"), 0.02, 10)
+	patch.scale = Vector3.ONE * 0.01
+	var t := create_tween()
+	t.tween_property(_hole, "scale", Vector3(0.6, 1.0, 0.6), 0.25)
+	t.tween_property(patch, "scale", Vector3.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_callback(_hole.queue_free)
+	_hole = null
+
+
+static func _disc(parent: Node3D, radius: float, color: Color, y: float, sides: int) -> void:
+	var m := MeshInstance3D.new()
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = radius
+	mesh.bottom_radius = radius
+	mesh.height = 0.004
+	mesh.radial_segments = sides
+	mesh.rings = 1
+	m.mesh = mesh
+	m.material_override = _material(color)
+	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	m.position.y = y
+	parent.add_child(m)
 
 
 static func _material(color: Color) -> StandardMaterial3D:

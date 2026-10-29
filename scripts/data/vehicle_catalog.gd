@@ -73,4 +73,6 @@ static func pitch(type: String) -> float:
 
 
 static func load_model(type: String) -> PackedScene:
+	if TYPES[type]["model"] == "":
+		return TankerModel.packed()
 	return load(MODEL_DIR + TYPES[type]["model"]) as PackedScene

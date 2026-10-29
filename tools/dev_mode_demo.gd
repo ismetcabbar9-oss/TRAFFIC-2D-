@@ -42,7 +42,7 @@ func _initialize():
 	menu.queue_free()
 	p.current_world = 4
 	p.current_level = 7
-	p.tips_seen = ["CARGO", "TURN", "LOCK", "GATE"]
+	p.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB"]
 	var game: Node = load("res://scenes/game.tscn").instantiate()
 	root.add_child(game)
 	await create_timer(1.4).timeout

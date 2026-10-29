@@ -14,7 +14,7 @@ func _initialize() -> void:
 	var progress := root.get_node("Progress")
 	progress.current_world = world
 	progress.tutorial_seen = true
-	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE"]
+	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB"]
 	for i in levels:
 		progress.current_level = i
 		var game: Node = load("res://scenes/game.tscn").instantiate()

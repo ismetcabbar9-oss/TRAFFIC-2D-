@@ -29,7 +29,7 @@ func _initialize() -> void:
 	await process_frame
 	var progress := root.get_node("Progress")
 	progress.tutorial_seen = true
-	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE"]
+	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB"]
 	var path := "user://mechanic_demo.json"
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	f.store_string(JSON.stringify(LEVEL))

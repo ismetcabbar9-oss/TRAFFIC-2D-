@@ -123,6 +123,9 @@ func load_level(index: int) -> void:
 	session.vehicle_locked.connect(_on_vehicle_locked)
 	session.vehicle_lifted.connect(_on_vehicle_lifted)
 	session.vehicle_restored.connect(_on_vehicle_restored)
+	session.vehicle_fell.connect(_on_vehicle_fell)
+	session.exploded.connect(_on_exploded)
+	session.bombs_ticked.connect(_on_bombs_ticked)
 	session.mistakes_changed.connect(func(_left: int): _refresh_rescues())
 	session.mistakes_changed.connect(func(left: int): hud.set_mistakes(left, level.mistakes))
 	session.won.connect(_on_won)
@@ -210,6 +213,15 @@ func _show_mechanic_tip(level: LevelData) -> void:
 	for e in level.obstacles:
 		if e.type == "gate":
 			tip = "GATE"
+	# Hazards win over mechanics: they are the new thing to learn here.
+	for e in level.vehicles:
+		if e.get("bomb", 0) > 0 and not "BOMB" in Progress.tips_seen:
+			tip = "BOMB"
+		elif e.type == "tanker" and not "TANKER" in Progress.tips_seen:
+			tip = "TANKER"
+	for e in level.obstacles:
+		if e.type == "pit" and not "PIT" in Progress.tips_seen:
+			tip = "PIT"
 	if tip == "" or tip in Progress.tips_seen:
 		return
 	Progress.mark_tip_seen(tip)
@@ -458,15 +470,23 @@ func _on_vehicle_crashed(id: int, result: BoardState.MoveResult) -> void:
 	var view: VehicleView = vehicle_views[id]
 	var target: Node3D = obstacle_views.get(result.contact_cell) if result.blocker < 0 \
 		else vehicle_views.get(result.blocker)
+	var impact := _on_crash_impact.bind(view, target, result.blocker)
+	if result.explodes:
+		var crashed: Array = [view]
+		if target is VehicleView:
+			crashed.append(target)
+		impact = func():
+			_on_crash_impact(view, target, result.blocker)
+			_explode(view.front_point(), crashed)
 	if result.turning:
-		view.play_turn_crash(_on_crash_impact.bind(view, target, result.blocker))
+		view.play_turn_crash(impact)
 		return
 	var cell_size := board.theme.cell_size
 	# From the car's center to the blocker's edge, minus the car's own half length.
 	var gap := view.length * cell_size * 0.5 + result.steps * cell_size - view.half_length
 	if target != null:
 		gap += target.inset_toward(view.dir)
-	view.play_crash(maxf(gap - 0.02, 0.05), _on_crash_impact.bind(view, target, result.blocker))
+	view.play_crash(maxf(gap - 0.02, 0.05), impact)
 
 
 func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
@@ -481,6 +501,11 @@ func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
 		Sfx.play("crash", -5.0, 1.3)
 		return
 	Sfx.play("crash", 0.0, 1.0, 0.1)
+	Sfx.play("glass_break", -9.0, 1.0, 0.1)
+	Effects.shards(effects, view.front_point(), push)
+	view.jolt(randf_range(0.12, 0.2) * (1.0 if randf() < 0.5 else -1.0))
+	if target is VehicleView:
+		(target as VehicleView).jolt(randf_range(-0.15, 0.15))
 	if target is VehicleView and randf() < horn_chance:
 		# The bumped car answers with its own horn; emergency vehicles often
 		# with their siren instead.
@@ -489,6 +514,83 @@ func _on_crash_impact(view: VehicleView, target: Node3D, blocker: int) -> void:
 		if VehicleCatalog.siren_sound(type) != "" and randf() < 0.5:
 			sound = VehicleCatalog.siren_sound(type)
 		get_tree().create_timer(0.12).timeout.connect(func(): Sfx.play(sound, -6.0, 1.0, 0.03))
+
+
+# --- Hazards -----------------------------------------------------------------------
+
+## A car drove into a pit: it tips in, dust flies and the pit is patched.
+func _on_vehicle_fell(id: int, result: BoardState.MoveResult) -> void:
+	var view: VehicleView = vehicle_views[id]
+	vehicle_views.erase(id)
+	_combo = 0
+	var pit_view: ObstacleView = obstacle_views.get(result.contact_cell)
+	obstacle_views.erase(result.contact_cell)
+	var pit := board.cell_to_world(Vector2(result.contact_cell))
+	Sfx.play("tire_squeal", -6.0, 0.9, 0.05)
+	view.play_fall(pit, func():
+		if result.explodes:
+			_explode(pit, [])
+			return
+		Sfx.play("pit_fall", 0.0, 1.0, 0.05)
+		Effects.dust_burst(effects, pit + Vector3.UP * 0.2, Color(0.72, 0.66, 0.58, 0.9))
+		camera.shake(0.35)
+		Haptics.pulse(60, 0.8)
+		if is_instance_valid(pit_view):
+			pit_view.fill())
+	if view.state.key >= 0 and not result.explodes:
+		_open_group(view.state.key, result.opened)
+	if not result.explodes:
+		_check_deadlock()
+
+
+## A bomb reached zero (tanker blasts start from their crash instead).
+func _on_exploded(id: int, cell: Vector2i) -> void:
+	if session.lose_reason != "bomb":
+		return
+	var view: VehicleView = vehicle_views.get(id)
+	_explode(board.cell_to_world(Vector2(cell)), [view] if view else [])
+
+
+## The blast: slow motion, flash and fire, the cars caught in it burnt and
+## the ones nearby thrown aside, heavy shake and rumble.
+func _explode(at: Vector3, burnt: Array) -> void:
+	_clear_hint()
+	_release_held_hint()
+	Effects.explosion(effects, at)
+	Sfx.play("explosion", 2.0, 1.0, 0.04)
+	Sfx.duck_music(3.0, -20.0)
+	camera.shake(1.0)
+	Haptics.pulse(400, 1.0)
+	for v in burnt:
+		if is_instance_valid(v):
+			var away: Vector3 = (v as VehicleView).global_position - at
+			away.y = 0.0
+			(v as VehicleView).play_burnt(away.normalized() if away.length() > 0.1 else Vector3.ZERO)
+	var reach := board.theme.cell_size * 2.6
+	for v in vehicle_views.values():
+		if v in burnt:
+			continue
+		var away: Vector3 = (v as VehicleView).global_position - at
+		away.y = 0.0
+		if away.length() < reach:
+			(v as VehicleView).nudge(away.normalized() * 2.5)
+			(v as VehicleView).jolt(randf_range(-0.3, 0.3))
+	# A heartbeat of slow motion (in real time, so it always ends).
+	Engine.time_scale = 0.3
+	get_tree().create_timer(0.45, true, false, true).timeout.connect(func(): Engine.time_scale = 1.0)
+
+
+## Every tap counts the bombs down: the numbers jump, beeps get higher.
+func _on_bombs_ticked() -> void:
+	var lowest := 99
+	for v in vehicle_views.values():
+		if (v as VehicleView).state.bomb > 0:
+			(v as VehicleView).update_bomb()
+			lowest = mini(lowest, (v as VehicleView).state.bomb)
+	if lowest < 99 and session.state == GameSession.State.PLAYING:
+		Sfx.play("bomb_beep", -4.0 if lowest <= 3 else -9.0, 1.0 if lowest > 3 else 1.25, 0.0)
+		if lowest <= 3:
+			Haptics.pulse(30, 0.6)
 
 
 func _on_won() -> void:
@@ -537,13 +639,16 @@ func _on_won() -> void:
 
 func _on_lost() -> void:
 	var played := session
+	var reason := session.lose_reason
 	Analytics.level("Fail", world_index, level_index, Daily.playing, -1,
-			{"time": snappedf(_clock - _level_start, 0.1), "cars_left": session.board.vehicles.size()})
-	await get_tree().create_timer(lose_delay).timeout
+			{"time": snappedf(_clock - _level_start, 0.1), "cars_left": session.board.vehicles.size(),
+			"reason": reason if reason != "" else "moves"})
+	# Let an explosion burn for a moment before the panel covers it.
+	await get_tree().create_timer(lose_delay + (1.6 if reason != "" else 0.0)).timeout
 	if played == session and session.state == GameSession.State.LOST:
 		Sfx.duck_music(2.0)
 		Sfx.play("lose", -2.0, 1.0, 0.0)
-		hud.show_lose({} if _onboarding else _continue_offer())
+		hud.show_lose({} if _onboarding else _continue_offer(), reason)
 
 
 # --- Rescues -------------------------------------------------------------------------
@@ -704,6 +809,7 @@ func _on_vehicle_restored(id: int) -> void:
 	var view: VehicleView = vehicle_views[id]
 	view.state = session.board.vehicles[id]
 	view.play_restore()
+	view.update_bomb(false)
 
 
 # --- Developer mode ---------------------------------------------------------------
