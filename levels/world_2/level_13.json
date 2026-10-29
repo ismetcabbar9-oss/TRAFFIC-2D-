@@ -4,111 +4,111 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "pickup",
+   "type": "taxi",
    "col": 2,
-   "row": 6,
-   "dir": "right",
-   "cargo": true
-  },
-  {
-   "type": "van",
-   "col": 0,
-   "row": 0,
-   "dir": "up",
-   "cargo": true
-  },
-  {
-   "type": "suv",
-   "col": 3,
    "row": 3,
    "dir": "up"
   },
   {
-   "type": "hatchback",
-   "col": 0,
-   "row": 2,
-   "dir": "down"
-  },
-  {
-   "type": "taxi",
-   "col": 4,
-   "row": 5,
-   "dir": "right"
-  },
-  {
-   "type": "sedan_sports",
+   "type": "delivery",
    "col": 1,
-   "row": 2,
-   "dir": "down"
+   "row": 1,
+   "dir": "left"
   },
   {
    "type": "van",
    "col": 4,
-   "row": 4,
+   "row": 1,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "delivery",
+   "col": 3,
+   "row": 3,
    "dir": "left",
    "cargo": true
   },
   {
    "type": "suv_luxury",
-   "col": 3,
-   "row": 0,
-   "dir": "left"
-  },
-  {
-   "type": "suv_luxury",
    "col": 2,
-   "row": 1,
-   "dir": "left"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 5,
    "row": 2,
-   "dir": "down"
+   "dir": "right"
   },
   {
-   "type": "hatchback",
+   "type": "firetruck",
    "col": 1,
-   "row": 4,
-   "dir": "left"
-  },
-  {
-   "type": "sedan_sports",
-   "col": 4,
-   "row": 1,
+   "row": 2,
    "dir": "up"
-  },
-  {
-   "type": "police",
-   "col": 5,
-   "row": 0,
-   "dir": "down"
   },
   {
    "type": "van",
    "col": 0,
-   "row": 6,
-   "dir": "right",
+   "row": 1,
+   "dir": "up",
    "cargo": true
   },
   {
-   "type": "sedan_sports",
+   "type": "police",
+   "col": 1,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "firetruck",
+   "col": 5,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "van",
    "col": 0,
+   "row": 5,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "delivery",
+   "col": 1,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 2,
    "row": 5,
    "dir": "right"
   },
   {
-   "type": "suv_luxury",
-   "col": 1,
-   "row": 0,
-   "dir": "left"
+   "type": "suv",
+   "col": 0,
+   "row": 3,
+   "dir": "up"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 2,
-   "row": 2
+   "col": 1,
+   "row": 5
   }
  ],
  "name": "Level 13"

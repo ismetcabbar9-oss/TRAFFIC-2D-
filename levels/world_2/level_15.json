@@ -4,97 +4,97 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "sedan",
-   "col": 1,
-   "row": 3,
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 2,
    "dir": "left"
   },
   {
    "type": "suv_luxury",
    "col": 4,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 3,
    "row": 0,
-   "dir": "right"
-  },
-  {
-   "type": "firetruck",
-   "col": 4,
-   "row": 1,
-   "dir": "down"
-  },
-  {
-   "type": "pickup",
-   "col": 2,
-   "row": 2,
-   "dir": "right",
+   "dir": "left",
    "cargo": true
   },
   {
-   "type": "pickup",
+   "type": "van",
    "col": 0,
+   "row": 6,
+   "dir": "left",
+   "cargo": true
+  },
+  {
+   "type": "sedan_sports",
+   "col": 2,
+   "row": 5,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
    "row": 4,
-   "dir": "down"
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 2,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 3,
+   "dir": "right"
   },
   {
    "type": "pickup",
-   "col": 0,
-   "row": 6,
+   "col": 3,
+   "row": 1,
    "dir": "left",
    "cargo": true
   },
   {
    "type": "suv",
-   "col": 3,
-   "row": 3,
-   "dir": "up"
-  },
-  {
-   "type": "police",
-   "col": 1,
-   "row": 0,
-   "dir": "left"
-  },
-  {
-   "type": "van",
-   "col": 4,
-   "row": 6,
-   "dir": "left",
-   "cargo": true
-  },
-  {
-   "type": "suv_luxury",
-   "col": 1,
-   "row": 1,
-   "dir": "left"
-  },
-  {
-   "type": "sedan",
-   "col": 1,
-   "row": 4,
-   "dir": "right"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 5,
-   "row": 2,
-   "dir": "down"
-  },
-  {
-   "type": "sedan",
-   "col": 3,
-   "row": 0,
-   "dir": "up"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 4,
-   "row": 4,
-   "dir": "right"
-  },
-  {
-   "type": "sedan",
    "col": 0,
-   "row": 1,
+   "row": 0,
    "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 1,
+   "row": 0,
+   "dir": "down"
   }
  ],
  "obstacles": [],

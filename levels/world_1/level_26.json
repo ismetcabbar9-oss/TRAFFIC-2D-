@@ -4,112 +4,112 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "pickup",
-   "col": 3,
-   "row": 1,
-   "dir": "up"
-  },
-  {
    "type": "sedan",
-   "col": 4,
-   "row": 0,
-   "dir": "left"
+   "col": 1,
+   "row": 2,
+   "dir": "down"
   },
   {
-   "type": "van",
-   "col": 4,
-   "row": 3,
-   "dir": "left"
+   "type": "police",
+   "col": 2,
+   "row": 1,
+   "dir": "down"
   },
   {
-   "type": "sedan_sports",
+   "type": "delivery",
+   "col": 0,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
    "col": 0,
    "row": 0,
    "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 3,
+   "dir": "left"
   },
   {
    "type": "suv_luxury",
    "col": 5,
-   "row": 4,
+   "row": 3,
    "dir": "down"
   },
   {
-   "type": "police",
-   "col": 3,
-   "row": 5,
-   "dir": "up"
+   "type": "hatchback",
+   "col": 1,
+   "row": 6,
+   "dir": "right"
   },
   {
-   "type": "sedan",
-   "col": 1,
-   "row": 2,
-   "dir": "up"
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 5,
+   "dir": "left"
   },
   {
    "type": "suv",
-   "col": 0,
-   "row": 3,
-   "dir": "down"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 4,
-   "row": 1,
-   "dir": "right"
-  },
-  {
-   "type": "hatchback",
-   "col": 4,
-   "row": 2,
-   "dir": "right"
-  },
-  {
-   "type": "police",
-   "col": 1,
-   "row": 6,
-   "dir": "left"
-  },
-  {
-   "type": "hatchback",
-   "col": 4,
-   "row": 5,
-   "dir": "up"
-  },
-  {
-   "type": "taxi",
-   "col": 1,
-   "row": 1,
-   "dir": "left"
-  },
-  {
-   "type": "suv_luxury",
    "col": 2,
-   "row": 3,
+   "row": 5,
    "dir": "left"
   },
   {
-   "type": "bus",
+   "type": "suv_luxury",
    "col": 1,
    "row": 0,
    "dir": "left"
   },
   {
-   "type": "police",
+   "type": "suv_luxury",
+   "col": 4,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "ambulance",
+   "col": 5,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
    "col": 0,
    "row": 5,
-   "dir": "down"
+   "dir": "left"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
    "col": 1,
-   "row": 5
+   "row": 1
   },
   {
    "type": "cone",
-   "col": 2,
-   "row": 4
+   "col": 3,
+   "row": 1
   }
  ],
  "name": "Level 26"

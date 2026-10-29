@@ -4,111 +4,111 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "bus",
-   "col": 1,
-   "row": 3,
-   "dir": "down"
-  },
-  {
-   "type": "suv",
-   "col": 1,
-   "row": 0,
-   "dir": "left"
-  },
-  {
-   "type": "sedan_sports",
-   "col": 4,
+   "type": "hatchback",
+   "col": 3,
    "row": 4,
    "dir": "up"
   },
   {
    "type": "hatchback",
-   "col": 0,
-   "row": 4,
-   "dir": "down"
+   "col": 3,
+   "row": 1,
+   "dir": "up",
+   "turn": "cw"
   },
   {
-   "type": "van",
-   "col": 5,
+   "type": "sedan",
+   "col": 0,
+   "row": 2,
+   "dir": "up",
+   "turn": "cw"
+  },
+  {
+   "type": "firetruck",
+   "col": 2,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
    "row": 0,
-   "dir": "down",
+   "dir": "left",
    "cargo": true
   },
   {
+   "type": "police",
+   "col": 5,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 4,
+   "row": 6,
+   "dir": "left"
+  },
+  {
    "type": "van",
-   "col": 2,
-   "row": 5,
-   "dir": "down",
+   "col": 1,
+   "row": 2,
+   "dir": "left",
    "turn": "ccw"
   },
   {
    "type": "taxi",
-   "col": 1,
-   "row": 1,
-   "dir": "up"
-  },
-  {
-   "type": "ambulance",
-   "col": 3,
-   "row": 2,
-   "dir": "down"
-  },
-  {
-   "type": "sedan",
    "col": 4,
-   "row": 1,
-   "dir": "up",
-   "turn": "ccw"
+   "row": 5,
+   "dir": "left"
   },
   {
-   "type": "suv_luxury",
-   "col": 4,
-   "row": 6,
-   "dir": "right"
-  },
-  {
-   "type": "suv_luxury",
+   "type": "hatchback",
    "col": 0,
-   "row": 0,
-   "dir": "up"
+   "row": 4,
+   "dir": "left",
+   "turn": "cw"
   },
   {
    "type": "van",
    "col": 2,
-   "row": 2,
-   "dir": "up",
-   "turn": "cw"
+   "row": 0,
+   "dir": "up"
   },
   {
-   "type": "pickup",
-   "col": 0,
-   "row": 2,
-   "dir": "up",
-   "turn": "cw"
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 5,
+   "dir": "left"
   },
   {
-   "type": "van",
-   "col": 0,
+   "type": "taxi",
+   "col": 1,
    "row": 6,
    "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 5,
-   "row": 3,
-   "dir": "down"
+   "col": 4,
+   "row": 2,
+   "dir": "right"
   },
   {
-   "type": "suv",
-   "col": 3,
-   "row": 0,
-   "dir": "right"
+   "type": "hatchback",
+   "col": 0,
+   "row": 1,
+   "dir": "left"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 3,
+   "col": 4,
    "row": 1
   }
  ],

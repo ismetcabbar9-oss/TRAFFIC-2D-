@@ -4,81 +4,50 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "suv_luxury",
-   "col": 0,
-   "row": 7,
-   "dir": "left"
-  },
-  {
-   "type": "sedan_sports",
-   "col": 6,
-   "row": 6,
-   "dir": "up"
-  },
-  {
-   "type": "suv",
+   "type": "pickup",
    "col": 3,
-   "row": 7,
-   "dir": "left",
-   "turn": "cw"
-  },
-  {
-   "type": "firetruck",
-   "col": 1,
-   "row": 5,
-   "dir": "left",
-   "lock": 0
-  },
-  {
-   "type": "firetruck",
-   "col": 5,
-   "row": 5,
-   "dir": "up"
-  },
-  {
-   "type": "firetruck",
-   "col": 1,
-   "row": 0,
-   "dir": "right"
-  },
-  {
-   "type": "hatchback",
-   "col": 0,
-   "row": 1,
+   "row": 4,
    "dir": "left",
    "turn": "ccw"
   },
   {
+   "type": "suv_luxury",
+   "col": 5,
+   "row": 1,
+   "dir": "up",
+   "turn": "ccw"
+  },
+  {
    "type": "suv",
-   "col": 1,
-   "row": 6,
-   "dir": "left",
+   "col": 3,
+   "row": 1,
+   "dir": "down",
    "key": 0
   },
   {
-   "type": "bus",
-   "col": 0,
-   "row": 2,
-   "dir": "left",
-   "lock": 0
+   "type": "delivery",
+   "col": 3,
+   "row": 6,
+   "dir": "right"
   },
   {
    "type": "delivery",
-   "col": 5,
-   "row": 1,
-   "dir": "up"
+   "col": 1,
+   "row": 5,
+   "dir": "right",
+   "key": 1
   },
   {
-   "type": "ambulance",
+   "type": "suv_luxury",
    "col": 0,
-   "row": 3,
+   "row": 2,
    "dir": "left"
   },
   {
-   "type": "firetruck",
+   "type": "hatchback",
    "col": 4,
    "row": 3,
-   "dir": "up"
+   "dir": "right"
   },
   {
    "type": "hatchback",
@@ -87,62 +56,99 @@
    "dir": "right"
   },
   {
-   "type": "suv_luxury",
-   "col": 3,
-   "row": 2,
-   "dir": "right"
-  },
-  {
-   "type": "ambulance",
-   "col": 2,
-   "row": 1,
-   "dir": "right"
-  },
-  {
-   "type": "sedan_sports",
-   "col": 5,
-   "row": 4,
-   "dir": "left"
-  },
-  {
-   "type": "taxi",
-   "col": 0,
+   "type": "bus",
+   "col": 6,
    "row": 5,
-   "dir": "down",
-   "key": 1
+   "dir": "down"
   },
   {
    "type": "taxi",
-   "col": 0,
-   "row": 4,
-   "dir": "left",
+   "col": 2,
+   "row": 2,
+   "dir": "up",
+   "lock": 0
+  },
+  {
+   "type": "hatchback",
+   "col": 2,
+   "row": 6,
+   "dir": "up",
    "lock": 1
   },
   {
+   "type": "sedan",
+   "col": 1,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 4,
+   "row": 1,
+   "dir": "up"
+  },
+  {
    "type": "sedan_sports",
+   "col": 3,
+   "row": 7,
+   "dir": "right",
+   "lock": 1
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
    "col": 6,
    "row": 2,
    "dir": "up"
   },
   {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 5,
+   "dir": "up"
+  },
+  {
    "type": "hatchback",
-   "col": 2,
-   "row": 4,
-   "dir": "left"
+   "col": 4,
+   "row": 5,
+   "dir": "right"
   },
   {
    "type": "hatchback",
    "col": 6,
    "row": 0,
    "dir": "up",
-   "lock": 1
+   "lock": 0
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 3,
-   "row": 6
+   "col": 1,
+   "row": 3
   }
  ],
  "name": "Level 24"

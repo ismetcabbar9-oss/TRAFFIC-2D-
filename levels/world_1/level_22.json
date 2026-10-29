@@ -4,101 +4,101 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "suv_luxury",
-   "col": 4,
-   "row": 0,
-   "dir": "right"
-  },
-  {
-   "type": "hatchback",
-   "col": 1,
-   "row": 0,
-   "dir": "down"
-  },
-  {
    "type": "sedan",
-   "col": 4,
-   "row": 3,
-   "dir": "down"
-  },
-  {
-   "type": "hatchback",
-   "col": 4,
-   "row": 5,
-   "dir": "down"
-  },
-  {
-   "type": "suv",
-   "col": 4,
-   "row": 1,
-   "dir": "right"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 1,
-   "row": 3,
-   "dir": "left"
-  },
-  {
-   "type": "pickup",
-   "col": 0,
-   "row": 4,
-   "dir": "down"
-  },
-  {
-   "type": "sedan",
-   "col": 0,
-   "row": 0,
-   "dir": "down"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 3,
-   "row": 2,
-   "dir": "left"
-  },
-  {
-   "type": "suv",
-   "col": 1,
-   "row": 2,
-   "dir": "left"
-  },
-  {
-   "type": "suv",
-   "col": 1,
-   "row": 4,
-   "dir": "left"
-  },
-  {
-   "type": "police",
-   "col": 2,
-   "row": 0,
-   "dir": "right"
-  },
-  {
-   "type": "police",
-   "col": 0,
-   "row": 2,
-   "dir": "down"
-  },
-  {
-   "type": "suv_luxury",
    "col": 5,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
    "row": 2,
    "dir": "up"
   },
   {
-   "type": "bus",
+   "type": "suv",
    "col": 0,
-   "row": 6,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 3,
+   "row": 1,
    "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "firetruck",
+   "col": 4,
+   "row": 4,
+   "dir": "up"
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 0,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 3,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 6,
+   "dir": "left"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 3,
-   "row": 3
+   "col": 1,
+   "row": 4
   }
  ],
  "name": "Level 22"

@@ -4,184 +4,178 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "pickup",
-   "col": 0,
+   "type": "delivery",
+   "col": 1,
+   "row": 3,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "police",
+   "col": 6,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 5,
    "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 6,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "van",
+   "col": 3,
+   "row": 1,
+   "dir": "up",
+   "cargo": true
+  },
+  {
+   "type": "hatchback",
+   "col": 7,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "pickup",
+   "col": 7,
+   "row": 5,
+   "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 2,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 6,
+   "row": 2,
+   "dir": "up"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 5,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 0,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "ambulance",
+   "col": 2,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 3,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "sedan",
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "van",
+   "col": 6,
+   "row": 5,
    "dir": "up",
    "cargo": true
   },
   {
    "type": "sedan",
-   "col": 1,
-   "row": 3,
-   "dir": "down"
-  },
-  {
-   "type": "hatchback",
-   "col": 6,
-   "row": 6,
-   "dir": "down"
-  },
-  {
-   "type": "pickup",
-   "col": 6,
-   "row": 1,
-   "dir": "down",
-   "cargo": true
-  },
-  {
-   "type": "police",
-   "col": 7,
-   "row": 2,
-   "dir": "down"
-  },
-  {
-   "type": "delivery",
-   "col": 3,
-   "row": 2,
-   "dir": "right",
-   "cargo": true
-  },
-  {
-   "type": "suv",
-   "col": 3,
-   "row": 6,
-   "dir": "left"
-  },
-  {
-   "type": "van",
-   "col": 5,
-   "row": 3,
-   "dir": "up",
-   "cargo": true
-  },
-  {
-   "type": "police",
    "col": 0,
-   "row": 3,
-   "dir": "up"
-  },
-  {
-   "type": "taxi",
-   "col": 3,
-   "row": 0,
-   "dir": "down"
-  },
-  {
-   "type": "taxi",
-   "col": 1,
-   "row": 6,
-   "dir": "left"
-  },
-  {
-   "type": "police",
-   "col": 1,
    "row": 0,
    "dir": "down"
   },
   {
    "type": "sedan_sports",
    "col": 1,
-   "row": 5,
-   "dir": "right"
-  },
-  {
-   "type": "van",
-   "col": 6,
-   "row": 0,
-   "dir": "left",
-   "cargo": true
-  },
-  {
-   "type": "suv",
-   "col": 3,
    "row": 4,
-   "dir": "right"
-  },
-  {
-   "type": "hatchback",
-   "col": 2,
-   "row": 7,
-   "dir": "right"
-  },
-  {
-   "type": "van",
-   "col": 7,
-   "row": 4,
-   "dir": "down"
-  },
-  {
-   "type": "police",
-   "col": 0,
-   "row": 6,
-   "dir": "down"
-  },
-  {
-   "type": "police",
-   "col": 0,
-   "row": 2,
-   "dir": "right"
-  },
-  {
-   "type": "taxi",
-   "col": 3,
-   "row": 3,
    "dir": "left"
-  },
-  {
-   "type": "hatchback",
-   "col": 2,
-   "row": 1,
-   "dir": "down"
   },
   {
    "type": "police",
    "col": 4,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 7,
    "row": 0,
    "dir": "up"
   },
   {
    "type": "pickup",
-   "col": 6,
-   "row": 3,
-   "dir": "down"
-  },
-  {
-   "type": "hatchback",
-   "col": 7,
-   "row": 6,
-   "dir": "down"
-  },
-  {
-   "type": "hatchback",
-   "col": 4,
-   "row": 7,
-   "dir": "right"
-  },
-  {
-   "type": "taxi",
-   "col": 2,
-   "row": 3,
-   "dir": "down"
-  },
-  {
-   "type": "pickup",
-   "col": 5,
+   "col": 1,
    "row": 5,
-   "dir": "right"
-  },
-  {
-   "type": "van",
-   "col": 3,
-   "row": 5,
-   "dir": "right"
+   "dir": "left",
+   "cargo": true
   }
  ],
  "obstacles": [
   {
    "type": "cone",
    "col": 5,
-   "row": 6
+   "row": 2
   }
  ],
  "name": "Level 30",

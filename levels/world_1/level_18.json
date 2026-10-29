@@ -4,112 +4,112 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "sedan",
-   "col": 3,
-   "row": 1,
-   "dir": "down"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 5,
-   "row": 3,
-   "dir": "up"
-  },
-  {
-   "type": "sedan",
-   "col": 1,
-   "row": 2,
-   "dir": "up"
-  },
-  {
-   "type": "bus",
-   "col": 1,
-   "row": 4,
-   "dir": "down"
-  },
-  {
-   "type": "police",
-   "col": 2,
-   "row": 4,
-   "dir": "left"
-  },
-  {
-   "type": "van",
-   "col": 3,
-   "row": 5,
-   "dir": "right"
-  },
-  {
-   "type": "suv",
-   "col": 2,
-   "row": 3,
-   "dir": "left"
-  },
-  {
-   "type": "sedan",
-   "col": 2,
-   "row": 1,
-   "dir": "up"
-  },
-  {
-   "type": "bus",
+   "type": "sedan_sports",
    "col": 0,
-   "row": 4,
-   "dir": "up"
+   "row": 6,
+   "dir": "right"
   },
   {
-   "type": "pickup",
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
    "col": 1,
    "row": 0,
-   "dir": "right"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 3,
-   "row": 0,
-   "dir": "right"
+   "dir": "left"
   },
   {
    "type": "ambulance",
-   "col": 3,
-   "row": 6,
-   "dir": "left"
+   "col": 1,
+   "row": 1,
+   "dir": "up"
   },
   {
    "type": "van",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "delivery",
+   "col": 0,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "suv_luxury",
    "col": 4,
    "row": 1,
    "dir": "up"
   },
   {
-   "type": "police",
-   "col": 5,
+   "type": "sedan",
+   "col": 3,
    "row": 0,
    "dir": "up"
   },
   {
-   "type": "taxi",
-   "col": 0,
-   "row": 1,
-   "dir": "left"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 2,
+   "type": "hatchback",
+   "col": 3,
    "row": 5,
    "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 1,
+   "dir": "up"
+  },
+  {
+   "type": "firetruck",
+   "col": 5,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 4,
+   "dir": "right"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 4,
-   "row": 4
+   "col": 2,
+   "row": 5
   },
   {
    "type": "cone",
-   "col": 4,
-   "row": 3
+   "col": 1,
+   "row": 5
   }
  ],
  "name": "Level 18"

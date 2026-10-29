@@ -4,180 +4,174 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "sedan_sports",
-   "col": 0,
-   "row": 4,
-   "dir": "down",
-   "turn": "ccw"
-  },
-  {
-   "type": "van",
-   "col": 2,
-   "row": 6,
-   "dir": "left",
-   "cargo": true
-  },
-  {
-   "type": "sedan_sports",
-   "col": 1,
-   "row": 7,
-   "dir": "left",
-   "turn": "cw"
-  },
-  {
-   "type": "sedan",
-   "col": 5,
-   "row": 1,
-   "dir": "left"
-  },
-  {
-   "type": "police",
-   "col": 1,
-   "row": 2,
-   "dir": "left"
-  },
-  {
    "type": "firetruck",
-   "col": 6,
+   "col": 5,
    "row": 2,
-   "dir": "up"
-  },
-  {
-   "type": "sedan_sports",
-   "col": 7,
-   "row": 6,
-   "dir": "down"
+   "dir": "left"
   },
   {
    "type": "hatchback",
-   "col": 3,
-   "row": 2,
+   "col": 6,
+   "row": 4,
    "dir": "up"
   },
   {
-   "type": "van",
-   "col": 5,
-   "row": 3,
-   "dir": "down",
-   "cargo": true
-  },
-  {
-   "type": "firetruck",
-   "col": 5,
-   "row": 0,
-   "dir": "left"
-  },
-  {
-   "type": "van",
-   "col": 5,
-   "row": 5,
-   "dir": "left",
-   "turn": "cw"
-  },
-  {
-   "type": "pickup",
+   "type": "sedan_sports",
    "col": 1,
-   "row": 5,
-   "dir": "up"
-  },
-  {
-   "type": "sedan",
-   "col": 2,
-   "row": 5,
-   "dir": "left"
-  },
-  {
-   "type": "pickup",
-   "col": 5,
-   "row": 7,
-   "dir": "right"
+   "row": 2,
+   "dir": "down"
   },
   {
    "type": "taxi",
-   "col": 4,
-   "row": 6,
+   "col": 2,
+   "row": 0,
    "dir": "left"
   },
   {
-   "type": "suv_luxury",
+   "type": "hatchback",
    "col": 2,
-   "row": 0,
-   "dir": "up",
+   "row": 5,
+   "dir": "left",
    "turn": "ccw"
+  },
+  {
+   "type": "pickup",
+   "col": 6,
+   "row": 0,
+   "dir": "down",
+   "turn": "ccw"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
+   "row": 3,
+   "dir": "right",
+   "cargo": true
   },
   {
    "type": "ambulance",
-   "col": 0,
-   "row": 1,
-   "dir": "up"
-  },
-  {
-   "type": "taxi",
-   "col": 7,
-   "row": 4,
-   "dir": "up"
-  },
-  {
-   "type": "hatchback",
    "col": 4,
-   "row": 3,
-   "dir": "up"
-  },
-  {
-   "type": "suv",
-   "col": 1,
-   "row": 0,
-   "dir": "up",
-   "turn": "ccw"
-  },
-  {
-   "type": "suv_luxury",
-   "col": 3,
    "row": 7,
    "dir": "right"
   },
   {
-   "type": "suv_luxury",
+   "type": "pickup",
+   "col": 7,
+   "row": 0,
+   "dir": "down",
+   "cargo": true
+  },
+  {
+   "type": "taxi",
    "col": 0,
    "row": 6,
-   "dir": "down"
-  },
-  {
-   "type": "suv",
-   "col": 1,
-   "row": 3,
-   "dir": "left"
-  },
-  {
-   "type": "hatchback",
-   "col": 3,
-   "row": 0,
-   "dir": "up"
-  },
-  {
-   "type": "van",
-   "col": 2,
-   "row": 4,
-   "dir": "right"
+   "dir": "right",
+   "turn": "ccw"
   },
   {
    "type": "taxi",
    "col": 4,
-   "row": 1,
-   "dir": "up"
+   "row": 0,
+   "dir": "right",
+   "turn": "cw"
+  },
+  {
+   "type": "pickup",
+   "col": 0,
+   "row": 0,
+   "dir": "up",
+   "turn": "cw"
+  },
+  {
+   "type": "taxi",
+   "col": 3,
+   "row": 6,
+   "dir": "left"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 5,
+   "dir": "right"
   },
   {
    "type": "sedan",
-   "col": 7,
-   "row": 2,
+   "col": 3,
+   "row": 4,
+   "dir": "left"
+  },
+  {
+   "type": "ambulance",
+   "col": 5,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 6,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "taxi",
+   "col": 1,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "police",
+   "col": 0,
+   "row": 3,
    "dir": "up"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 3,
+   "dir": "right"
+  },
+  {
+   "type": "sedan",
+   "col": 2,
+   "row": 7,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 0,
+   "row": 7,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 2,
+   "row": 2,
+   "dir": "left"
+  },
+  {
+   "type": "hatchback",
+   "col": 7,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "hatchback",
+   "col": 3,
+   "row": 1,
+   "dir": "right"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
    "col": 5,
-   "row": 2
+   "row": 4
   }
  ],
  "name": "Level 31"

@@ -4,39 +4,81 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "suv",
-   "col": 5,
-   "row": 5,
-   "dir": "down"
-  },
-  {
    "type": "sedan_sports",
    "col": 3,
-   "row": 5,
+   "row": 4,
    "dir": "left"
   },
   {
-   "type": "hatchback",
+   "type": "police",
+   "col": 1,
+   "row": 2,
+   "dir": "down"
+  },
+  {
+   "type": "taxi",
+   "col": 4,
+   "row": 1,
+   "dir": "left"
+  },
+  {
+   "type": "police",
+   "col": 2,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 0,
+   "row": 0,
+   "dir": "down"
+  },
+  {
+   "type": "delivery",
    "col": 2,
    "row": 2,
    "dir": "up"
   },
   {
    "type": "suv_luxury",
-   "col": 2,
+   "col": 3,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "suv_luxury",
+   "col": 1,
    "row": 0,
    "dir": "up"
   },
   {
-   "type": "sedan",
+   "type": "police",
+   "col": 0,
+   "row": 4,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 5,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "hatchback",
+   "col": 5,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "suv",
    "col": 1,
    "row": 4,
    "dir": "down"
   },
   {
-   "type": "van",
-   "col": 1,
-   "row": 0,
+   "type": "sedan_sports",
+   "col": 0,
+   "row": 2,
    "dir": "down"
   },
   {
@@ -46,59 +88,17 @@
    "dir": "right"
   },
   {
-   "type": "sedan",
-   "col": 0,
-   "row": 3,
-   "dir": "right"
-  },
-  {
-   "type": "suv",
-   "col": 4,
-   "row": 0,
-   "dir": "left"
-  },
-  {
-   "type": "sedan_sports",
+   "type": "van",
    "col": 3,
-   "row": 1,
-   "dir": "left"
-  },
-  {
-   "type": "hatchback",
-   "col": 4,
    "row": 3,
-   "dir": "right"
-  },
-  {
-   "type": "suv",
-   "col": 4,
-   "row": 4,
    "dir": "left"
-  },
-  {
-   "type": "taxi",
-   "col": 2,
-   "row": 4,
-   "dir": "left"
-  },
-  {
-   "type": "sedan",
-   "col": 5,
-   "row": 1,
-   "dir": "up"
-  },
-  {
-   "type": "sedan",
-   "col": 0,
-   "row": 4,
-   "dir": "down"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 4,
-   "row": 2
+   "col": 2,
+   "row": 5
   }
  ],
  "name": "Level 14"

@@ -4,104 +4,103 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "taxi",
-   "col": 3,
-   "row": 1,
-   "dir": "right"
-  },
-  {
-   "type": "bus",
-   "col": 0,
-   "row": 1,
+   "type": "sedan_sports",
+   "col": 1,
+   "row": 3,
    "dir": "right"
   },
   {
    "type": "police",
+   "col": 5,
+   "row": 1,
+   "dir": "down"
+  },
+  {
+   "type": "sedan_sports",
    "col": 0,
-   "row": 2,
+   "row": 4,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
+   "col": 4,
+   "row": 3,
+   "dir": "down"
+  },
+  {
+   "type": "sedan",
+   "col": 4,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 3,
+   "row": 5,
+   "dir": "right"
+  },
+  {
+   "type": "hatchback",
+   "col": 5,
+   "row": 5,
    "dir": "down"
   },
   {
    "type": "taxi",
-   "col": 4,
+   "col": 1,
    "row": 6,
    "dir": "right"
   },
   {
    "type": "pickup",
+   "col": 3,
+   "row": 6,
+   "dir": "right"
+  },
+  {
+   "type": "police",
+   "col": 3,
+   "row": 1,
+   "dir": "right"
+  },
+  {
+   "type": "suv",
    "col": 0,
+   "row": 5,
+   "dir": "down"
+  },
+  {
+   "type": "pickup",
+   "col": 2,
    "row": 4,
+   "dir": "right",
+   "cargo": true
+  },
+  {
+   "type": "pickup",
+   "col": 1,
+   "row": 0,
    "dir": "left",
    "cargo": true
   },
   {
-   "type": "bus",
+   "type": "suv",
    "col": 1,
-   "row": 6,
-   "dir": "left"
+   "row": 1,
+   "dir": "right"
   },
   {
-   "type": "delivery",
-   "col": 2,
-   "row": 0,
-   "dir": "right",
-   "cargo": true
-  },
-  {
-   "type": "pickup",
+   "type": "hatchback",
    "col": 0,
-   "row": 5,
-   "dir": "right",
-   "cargo": true
-  },
-  {
-   "type": "sedan_sports",
-   "col": 4,
-   "row": 4,
-   "dir": "left"
-  },
-  {
-   "type": "suv",
-   "col": 2,
-   "row": 4,
-   "dir": "up"
-  },
-  {
-   "type": "hatchback",
-   "col": 3,
-   "row": 5,
-   "dir": "right"
-  },
-  {
-   "type": "sedan_sports",
-   "col": 5,
    "row": 0,
-   "dir": "up"
-  },
-  {
-   "type": "van",
-   "col": 3,
-   "row": 2,
    "dir": "down"
-  },
-  {
-   "type": "hatchback",
-   "col": 1,
-   "row": 2,
-   "dir": "right"
-  },
-  {
-   "type": "suv",
-   "col": 5,
-   "row": 2,
-   "dir": "up"
   }
  ],
  "obstacles": [
   {
    "type": "cone",
-   "col": 4,
-   "row": 3
+   "col": 1,
+   "row": 2
   }
  ],
  "name": "Level 11"
