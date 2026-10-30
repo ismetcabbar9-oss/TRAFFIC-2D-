@@ -447,6 +447,7 @@ func _on_vehicle_exited(id: int, result: BoardState.MoveResult) -> void:
 	_last_out = view
 	view.play_exit()
 	Progress.add_stat("cars")
+	Quests.report(Progress, "cars")
 	_play_launch_sounds(view.type)
 	Haptics.pulse(12, 0.4)
 	_count_combo(view)
@@ -515,6 +516,8 @@ func _count_combo(view: VehicleView) -> void:
 	_combo = _combo + 1 if _clock - _last_exit_time <= combo_window else 1
 	_last_exit_time = _clock
 	_best_combo = maxi(_best_combo, _combo)
+	if _combo >= 2:
+		Quests.report(Progress, "combo", _combo)
 	Progress.max_stat("best_combo", _combo)
 	if _combo < 2:
 		return
@@ -812,6 +815,7 @@ func _on_rush_over() -> void:
 		_rush_marker.queue_free()
 	var best_before := _rush_best_before
 	Progress.max_stat("rush_best", _rush_score)
+	Quests.report(Progress, "rush_score", _rush_score)
 	if not _rush_continued:
 		Progress.add_stat("rush_runs")
 	var per_coin := int(Economy.value("rush_points_per_coin"))
@@ -859,6 +863,15 @@ func _on_won() -> void:
 	}
 	if record.has("streak"):
 		result["streak"] = record.streak
+	Quests.report(Progress, "level_won")
+	if stars == 3:
+		Quests.report(Progress, "perfect")
+	if Daily.playing:
+		Quests.report(Progress, "daily")
+	if session.level.vehicles.any(func(e): return e.type == "tanker"):
+		Quests.report(Progress, "tanker_level")
+	if session.level.vehicles.any(func(e): return e.get("bomb", 0) > 0):
+		Quests.report(Progress, "bomb_level")
 	Analytics.level("Complete", world_index, level_index, Daily.playing, stars,
 			{"time": snappedf(time, 0.1), "crashes": session.crashes, "taps": session.taps, "combo": _best_combo})
 	if _onboarding:

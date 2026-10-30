@@ -281,3 +281,17 @@ WHEEL_AD,Watch an ad and spin (%d left),Reklam izle ve çevir (%d kaldı)
 WHEEL_TOMORROW,Come back tomorrow,Yarın tekrar gel
 WHEEL_COINS,coins,jeton
 WHEEL_WON,You won %s!,%s kazandın!
+QUESTS_TITLE,Daily quests,Günlük görevler
+QUESTS_NOTE,Three new quests every day. Finish all three for a bonus chest.,Her gün üç yeni görev. Üçünü de bitir: bonus sandık senin.
+QUEST_LEVELS_3,Clear 3 levels,3 bölüm bitir
+QUEST_PERFECT_2,Clear 2 levels without a mistake,2 bölümü hatasız bitir
+QUEST_CARS_40,Get 40 cars out,40 aracı çıkar
+QUEST_COMBO_5,Reach a x5 combo,x5 combo yap
+QUEST_DAILY_1,Solve the daily puzzle,Günlük bulmacayı çöz
+QUEST_RUSH_300,Score 300 in Rush Hour,Yoğun Trafik'te 300 puan yap
+QUEST_TANKER_1,Clear a level with a fuel tanker,Tankerli bir bölüm bitir
+QUEST_BOMB_1,Clear a level with a time bomb,Bombalı bir bölüm bitir
+QUEST_CLAIM,Collect,Al
+QUEST_DOUBLE,x2 · ad,x2 · reklam
+QUEST_CHEST,Bonus chest · +%d coins,Bonus sandık · +%d jeton
+QUEST_CHEST_OPENED,Chest opened: see you tomorrow!,Sandık açıldı: yarın görüşürüz!

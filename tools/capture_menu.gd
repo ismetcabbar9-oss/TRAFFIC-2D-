@@ -25,7 +25,11 @@ func _initialize() -> void:
 	progress.daily_puzzle = {"last_day": Daily.day_before(Daily.today()), "streak": 3}
 	progress.stats = {"cars": 140, "best_combo": 5, "cranes": 1}
 	progress.claimed = ["first_win"]
-	for page in ["home", "world", "settings", "credits", "shop", "garage", "gift", "achievements", "wheel"]:
+	progress.daily = {"day": Time.get_date_string_from_system(), "quests": [
+		{"id": "levels_3", "progress": 3, "claimed": false},
+		{"id": "combo_5", "progress": 3, "claimed": false},
+		{"id": "cars_40", "progress": 40, "claimed": true}]}
+	for page in ["home", "world", "settings", "credits", "shop", "garage", "gift", "achievements", "wheel", "quests"]:
 		menu._show(page, false)
 		for i in 20:
 			await process_frame

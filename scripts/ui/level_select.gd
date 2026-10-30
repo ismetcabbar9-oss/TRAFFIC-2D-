@@ -52,6 +52,7 @@ func _ready() -> void:
 	_pages["dev"] = _page()
 	_pages["events"] = _page()
 	_pages["wheel"] = _page()
+	_pages["quests"] = _page()
 	# A brand-new player goes straight into level 1: no menu before playing.
 	if not _launched and Progress.in_onboarding():
 		_launched = true
@@ -133,6 +134,7 @@ func _show(page: String, animate := true) -> void:
 		"dev": _build_dev()
 		"events": _build_events()
 		"wheel": _build_wheel()
+		"quests": _build_quests()
 	for name in _pages:
 		(_pages[name] as Control).get_parent().get_parent().visible = name == page
 	var shown: Control = (_pages[page] as Control).get_parent().get_parent()
@@ -196,6 +198,7 @@ func _build_home() -> void:
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	page.add_child(subtitle)
 
+	page.add_child(_quests_card())
 	page.add_child(_rush_card())
 	for w in LevelCatalog.world_count():
 		page.add_child(_world_card(w))
@@ -925,6 +928,100 @@ func _start_daily() -> void:
 			await get_tree().process_frame
 	Daily.start()
 	Transition.change_scene(GAME_SCENE)
+
+
+## Slim card above the modes: today's quests done and a dot when coins wait.
+func _quests_card() -> Button:
+	var quests := Quests.today(Progress)
+	var done := quests.filter(func(e): return Quests.done(e)).size()
+	var card := Button.new()
+	card.theme_type_variation = "IconButton"
+	card.custom_minimum_size = Vector2(0, 76)
+	card.focus_mode = Control.FOCUS_NONE
+	card.text = "%s   %d/%d" % [tr("QUESTS_TITLE"), done, quests.size()]
+	card.add_theme_font_size_override("font_size", 28)
+	card.pressed.connect(func():
+		_click()
+		_show("quests"))
+	if Quests.claimable(Progress):
+		_add_dot(card)
+	return card
+
+
+## Today's three quests with progress bars; finished ones pay out (double for
+## an ad); all three collected opens the bonus chest.
+func _build_quests() -> void:
+	var page: VBoxContainer = _pages["quests"]
+	_clear(page)
+	_page_header(page, "QUESTS_TITLE", "home")
+	var note := _label(tr("QUESTS_NOTE"), 24, UiStyle.INK.lerp(Color.WHITE, 0.3), true)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	page.add_child(note)
+	var quests := Quests.today(Progress)
+	for i in quests.size():
+		var entry: Dictionary = quests[i]
+		var q := Quests.info(entry.id)
+		var panel := PanelContainer.new()
+		page.add_child(panel)
+		var box := VBoxContainer.new()
+		box.add_theme_constant_override("separation", 8)
+		panel.add_child(box)
+		var top := HBoxContainer.new()
+		box.add_child(top)
+		var name_label := _label(tr("QUEST_" + str(entry.id).to_upper()), 28, UiStyle.INK, true)
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		top.add_child(name_label)
+		top.add_child(_label("+%d" % int(q.coins), 28, UiStyle.ACCENT_DARK))
+		var bar := ProgressBar.new()
+		bar.max_value = int(q.goal)
+		bar.value = mini(int(entry.progress), int(q.goal))
+		bar.show_percentage = false
+		bar.custom_minimum_size.y = 18
+		var track := StyleBoxFlat.new()
+		track.bg_color = Color(UiStyle.INK, 0.12)
+		track.set_corner_radius_all(9)
+		var fill := StyleBoxFlat.new()
+		fill.bg_color = UiStyle.GOOD if Quests.done(entry) else Color("ffb23e")
+		fill.set_corner_radius_all(9)
+		bar.add_theme_stylebox_override("background", track)
+		bar.add_theme_stylebox_override("fill", fill)
+		box.add_child(bar)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		box.add_child(row)
+		row.add_child(_label("%d / %d" % [mini(int(entry.progress), int(q.goal)), int(q.goal)], 22,
+				UiStyle.INK.lerp(Color.WHITE, 0.3)))
+		var gap := Control.new()
+		gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(gap)
+		if entry.claimed:
+			row.add_child(_label(tr("ACH_COLLECTED"), 24, UiStyle.GOOD_DARK))
+		elif Quests.done(entry):
+			var take := _small_button(tr("QUEST_CLAIM"), func():
+				Quests.claim(Progress, i)
+				Sfx.play("combo", -3.0, 1.2, 0.0)
+				_show("quests", false))
+			row.add_child(take)
+			if AdManager.rewarded_available("quest_double"):
+				var double := _small_button(tr("QUEST_DOUBLE"), func():
+					AdManager.show_rewarded("quest_double", func():
+						Quests.claim(Progress, i, 2)
+						Sfx.play("celebrate", -3.0, 1.0, 0.0)
+						_show("quests", false)))
+				double.theme_type_variation = "GoodButton"
+				row.add_child(double)
+	var chest := _wide_button(tr("QUEST_CHEST") % Quests.CHEST_COINS, Callable())
+	chest.disabled = not Quests.chest_ready(Progress)
+	if Quests.chest_ready(Progress):
+		chest.theme_type_variation = "GoodButton"
+	elif Progress._today().get("quest_chest", false):
+		chest.text = tr("QUEST_CHEST_OPENED")
+	chest.pressed.connect(func():
+		if Quests.open_chest(Progress):
+			Sfx.play("celebrate", -2.0, 1.0, 0.0)
+			add_child(Confetti.new())
+			_show("quests", false))
+	page.add_child(chest)
 
 
 ## Lucky wheel: the free spin of the day, then a few more for ads.

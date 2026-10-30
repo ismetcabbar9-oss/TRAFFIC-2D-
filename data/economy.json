@@ -36,7 +36,8 @@
     "bomb_time": 4,
     "rush_continue": 5,
     "cosmetic": 10,
-    "wheel": 3
+    "wheel": 3,
+    "quest_double": 3
   },
   "continue_moves": 2,
   "crane_gift_level": [

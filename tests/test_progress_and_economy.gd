@@ -115,3 +115,34 @@ func test_wheel_free_spin_once_a_day() -> void:
 	p.daily = {"day": "2001-01-01", "wheel_free_used": true}
 	check(p.wheel_free_ready(), "a new day brings a new one")
 	p.free()
+
+
+func test_daily_quests() -> void:
+	var p: Node = ProgressScript.new()
+	var quests := Quests.today(p)
+	check_eq(quests.size(), Quests.PER_DAY, "three a day")
+	check(quests.all(func(e): return Quests.info(e.id).get("needs", "") == ""), "nothing out of reach for a new player")
+	check_eq(Quests.today(p), quests, "the same all day")
+	# Force a known set to check the rules.
+	p.daily.quests = [{"id": "levels_3", "progress": 0, "claimed": false},
+		{"id": "combo_5", "progress": 0, "claimed": false},
+		{"id": "cars_40", "progress": 0, "claimed": false}]
+	Quests.report(p, "level_won")
+	Quests.report(p, "combo", 3)
+	Quests.report(p, "combo", 2)
+	check_eq(int(p.daily.quests[0].progress), 1, "levels add up")
+	check_eq(int(p.daily.quests[1].progress), 3, "a combo keeps its best")
+	check(not Quests.claim(p, 0), "not finished yet")
+	Quests.report(p, "level_won", 2)
+	var coins_before: int = p.coins
+	check(Quests.claim(p, 0, 2), "collected, doubled")
+	check_eq(p.coins - coins_before, 80, "40 coins x2")
+	check(not Quests.claim(p, 0), "only once")
+	Quests.report(p, "combo", 5)
+	Quests.report(p, "cars", 40)
+	Quests.claim(p, 1)
+	check(not Quests.chest_ready(p), "chest waits for all three")
+	Quests.claim(p, 2)
+	check(Quests.open_chest(p), "chest opens")
+	check(not Quests.open_chest(p), "once a day")
+	p.free()
