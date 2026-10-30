@@ -34,7 +34,8 @@
     "free_coins": 5,
     "rewind": 4,
     "bomb_time": 4,
-    "rush_continue": 5
+    "rush_continue": 5,
+    "cosmetic": 10
   },
   "continue_moves": 2,
   "crane_gift_level": [

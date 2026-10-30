@@ -79,3 +79,17 @@ func test_daily_streak() -> void:
 	p.daily_puzzle = {"last_day": "2001-01-01", "streak": 9}
 	check_eq(p.daily_streak(), 0, "missed days reset the streak")
 	p.free()
+
+
+func test_ad_unlocked_paint() -> void:
+	var p: Node = ProgressScript.new()
+	var need := int(Cosmetics.find("paint_neon").ads)
+	check(not p.owns("paint_neon"), "not owned at first")
+	for i in need - 1:
+		check(not p.add_cosmetic_ad("paint_neon"), "not yet")
+	check_eq(p.cosmetic_ads_watched("paint_neon"), need - 1, "progress kept")
+	check(p.add_cosmetic_ad("paint_neon"), "unlocked by the last ad")
+	check(p.owns("paint_neon"), "owned")
+	check_eq(p.equipped("paint"), "paint_neon", "and put on")
+	check(not p.add_cosmetic_ad("paint_chrome"), "coin items are not unlocked by ads")
+	p.free()

@@ -92,6 +92,7 @@ func setup(board: BoardView, p_state: VehicleState, effects_root: Node3D) -> voi
 	_body.name = "Body"
 	add_child(_body)
 	_model = VehicleCatalog.load_model(type).instantiate()
+	FleetPaint.apply(_model, type, state.id)
 	_body.add_child(_model)
 	for wheel in _model.find_children("wheel-*", "Node3D", false, false):
 		_wheels.append(wheel)

@@ -261,3 +261,16 @@ RUSH_ALMOST,Only %d points short of your best!,Rekoruna %d puan kaldı!
 BOMB_TIME_BUTTON,Bomb +3,Bomba +3
 RESCUE_BOMB_TIME,Bomb +3,Bomba +3
 RESCUE_BOMB_TIME_DESC,Adds three taps to the bomb's countdown.,Bombanın sayacına üç dokunuş ekler.
+GARAGE_PAINT,Fleet paint,Filo boyası
+COS_PAINT_FACTORY,Factory,Fabrika
+COS_PAINT_CHROME,Chrome,Krom
+COS_PAINT_MATTE,Matte black,Mat siyah
+COS_PAINT_PASTEL,Pastel,Pastel
+COS_PAINT_RACING,Racing white,Yarış beyazı
+COS_PAINT_GOLD,Gold,Altın
+COS_PAINT_NEON,Neon,Neon
+COS_PAINT_MIDNIGHT,Midnight blue,Gece mavisi
+COS_PAINT_RAINBOW,Rainbow,Gökkuşağı
+GARAGE_ADS,%d/%d ads,%d/%d reklam
+GARAGE_PAINT_NOTE,"Civilian cars only: police, ambulance, fire truck, taxi and tanker keep their colors.","Sadece sivil araçlar: polis, ambulans, itfaiye, taksi ve tanker kendi renginde kalır."
+AD_LIMIT_REACHED,No more ads today: come back tomorrow!,Bugünlük reklam hakkı doldu: yarın tekrar gel!

@@ -771,6 +771,10 @@ func _build_garage() -> void:
 	page.add_child(note)
 	for category in Cosmetics.CATEGORIES:
 		_section(page, "GARAGE_" + category.to_upper())
+		if category == "paint":
+			var paint_note := _label(tr("GARAGE_PAINT_NOTE"), 20, UiStyle.INK.lerp(Color.WHITE, 0.35), true)
+			paint_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			page.add_child(paint_note)
 		var grid := GridContainer.new()
 		grid.columns = 3
 		grid.add_theme_constant_override("h_separation", 14)
@@ -784,11 +788,27 @@ func _build_garage() -> void:
 			var equipped_id := Progress.equipped(category)
 			if equipped_id == "":
 				equipped_id = Cosmetics.items(category)[0].id
+			tile.ads_watched = Progress.cosmetic_ads_watched(id)
 			tile.setup(category, item, Progress.owns(id), id == equipped_id)
 			tile.pressed.connect(func():
 				if Progress.owns(id):
 					_click()
 					Progress.equip(id)
+				elif int(item.get("ads", 0)) > 0:
+					# Ad-unlocked: each ad brings it one step closer.
+					if not AdManager.rewarded_available("cosmetic"):
+						Sfx.play("lock_rattle", -4.0)
+						_shake(tile)
+						_toast(tr("AD_LIMIT_REACHED"))
+						return
+					_click()
+					AdManager.show_rewarded("cosmetic", func():
+						if Progress.add_cosmetic_ad(id):
+							Sfx.play("celebrate", -4.0, 1.0, 0.0)
+						else:
+							Sfx.play("combo", -4.0, 1.2, 0.0)
+						_show("garage", false))
+					return
 				elif Progress.buy_cosmetic(id):
 					Sfx.play("combo", -4.0, 1.2, 0.0)
 					Progress.equip(id)

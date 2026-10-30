@@ -19,6 +19,7 @@ var inventory := {} ## rescue name ("hint", "undo", "crane") -> count owned
 var daily := {}
 var flags := {} ## one-time events, e.g. "crane_gift"
 var owned: Array = [] ## bought garage items (see Cosmetics)
+var cosmetic_ads := {} ## ad-unlocked garage item id -> ads watched toward it
 var equipped_items := {} ## garage category -> item id
 var stats := {} ## lifetime counters: cars, best_combo, cranes, daily_best
 var claimed: Array = [] ## collected achievement ids
@@ -271,6 +272,7 @@ func reset_progress() -> void:
 	flags = {}
 	owned = []
 	equipped_items = {}
+	cosmetic_ads = {}
 	stats = {}
 	claimed = []
 	gift = {}
@@ -296,6 +298,26 @@ func buy_cosmetic(id: String) -> bool:
 	owned.append(id)
 	save()
 	return true
+
+
+## One more ad watched toward an ad-unlocked garage item; it is owned (and
+## equipped) once enough are watched. Returns true when that happens.
+func add_cosmetic_ad(id: String) -> bool:
+	var need := int(Cosmetics.find(id).get("ads", 0))
+	if need <= 0 or owns(id):
+		return false
+	cosmetic_ads[id] = int(cosmetic_ads.get(id, 0)) + 1
+	if int(cosmetic_ads[id]) >= need:
+		owned.append(id)
+		equipped_items[Cosmetics.category_of(id)] = id
+		save()
+		return true
+	save()
+	return false
+
+
+func cosmetic_ads_watched(id: String) -> int:
+	return int(cosmetic_ads.get(id, 0))
 
 
 func equip(id: String) -> void:
@@ -410,6 +432,8 @@ func _apply_settings() -> void:
 # --- Save file -----------------------------------------------------------------
 
 func save() -> void:
+	if not is_inside_tree():
+		return # a stand-alone copy (tests) never touches the real save
 	var data := {
 		"version": SAVE_VERSION,
 		"coins": coins,
@@ -417,7 +441,7 @@ func save() -> void:
 		"inventory": inventory,
 		"daily": daily,
 		"flags": flags,
-		"garage": {"owned": owned, "equipped": equipped_items},
+		"garage": {"owned": owned, "equipped": equipped_items, "ads": cosmetic_ads},
 		"stats": stats,
 		"claimed": claimed,
 		"gift": gift,
@@ -459,6 +483,7 @@ func _load() -> void:
 	var garage: Dictionary = data.get("garage", {})
 	owned = garage.get("owned", [])
 	equipped_items = garage.get("equipped", {})
+	cosmetic_ads = garage.get("ads", {})
 	stats = data.get("stats", {})
 	claimed = data.get("claimed", [])
 	gift = data.get("gift", {})
