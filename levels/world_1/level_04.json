@@ -4,21 +4,15 @@
  "mistakes": 3,
  "vehicles": [
   {
-   "type": "van",
-   "col": 1,
-   "row": 3,
-   "dir": "left"
-  },
-  {
-   "type": "police",
-   "col": 3,
+   "type": "hatchback",
+   "col": 2,
    "row": 2,
-   "dir": "left"
+   "dir": "down"
   },
   {
-   "type": "pickup",
-   "col": 3,
-   "row": 4,
+   "type": "taxi",
+   "col": 0,
+   "row": 2,
    "dir": "left"
   },
   {
@@ -28,30 +22,42 @@
    "dir": "up"
   },
   {
+   "type": "suv",
+   "col": 3,
+   "row": 0,
+   "dir": "left"
+  },
+  {
+   "type": "sedan_sports",
+   "col": 4,
+   "row": 3,
+   "dir": "up"
+  },
+  {
+   "type": "sedan",
+   "col": 1,
+   "row": 3,
+   "dir": "up"
+  },
+  {
    "type": "suv_luxury",
    "col": 2,
-   "row": 1,
-   "dir": "up"
+   "row": 4,
+   "dir": "left"
   },
   {
    "type": "pickup",
    "col": 3,
    "row": 1,
-   "dir": "left"
-  },
-  {
-   "type": "taxi",
-   "col": 2,
-   "row": 0,
-   "dir": "left"
-  },
-  {
-   "type": "police",
-   "col": 3,
-   "row": 3,
-   "dir": "left"
+   "dir": "up"
   }
  ],
- "obstacles": [],
+ "obstacles": [
+  {
+   "type": "cone",
+   "col": 2,
+   "row": 1
+  }
+ ],
  "name": "Level 4"
 }

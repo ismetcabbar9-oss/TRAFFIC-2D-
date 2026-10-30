@@ -75,8 +75,12 @@ static func spec(w: int, i: int, mechanic: String) -> Dictionary:
 	var act := i / ACT_LENGTH
 	var p := float(i % ACT_LENGTH) / (ACT_LENGTH - 1)
 	var d: float = tuning.base + p * 0.7 if act == 0 else tuning.base + 0.45 + p * 0.75
+	# City after the three tutorial levels: a steady climb toward level 11
+	# instead of six more tiny lots (adults got bored, then hit a wall).
+	if w == 0 and i >= 3 and i < ACT_LENGTH / 2:
+		d = maxf(d, 0.2 + (i - 3) * 0.05)
 	if i in BREATHERS:
-		d -= 0.22
+		d = maxf(d - 0.22, 0.12)
 	if i in HARD:
 		d += 0.12
 	var intro := mechanic != "" and i < 2
