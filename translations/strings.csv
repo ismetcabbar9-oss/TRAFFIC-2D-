@@ -203,7 +203,6 @@ DEV_PREV,Previous level,Önceki bölüm
 DEV_NEXT,Next level,Sonraki bölüm
 ACH_LEVELS_200,Clear all 200 levels,200 bölümün hepsini bitir
 ACH_PERFECT_150,Clear 150 levels without a crash,150 bölümü hatasız bitir
-HINT_ZOOM,Pinch or double tap to zoom in,Yakınlaştırmak için iki parmakla aç ya da çift dokun
 WIN_CONTINUE,Continue,Devam
 DEV_EVENTS,Analytics events (%d queued),Ölçüm olayları (%d sırada)
 DEV_EVENTS_TITLE,Analytics events,Ölçüm olayları
@@ -304,3 +303,8 @@ SET_GRAPHICS,Graphics,Grafik
 GFX_AUTO,Auto,Otomatik
 GFX_HIGH,High,Yüksek
 GFX_LOW,Low (faster),Düşük (daha akıcı)
+ZOOM_TUT_PINCH,Spread two fingers to zoom in,İki parmağını açarak büyüt
+ZOOM_TUT_CLOSE,Pinch them together to zoom out,Parmaklarını kapatarak küçült
+ZOOM_TUT_PAN,Zoomed in? Drag with one finger,Büyütünce tek parmakla kaydır
+ZOOM_TUT_DOUBLE,Tip: double tap to zoom in quickly,İpucu: hızlı yakınlaşmak için çift dokun
+ZOOM_TUT_OK,Got it,Anladım

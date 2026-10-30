@@ -16,6 +16,10 @@ func _initialize() -> void:
 	progress.reset_progress()
 	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
 	await create_timer(2.6).timeout
+	await create_timer(3.0).timeout # the pinch / pan guide plays a round
+	if is_instance_valid(current_scene.hud.zoom_guide):
+		current_scene.hud.zoom_guide.closed.emit()
+	await create_timer(1.2).timeout
 	print("first scene: ", current_scene.name)
 	await _shot("o1_level1_hand")
 	for level in 3:

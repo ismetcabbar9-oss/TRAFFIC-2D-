@@ -391,6 +391,28 @@ func hide_hand() -> void:
 	_hand.visible = false
 
 
+## The pinch / pan gesture guide (first level); null when not shown.
+var zoom_guide: ZoomGuide
+
+
+func show_zoom_guide() -> ZoomGuide:
+	hide_zoom_guide()
+	zoom_guide = ZoomGuide.new()
+	_root.add_child(zoom_guide)
+	zoom_guide.modulate.a = 0.0
+	zoom_guide.create_tween().tween_property(zoom_guide, "modulate:a", 1.0, 0.25)
+	return zoom_guide
+
+
+func hide_zoom_guide() -> void:
+	if is_instance_valid(zoom_guide):
+		var g := zoom_guide
+		var t := g.create_tween()
+		t.tween_property(g, "modulate:a", 0.0, 0.2)
+		t.tween_callback(g.queue_free)
+	zoom_guide = null
+
+
 # --- Rescue bar --------------------------------------------------------------------
 
 func set_coins(amount: int) -> void:

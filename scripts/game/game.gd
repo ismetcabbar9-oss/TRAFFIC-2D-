@@ -65,6 +65,7 @@ var _cinematic := false ## a cut scene is running (a tap skips it)
 var _skip := false
 var _follow: VehicleView ## car the camera follows during the finale
 var _last_out: VehicleView ## the car that most recently left the lot
+var _zoom_tut := false ## the pinch / pan guide is running (level 1, once)
 var _fps_frames := 0 ## auto graphics: frames counted early in a level
 var _fps_time := 0.0
 
@@ -89,7 +90,10 @@ func _ready() -> void:
 	hud.rescue_pressed.connect(_on_rescue)
 	_gestures.tapped.connect(_on_tap)
 	_gestures.panned.connect(func(delta: Vector2): camera.pan_by(delta))
-	_gestures.pinched.connect(func(factor: float, center: Vector2): camera.zoom_at(factor, center))
+	_gestures.pinched.connect(func(factor: float, center: Vector2):
+		camera.zoom_at(factor, center)
+		if _zoom_tut:
+			_end_zoom_tutorial()) # the player did it: lesson learnt
 	hud.dev_requested.connect(_show_dev_panel)
 	hud.bomb_time_requested.connect(func(): _offer("bomb_time"))
 	hud.paused_changed.connect(func(on: bool): _paused = on)
@@ -241,10 +245,10 @@ func load_level(index: int) -> void:
 	_show_mechanic_tip(level)
 	if not Rush.playing:
 		_maybe_gift_crane()
-	# The first big board tells how to zoom (once).
-	if level.cols * level.rows >= 49 and not Progress.flag("zoom_tip") and not _tutorial_open:
-		Progress.set_flag("zoom_tip")
-		hud.show_hint(tr("HINT_ZOOM"))
+	# Level 1 first shows how to zoom and pan (once), then the tap guide.
+	_zoom_tut = false
+	if _onboarding and level_index == 0 and not Progress.flag("zoom_tutorial"):
+		_zoom_tutorial()
 	var title := tr("LEVEL_N") % (level_index + 1)
 	if Daily.playing:
 		title = tr("DAILY_TITLE")
@@ -317,6 +321,8 @@ func _unhandled_input(event: InputEvent) -> void:
 ## A finger lifted without dragging: tap the car under it. Two quick taps on
 ## empty ground zoom in there (or back out).
 func _on_tap(screen_pos: Vector2) -> void:
+	if _zoom_tut:
+		return # the gesture guide is showing; its "Got it" button closes it
 	if _cinematic:
 		_skip = true
 		return
@@ -359,6 +365,9 @@ func _process(delta: float) -> void:
 	if is_instance_valid(_follow):
 		camera.cinematic_follow(_follow.global_position, delta / maxf(Engine.time_scale, 0.01))
 	if session == null or session.state != GameSession.State.PLAYING or _tutorial_open:
+		hud.hide_hand()
+		return
+	if _zoom_tut:
 		hud.hide_hand()
 		return
 	if _onboarding and level_index == 0:
@@ -709,6 +718,82 @@ func _measure_fps(delta: float) -> void:
 		if Quality.report_fps(Progress, fps):
 			Quality.apply(Progress, $Sun, get_viewport())
 			Analytics.design("graphics:auto_low", fps)
+
+
+# --- Gesture guide (level 1) -------------------------------------------------------
+
+## Shows a new player how to zoom and pan: two fingertips spread (the camera
+## zooms in with them) and close again, then one drags (the view slides),
+## over and over until the player pinches or taps "Got it".
+func _zoom_tutorial() -> void:
+	var played := session
+	await get_tree().create_timer(1.2).timeout # after the intro glide
+	if played != session or session.state != GameSession.State.PLAYING:
+		return
+	_zoom_tut = true
+	hud.hide_hand()
+	var guide := hud.show_zoom_guide()
+	guide.closed.connect(_end_zoom_tutorial)
+	var center := get_viewport().get_visible_rect().size * Vector2(0.5, 0.42)
+	var diag := Vector2(1.0, -1.0).normalized()
+	var pinch := func(t: float) -> Array[Vector2]:
+		var spread := lerpf(45.0, 170.0, t)
+		return [center - diag * spread, center + diag * spread]
+	while _zoom_tut and played == session:
+		guide.set_caption("ZOOM_TUT_PINCH")
+		camera.cinematic_to(Vector3.ZERO, 1.8, 1.2)
+		await _move_fingers(guide, pinch, 0.0, 1.0, 1.2)
+		await _guide_pause(0.4)
+		if not _zoom_tut:
+			break
+		guide.set_caption("ZOOM_TUT_CLOSE")
+		camera.cinematic_to(Vector3.ZERO, 1.0, 1.0)
+		await _move_fingers(guide, pinch, 1.0, 0.0, 1.0)
+		await _guide_pause(0.3)
+		if not _zoom_tut:
+			break
+		guide.set_caption("ZOOM_TUT_PAN")
+		guide.fingers = []
+		camera.cinematic_to(Vector3.ZERO, 1.8, 0.4)
+		await _guide_pause(0.5)
+		if not _zoom_tut:
+			break
+		# A finger dragging left slides the view to the right.
+		camera.cinematic_to(Vector3(board.view_half_extents().x * 0.35, 0.0, 0.0), 1.8, 1.1)
+		await _move_fingers(guide, func(t: float) -> Array[Vector2]:
+			return [center + Vector2(lerpf(150.0, -150.0, t), 60.0)], 0.0, 1.0, 1.1)
+		await _guide_pause(0.3)
+		guide.fingers = []
+		if _zoom_tut:
+			camera.cinematic_to(Vector3.ZERO, 1.0, 0.6)
+		await _guide_pause(0.9)
+
+
+## Moves the guide's fingertips along `path(t)` from `from` to `to` (0..1).
+func _move_fingers(guide: ZoomGuide, path: Callable, from: float, to: float, seconds: float) -> void:
+	var start := Time.get_ticks_msec()
+	while _zoom_tut and is_instance_valid(guide):
+		var k := clampf((Time.get_ticks_msec() - start) / (seconds * 1000.0), 0.0, 1.0)
+		guide.fingers = path.call(lerpf(from, to, ease(k, -2.0)))
+		if k >= 1.0:
+			break
+		await get_tree().process_frame
+
+
+func _guide_pause(seconds: float) -> void:
+	var start := Time.get_ticks_msec()
+	while _zoom_tut and Time.get_ticks_msec() - start < seconds * 1000.0:
+		await get_tree().process_frame
+
+
+func _end_zoom_tutorial() -> void:
+	if not _zoom_tut:
+		return
+	_zoom_tut = false
+	Progress.set_flag("zoom_tutorial")
+	hud.hide_zoom_guide()
+	camera.cinematic_end(0.4)
+	_reset_guide()
 
 
 # --- Cut scenes --------------------------------------------------------------------

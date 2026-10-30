@@ -22,6 +22,10 @@ func _initialize() -> void:
 	progress.reset_progress()
 	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
 	await _wait(2.6)
+	await create_timer(3.0).timeout # the pinch / pan guide plays a round
+	if is_instance_valid(current_scene.hud.zoom_guide):
+		current_scene.hud.zoom_guide.closed.emit()
+	await create_timer(1.2).timeout
 	for level in 10:
 		if current_scene.name != "Game":
 			print("[menu] after level ", level, ": opening the next level from the Play button")
