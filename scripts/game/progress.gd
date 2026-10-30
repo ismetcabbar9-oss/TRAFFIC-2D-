@@ -378,6 +378,13 @@ func in_onboarding() -> bool:
 	return not tutorial_seen and levels.size() < 3
 
 
+## Before City level 10 is cleared: the menu shows no red dots and the win
+## panel no "double coins" ad, so a new player is not pulled in every
+## direction at once.
+func is_newcomer() -> bool:
+	return level_stars(0, 9) == 0
+
+
 func mark_tutorial_seen() -> void:
 	if not tutorial_seen:
 		Analytics.design("onboarding:complete")

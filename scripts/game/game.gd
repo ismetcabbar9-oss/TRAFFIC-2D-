@@ -874,6 +874,7 @@ func _on_rush_over() -> void:
 
 func _on_won() -> void:
 	var played := session
+	var newcomer := Progress.is_newcomer() # before this win is recorded (level 10 counts too)
 	_set_crane_mode(false)
 	var mistakes_used := session.crashes
 	var stars := Economy.stars_for(mistakes_used, _rescued)
@@ -889,7 +890,7 @@ func _on_won() -> void:
 		"best_time": record.best_time, "perfect": stars == 3,
 		"star_note": "" if stars == 3 else ("STAR_NOTE_RESCUE" if _rescued and mistakes_used == 0 else "STAR_NOTE_CRASH"),
 		"last_level": Daily.playing or not Progress.has_next_level(world_index, level_index),
-		"double_ok": record.coins > 0 and AdManager.rewarded_available("double_coins"),
+		"double_ok": record.coins > 0 and AdManager.rewarded_available("double_coins") and not newcomer,
 	}
 	if record.has("streak"):
 		result["streak"] = record.streak

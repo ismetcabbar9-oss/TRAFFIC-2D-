@@ -166,13 +166,13 @@ func _build_home() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(spacer)
 	var wheel := RoundButton.new("wheel", Color("ff5a5f"), 76.0)
-	wheel.show_dot = Progress.wheel_free_ready()
+	wheel.show_dot = Progress.wheel_free_ready() and not Progress.is_newcomer()
 	wheel.pressed.connect(func():
 		_click()
 		_show("wheel"))
 	bar.add_child(wheel)
 	var trophies := RoundButton.new("trophy", Color("ffc93c"), 76.0)
-	trophies.show_dot = Achievements.any_claimable(Progress)
+	trophies.show_dot = Achievements.any_claimable(Progress) and not Progress.is_newcomer()
 	trophies.pressed.connect(func():
 		_click()
 		_show("achievements"))
@@ -262,7 +262,7 @@ func _build_tab_bar() -> void:
 			row.add_child(gap)
 			continue
 		var b := TabButton.new(t[0], t[1], tr(t[2]))
-		b.show_dot = t[4]
+		b.show_dot = t[4] and not Progress.is_newcomer()
 		var action: Callable = t[3]
 		b.pressed.connect(func():
 			_click()
@@ -1232,6 +1232,8 @@ func _build_achievements() -> void:
 
 ## Small red dot in the top-right corner of a button (something to collect).
 static func _add_dot(button: Control) -> void:
+	if Progress.is_newcomer():
+		return # no red dots during the first ten levels
 	var dot := Panel.new()
 	var style := StyleBoxFlat.new()
 	style.bg_color = UiStyle.DANGER
