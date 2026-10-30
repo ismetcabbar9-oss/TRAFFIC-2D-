@@ -51,6 +51,7 @@ func _ready() -> void:
 	_pages["achievements"] = _page()
 	_pages["dev"] = _page()
 	_pages["events"] = _page()
+	_pages["wheel"] = _page()
 	# A brand-new player goes straight into level 1: no menu before playing.
 	if not _launched and Progress.in_onboarding():
 		_launched = true
@@ -131,6 +132,7 @@ func _show(page: String, animate := true) -> void:
 		"achievements": _build_achievements()
 		"dev": _build_dev()
 		"events": _build_events()
+		"wheel": _build_wheel()
 	for name in _pages:
 		(_pages[name] as Control).get_parent().get_parent().visible = name == page
 	var shown: Control = (_pages[page] as Control).get_parent().get_parent()
@@ -161,6 +163,12 @@ func _build_home() -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(spacer)
+	var wheel := RoundButton.new("wheel", Color("ff5a5f"), 76.0)
+	wheel.show_dot = Progress.wheel_free_ready()
+	wheel.pressed.connect(func():
+		_click()
+		_show("wheel"))
+	bar.add_child(wheel)
 	var trophies := RoundButton.new("trophy", Color("ffc93c"), 76.0)
 	trophies.show_dot = Achievements.any_claimable(Progress)
 	trophies.pressed.connect(func():
@@ -917,6 +925,60 @@ func _start_daily() -> void:
 			await get_tree().process_frame
 	Daily.start()
 	Transition.change_scene(GAME_SCENE)
+
+
+## Lucky wheel: the free spin of the day, then a few more for ads.
+func _build_wheel() -> void:
+	var page: VBoxContainer = _pages["wheel"]
+	_clear(page)
+	_page_header(page, "WHEEL_TITLE", "home")
+	var note := _label(tr("WHEEL_NOTE"), 24, UiStyle.INK.lerp(Color.WHITE, 0.3), true)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	page.add_child(note)
+	var view := WheelView.new()
+	view.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	page.add_child(view)
+	var free := Progress.wheel_free_ready()
+	var ads_left := int(Economy.value("ad_limits_per_day").get("wheel", 3)) - Progress.ads_watched("wheel")
+	var button := _wide_button("", Callable())
+	if free:
+		button.text = tr("WHEEL_FREE")
+		button.theme_type_variation = "GoodButton"
+	elif AdManager.rewarded_available("wheel"):
+		button.text = tr("WHEEL_AD") % ads_left
+		button.theme_type_variation = ""
+	else:
+		button.text = tr("WHEEL_TOMORROW")
+		button.disabled = true
+	page.add_child(button)
+	var spin := func():
+		var rng := RandomNumberGenerator.new()
+		rng.randomize()
+		var index := Wheel.pick(rng)
+		button.disabled = true
+		Analytics.design("wheel:spin:%s" % ("free" if free else "ad"))
+		view.spin_to(index)
+		await view.stopped
+		var prize: Dictionary = Wheel.PRIZES[index]
+		Wheel.grant(Progress, index)
+		Analytics.design("wheel:prize:%s%d" % [prize.kind, int(prize.amount)])
+		var won := ("+%d " % int(prize.amount)) + (tr("WHEEL_COINS") if prize.kind == "coins" else tr("RESCUE_" + str(prize.kind).to_upper()))
+		Sfx.play("celebrate" if prize.get("jackpot", false) else "combo", -3.0, 1.0, 0.0)
+		if prize.get("jackpot", false):
+			add_child(Confetti.new())
+		_toast(tr("WHEEL_WON") % won)
+		await get_tree().create_timer(1.6).timeout
+		if _current == "wheel":
+			_show("wheel", false)
+	button.pressed.connect(func():
+		if view.spinning:
+			return
+		_click()
+		if free:
+			Progress.use_wheel_free()
+			spin.call()
+		else:
+			AdManager.show_rewarded("wheel", spin))
 
 
 func _build_achievements() -> void:

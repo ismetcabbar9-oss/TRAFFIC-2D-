@@ -1,7 +1,7 @@
 class_name UiIcons
 ## Simple vector icons drawn in code (the UI font has no symbols), all in a
 ## box of `s` pixels centered on `c`: pause, retry, back, gear, trophy, cart,
-## car, calendar, gift, sound, music, home, lock and the "no entry" sign.
+## car, calendar, gift, wheel, sound, music, home, lock and the "no entry" sign.
 
 
 static func draw(item: CanvasItem, icon: String, c: Vector2, s: float, color: Color) -> void:
@@ -50,6 +50,14 @@ static func draw(item: CanvasItem, icon: String, c: Vector2, s: float, color: Co
 				_rounded(item, Rect2(c + Vector2(x - 0.05, -0.42) * s, Vector2(0.1, 0.2) * s), s * 0.03, color)
 			for k in 4:
 				item.draw_circle(c + Vector2(-0.18 + (k % 2) * 0.36, 0.06 + (k / 2) * 0.16) * s, s * 0.05, Color(0, 0, 0, 0.25))
+		"wheel":
+			item.draw_arc(c, s * 0.36, 0.0, TAU, 32, color, s * 0.08, true)
+			for k in 8:
+				var d := Vector2(cos(k * TAU / 8.0), sin(k * TAU / 8.0))
+				item.draw_line(c + d * s * 0.08, c + d * s * 0.34, color, s * 0.06, true)
+			item.draw_circle(c, s * 0.1, color)
+			item.draw_colored_polygon(PackedVector2Array([c + Vector2(-0.1, -0.5) * s, c + Vector2(0.1, -0.5) * s,
+					c + Vector2(0, -0.32) * s]), color)
 		"gift":
 			_rounded(item, Rect2(c + Vector2(-0.34, -0.08) * s, Vector2(0.68, 0.44) * s), s * 0.06, color)
 			_rounded(item, Rect2(c + Vector2(-0.4, -0.22) * s, Vector2(0.8, 0.16) * s), s * 0.05, color)

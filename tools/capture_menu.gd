@@ -25,7 +25,7 @@ func _initialize() -> void:
 	progress.daily_puzzle = {"last_day": Daily.day_before(Daily.today()), "streak": 3}
 	progress.stats = {"cars": 140, "best_combo": 5, "cranes": 1}
 	progress.claimed = ["first_win"]
-	for page in ["home", "world", "settings", "credits", "shop", "garage", "gift", "achievements"]:
+	for page in ["home", "world", "settings", "credits", "shop", "garage", "gift", "achievements", "wheel"]:
 		menu._show(page, false)
 		for i in 20:
 			await process_frame

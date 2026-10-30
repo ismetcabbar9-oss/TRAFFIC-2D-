@@ -93,3 +93,25 @@ func test_ad_unlocked_paint() -> void:
 	check_eq(p.equipped("paint"), "paint_neon", "and put on")
 	check(not p.add_cosmetic_ad("paint_chrome"), "coin items are not unlocked by ads")
 	p.free()
+
+
+func test_wheel_odds() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5
+	var hits := {}
+	for i in 10000:
+		var k := Wheel.pick(rng)
+		hits[k] = hits.get(k, 0) + 1
+	var jackpot := Wheel.PRIZES.find(Wheel.PRIZES.filter(func(p): return p.get("jackpot", false))[0])
+	check(hits.get(jackpot, 0) > 100 and hits.get(jackpot, 0) < 320, "jackpot about 2% (%d)" % hits.get(jackpot, 0))
+	check_eq(hits.size(), Wheel.PRIZES.size(), "every slice can come up")
+
+
+func test_wheel_free_spin_once_a_day() -> void:
+	var p: Node = ProgressScript.new()
+	check(p.wheel_free_ready(), "free spin today")
+	p.use_wheel_free()
+	check(not p.wheel_free_ready(), "used")
+	p.daily = {"day": "2001-01-01", "wheel_free_used": true}
+	check(p.wheel_free_ready(), "a new day brings a new one")
+	p.free()

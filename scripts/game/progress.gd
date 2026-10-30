@@ -157,6 +157,16 @@ func ads_watched(placement: String) -> int:
 	return int(_today().get("ads", {}).get(placement, 0))
 
 
+## The lucky wheel's free spin of the day is still there.
+func wheel_free_ready() -> bool:
+	return not bool(_today().get("wheel_free_used", false))
+
+
+func use_wheel_free() -> void:
+	_today()["wheel_free_used"] = true
+	save()
+
+
 func count_ad(placement: String) -> void:
 	var ads: Dictionary = _today().get_or_add("ads", {})
 	ads[placement] = int(ads.get(placement, 0)) + 1
