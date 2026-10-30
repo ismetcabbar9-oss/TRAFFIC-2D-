@@ -943,8 +943,9 @@ func _start_daily() -> void:
 ## button once it is full.
 func _star_chest_card() -> Button:
 	var ready := StarChest.ready(Progress)
+	var calm := Progress.is_newcomer() # first ten levels: openable, but no glow or throb
 	var card := Button.new()
-	card.theme_type_variation = "GoodButton" if ready else "IconButton"
+	card.theme_type_variation = "GoodButton" if ready and not calm else "IconButton"
 	card.custom_minimum_size = Vector2(0, 76)
 	card.focus_mode = Control.FOCUS_NONE
 	card.add_theme_font_size_override("font_size", 26)
@@ -954,6 +955,8 @@ func _star_chest_card() -> Button:
 			_open_star_chest())
 	if ready:
 		card.text = tr("STAR_CHEST_OPEN")
+		if calm:
+			return card
 		_add_dot(card)
 		var pulse := card.create_tween().set_loops()
 		card.resized.connect(func(): card.pivot_offset = card.size * 0.5)
