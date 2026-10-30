@@ -250,3 +250,14 @@ ACH_RUSH_2500,Score 2500 in Rush Hour,Yoğun Trafik'te 2500 puan yap
 CLEARED,CLEARED!,TEMİZLENDİ!
 CLEARED_HARD,HARD ONE CLEARED!,ZOR BÖLÜM BİTTİ!
 CLEARED_COMBO,Best combo x%d,En iyi combo x%d
+REWIND_AD,Rewind time · watch an ad,Zamanı geri sar · reklam izle
+REWIND_COINS,Rewind time · %d coins,Zamanı geri sar · %d jeton
+RUSH_CLEAR_AD,Clear 5 cars and go on · ad,5 aracı kaldır ve devam et · reklam
+RUSH_CLEAR_COINS,Clear 5 cars and go on · %d coins,5 aracı kaldır ve devam et · %d jeton
+RUSH_LIFE_AD,+1 life · watch an ad,+1 hak · reklam izle
+RUSH_LIFE_COINS,+1 life · %d coins,+1 hak · %d jeton
+LOSE_ALMOST,Only %d cars were left!,Sadece %d araç kalmıştı!
+RUSH_ALMOST,Only %d points short of your best!,Rekoruna %d puan kaldı!
+BOMB_TIME_BUTTON,Bomb +3,Bomba +3
+RESCUE_BOMB_TIME,Bomb +3,Bomba +3
+RESCUE_BOMB_TIME_DESC,Adds three taps to the bomb's countdown.,Bombanın sayacına üç dokunuş ekler.

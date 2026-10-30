@@ -10,7 +10,8 @@ signal menu_requested
 signal tutorial_closed
 signal rescue_pressed(kind: String) ## "hint", "undo" or "crane"
 signal offer_accepted(kind: String, with_ad: bool) ## pay for a rescue
-signal continue_requested(with_ad: bool) ## +2 moves after losing
+signal continue_requested(with_ad: bool) ## the lose panel's rescue: +2 moves, rewind or rush continue
+signal bomb_time_requested ## the "+3" button next to a bomb about to go off
 signal double_coins_requested
 signal dev_requested ## developer mode panel
 signal paused_changed(paused: bool) ## the pause panel opened or closed
@@ -42,6 +43,8 @@ var _coin_value: Label
 var _rescue_buttons := {} ## kind -> RescueButton
 var _star_note: Label ## why the third star was missed
 var _rush_bar: ProgressBar ## endless mode: time until the next car arrives
+var _bomb_button: Button ## "Bomb +3" rescue while a bomb is about to blow
+var _continue_pulse: Tween
 var _rush_fill: StyleBoxFlat
 var _coin_label: Label
 var _continue_ad: Button
@@ -129,21 +132,19 @@ func show_win(result: Dictionary) -> void:
 	_reveal(result.stars, result.coins)
 
 
-## `offer`: {moves, price, can_afford, ad_ok}; empty when continuing is not
-## possible (e.g. the board is boxed in).
-func show_lose(offer: Dictionary = {}, reason := "") -> void:
+## `offer`: {kind, price, can_afford, ad_ok, [moves]}; empty when no rescue
+## is possible (e.g. the board is boxed in). `note`: a "so close" line that
+## also makes the rescue buttons throb.
+func show_lose(offer: Dictionary = {}, reason := "", note := "") -> void:
 	_won = false
 	_double_button.visible = false
-	_continue_ad.visible = offer.get("ad_ok", false)
-	_continue_coins.visible = not offer.is_empty()
-	if not offer.is_empty():
-		_continue_ad.text = tr("CONTINUE_AD") % offer.moves
-		_continue_coins.text = tr("CONTINUE_COINS") % [offer.moves, offer.price]
-		_continue_coins.disabled = not offer.can_afford
+	_set_continue(offer, note != "")
 	_result_title.text = tr("LOSE_BOOM_TITLE" if reason != "" else "LOSE_TITLE")
 	_result_title.add_theme_color_override("font_color", UiStyle.DANGER)
 	_result_text.visible = true
 	_result_text.text = tr({"explosion": "LOSE_TANKER_TEXT", "bomb": "LOSE_BOMB_TEXT"}.get(reason, "LOSE_TEXT"))
+	if note != "":
+		_result_text.text += "\n" + note
 	_star_row.visible = false
 	_stats.visible = false
 	_star_note.visible = false
@@ -152,6 +153,48 @@ func show_lose(offer: Dictionary = {}, reason := "") -> void:
 	_secondary.visible = _menu_button.visible # hidden in the first session
 	_badge.visible = false
 	_show_result()
+
+
+## The lose panel's rescue buttons (ad and coins) for `offer.kind`:
+## "continue" (+moves), "rewind", "rush_clear" (remove cars) or "rush_life".
+func _set_continue(offer: Dictionary, throb: bool) -> void:
+	if _continue_pulse:
+		_continue_pulse.kill()
+		_continue_pulse = null
+	_continue_ad.scale = Vector2.ONE
+	_continue_ad.visible = offer.get("ad_ok", false)
+	_continue_coins.visible = not offer.is_empty()
+	if offer.is_empty():
+		return
+	var kind: String = offer.kind
+	match kind:
+		"continue":
+			_continue_ad.text = tr("CONTINUE_AD") % offer.moves
+			_continue_coins.text = tr("CONTINUE_COINS") % [offer.moves, offer.price]
+		_:
+			_continue_ad.text = tr(kind.to_upper() + "_AD")
+			_continue_coins.text = tr(kind.to_upper() + "_COINS") % offer.price
+	_continue_coins.disabled = not offer.can_afford
+	if throb:
+		var button := _continue_ad if _continue_ad.visible else _continue_coins
+		_continue_pulse = button.create_tween().set_loops()
+		button.resized.connect(func(): button.pivot_offset = button.size * 0.5)
+		button.pivot_offset = button.size * 0.5
+		_continue_pulse.tween_property(button, "scale", Vector2.ONE * 1.05, 0.35).set_trans(Tween.TRANS_SINE)
+		_continue_pulse.tween_property(button, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_SINE)
+
+
+## The "Bomb +3" button shows while a bomb is about to blow and can still be
+## given more time.
+func set_bomb_offer(on: bool) -> void:
+	if _bomb_button.visible == on:
+		return
+	_bomb_button.visible = on
+	if on:
+		_bomb_button.pivot_offset = _bomb_button.size * 0.5
+		var t := _bomb_button.create_tween()
+		_bomb_button.scale = Vector2.ONE * 0.3
+		t.tween_property(_bomb_button, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 ## Stars pop in one by one with a rising chime, then the coins count up.
@@ -624,17 +667,18 @@ func show_points(points: int, at: Vector2) -> void:
 
 ## End of an endless run: why it ended, the score against the best, how
 ## long it lasted, the best combo and the coins earned.
-## `result`: {score, best, new_best, time, combo, coins, reason}.
+## `result`: {score, best, new_best, time, combo, coins, reason, offer, note}.
 func show_rush_over(result: Dictionary) -> void:
 	_won = false
 	_double_button.visible = false
-	_continue_ad.visible = false
-	_continue_coins.visible = false
+	_set_continue(result.get("offer", {}), result.get("note", "") != "")
 	var titles := {"full": "RUSH_FULL", "explosion": "LOSE_BOOM_TITLE", "bomb": "LOSE_BOOM_TITLE"}
 	_result_title.text = tr(titles.get(result.reason, "RUSH_OUT"))
 	_result_title.add_theme_color_override("font_color", UiStyle.DANGER)
 	_result_text.visible = true
 	_result_text.text = tr("RUSH_SCORE_LINE") % [result.score, result.best]
+	if result.get("note", "") != "":
+		_result_text.text += "\n" + result.note
 	_badge.text = tr("RUSH_NEW_BEST")
 	_badge.visible = result.new_best
 	_star_row.visible = false
@@ -842,6 +886,18 @@ func _build_top_bar(root: Control) -> void:
 	_rush_bar.add_theme_stylebox_override("fill", _rush_fill)
 	_rush_bar.visible = false
 	rows.add_child(_rush_bar)
+
+	_bomb_button = Button.new()
+	_bomb_button.text = tr("BOMB_TIME_BUTTON")
+	_bomb_button.theme_type_variation = "GoodButton"
+	_bomb_button.add_theme_font_size_override("font_size", 28)
+	_bomb_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_bomb_button.custom_minimum_size = Vector2(240, 64)
+	_bomb_button.visible = false
+	_bomb_button.pressed.connect(func():
+		_click()
+		bomb_time_requested.emit())
+	rows.add_child(_bomb_button)
 
 
 func _small_button(text: String, action: Callable) -> Button:

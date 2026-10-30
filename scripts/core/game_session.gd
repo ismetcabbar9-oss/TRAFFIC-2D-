@@ -14,6 +14,7 @@ signal vehicle_fell(id: int, result: BoardState.MoveResult) ## drove into a pit
 signal exploded(id: int, cell: Vector2i) ## tanker crash or bomb at zero: the level is lost
 signal bombs_ticked ## bomb counters changed (a tap, or an undo)
 signal vehicle_added(id: int) ## endless mode: a new car arrived
+signal rewound ## the board went back to before the fatal tap (rewind rescue)
 signal mistakes_changed(left: int)
 signal won
 signal lost
@@ -33,6 +34,7 @@ var endless := false ## endless mode: an empty board is not a win, cars keep arr
 ## Last tap that can be undone: {action, id, previous: VehicleState}, or empty.
 var _undoable := {}
 var _next_id := 0 ## endless mode: ids are never reused (views are keyed by id)
+var _before := {} ## the game as it was before the last tap (see rewind)
 
 
 func _init(p_level: LevelData) -> void:
@@ -49,6 +51,7 @@ func tap(id: int) -> BoardState.MoveResult:
 	taps += 1
 	var result := board.probe(id)
 	if result.action != BoardState.Action.LOCKED:
+		_before = {"board": board.clone(), "mistakes": mistakes_left, "crashes": crashes, "falls": falls}
 		_undoable = {}
 		if result.action != BoardState.Action.EXIT and result.action != BoardState.Action.FALL and not result.explodes:
 			_undoable = {"action": result.action, "id": id, "previous": (board.vehicles[id] as VehicleState).duplicate(),
@@ -105,6 +108,44 @@ func _check_cleared() -> bool:
 	state = State.WON
 	won.emit()
 	return true
+
+
+## True after an explosion while the position before the fatal tap is known.
+func can_rewind() -> bool:
+	return state == State.LOST and lose_reason in ["explosion", "bomb"] and not _before.is_empty()
+
+
+## Rewind rescue: back to just before the tap that blew up, and play on.
+func rewind() -> bool:
+	if not can_rewind():
+		return false
+	board = _before.board
+	mistakes_left = _before.mistakes
+	crashes = _before.crashes
+	falls = _before.falls
+	_before = {}
+	_undoable = {}
+	lose_reason = ""
+	state = State.PLAYING
+	rewound.emit()
+	mistakes_changed.emit(mistakes_left)
+	return true
+
+
+## Adds `amount` taps to a parked bomb's countdown (bomb time rescue).
+func add_bomb_time(id: int, amount: int) -> void:
+	if not board.vehicles.has(id) or (board.vehicles[id] as VehicleState).bomb <= 0:
+		return
+	(board.vehicles[id] as VehicleState).bomb += amount
+	bombs_ticked.emit()
+
+
+## Endless mode: back to playing after a full lot (the rush continue).
+func resume() -> void:
+	if state != State.LOST or lose_reason in ["explosion", "bomb"]:
+		return
+	lose_reason = ""
+	state = State.PLAYING
 
 
 ## Endless mode: a new vehicle drives onto the board. Returns its id, or -1

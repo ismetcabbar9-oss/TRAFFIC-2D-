@@ -51,6 +51,14 @@ var _rush_timer := 0.0 ## seconds until the next car drops
 var _rush_next := {} ## the car about to drop (its spot is marked)
 var _rush_marker: Node3D
 var _rush_landed := {} ## vehicle id -> clock time it landed (quick bonus)
+var _rush_best_before := 0 ## best score when this run began
+var _rush_paid := 0 ## points already paid out in coins (a continued run pays the rest)
+var _rush_continued := false ## the one continue of a run is used
+
+# Rescues offered on the lose panel and next to bombs.
+var _continue_kind := "" ## what the lose panel's rescue buttons do right now
+var _rewound := false ## the rewind rescue is used on this level
+var _bomb_boosted := {} ## bomb vehicle id -> true once given more time
 
 # Cut scenes: the level-end finale and the explosion close-up.
 var _cinematic := false ## a cut scene is running (a tap skips it)
@@ -76,6 +84,7 @@ func _ready() -> void:
 	_gestures.panned.connect(func(delta: Vector2): camera.pan_by(delta))
 	_gestures.pinched.connect(func(factor: float, center: Vector2): camera.zoom_at(factor, center))
 	hud.dev_requested.connect(_show_dev_panel)
+	hud.bomb_time_requested.connect(func(): _offer("bomb_time"))
 	hud.paused_changed.connect(func(on: bool): _paused = on)
 	hud.offer_accepted.connect(_on_offer_accepted)
 	hud.continue_requested.connect(_on_continue)
@@ -139,6 +148,13 @@ func load_level(index: int) -> void:
 	session = GameSession.new(level)
 	session.endless = Rush.playing
 	session.vehicle_added.connect(_on_vehicle_added)
+	session.rewound.connect(_on_rewound)
+	_rewound = false
+	_bomb_boosted = {}
+	_rush_best_before = int(Progress.stats.get("rush_best", 0))
+	_rush_paid = 0
+	_rush_continued = false
+	hud.set_bomb_offer(false)
 	_rush_score = 0
 	_rush_arrived = 0
 	_rush_timer = Rush.interval(0) + 1.0 # a moment to look before the first drop
@@ -177,16 +193,7 @@ func load_level(index: int) -> void:
 	board.theme = world_theme.board
 	board.build(level.cols, level.rows)
 	scenery.build(board.view_half_extents(), board.theme.road_width * 0.5, level.cols * 31 + level.rows, world_theme)
-	for id in session.board.vehicles:
-		var view := VehicleView.new()
-		pieces.add_child(view)
-		view.setup(board, session.board.vehicles[id], effects)
-		vehicle_views[id] = view
-	for e in level.obstacles:
-		var obstacle := ObstacleView.new()
-		pieces.add_child(obstacle)
-		obstacle.setup(board, e.type, e.cell, e.get("group", -1))
-		obstacle_views[e.cell] = obstacle
+	_build_pieces()
 	# Each level is a little later in the day: morning light to sunset.
 	var hour := TimeOfDay.hour_for_level(level_index, LevelCatalog.level_count(world_index))
 	var env := ($WorldEnvironment as WorldEnvironment).environment
@@ -335,6 +342,8 @@ func _process(delta: float) -> void:
 	if _paused:
 		return
 	_clock += delta
+	if session != null:
+		_refresh_bomb_offer()
 	if is_instance_valid(_follow):
 		camera.cinematic_follow(_follow.global_position, delta / maxf(Engine.time_scale, 0.01))
 	if session == null or session.state != GameSession.State.PLAYING or _tutorial_open:
@@ -656,6 +665,21 @@ func _on_bombs_ticked() -> void:
 			Haptics.pulse(30, 0.6)
 
 
+## Offers "Bomb +3" while a bomb that has not had extra time is down to 3.
+func _refresh_bomb_offer() -> void:
+	hud.set_bomb_offer(session.state == GameSession.State.PLAYING and _urgent_bomb() >= 0)
+
+
+func _urgent_bomb() -> int:
+	var best := -1
+	for id in session.board.vehicles:
+		var v: VehicleState = session.board.vehicles[id]
+		if v.bomb > 0 and v.bomb <= 3 and not _bomb_boosted.has(id):
+			if best < 0 or v.bomb < (session.board.vehicles[best] as VehicleState).bomb:
+				best = id
+	return best
+
+
 # --- Cut scenes --------------------------------------------------------------------
 
 ## Level-end finale (about 2 s, a tap skips it): the last car leaves in slow
@@ -786,10 +810,13 @@ func _on_rush_over() -> void:
 	var played := session
 	if is_instance_valid(_rush_marker):
 		_rush_marker.queue_free()
-	var best_before := int(Progress.stats.get("rush_best", 0))
+	var best_before := _rush_best_before
 	Progress.max_stat("rush_best", _rush_score)
-	Progress.add_stat("rush_runs")
-	var coins := _rush_score / int(Economy.value("rush_points_per_coin"))
+	if not _rush_continued:
+		Progress.add_stat("rush_runs")
+	var per_coin := int(Economy.value("rush_points_per_coin"))
+	var coins := _rush_score / per_coin - _rush_paid / per_coin # a continued run pays only what is new
+	_rush_paid = _rush_score
 	if coins > 0:
 		Progress.add_coins(coins, "rush")
 	Progress.save()
@@ -801,9 +828,13 @@ func _on_rush_over() -> void:
 		return
 	Sfx.duck_music(2.0)
 	Sfx.play("lose", -2.0, 1.0, 0.0)
+	var note := ""
+	if best_before > 0 and _rush_score < best_before and _rush_score >= best_before * 0.8:
+		note = tr("RUSH_ALMOST") % (best_before - _rush_score)
+	hud.set_bomb_offer(false)
 	hud.show_rush_over({"score": _rush_score, "best": maxi(best_before, _rush_score),
 		"new_best": _rush_score > best_before and _rush_score > 0, "time": time, "combo": _best_combo,
-		"coins": coins, "reason": session.lose_reason})
+		"coins": coins, "reason": session.lose_reason, "offer": _continue_offer(), "note": note})
 	_announce_achievements()
 
 
@@ -861,7 +892,13 @@ func _on_lost() -> void:
 	if played == session and session.state == GameSession.State.LOST:
 		Sfx.duck_music(2.0)
 		Sfx.play("lose", -2.0, 1.0, 0.0)
-		hud.show_lose({} if _onboarding else _continue_offer(), reason)
+		var offer := {} if _onboarding else _continue_offer()
+		var left := session.board.vehicles.size()
+		var note := ""
+		if not offer.is_empty() and left > 0 and (left <= 5 or left <= session.level.vehicles.size() * 0.3):
+			note = tr("LOSE_ALMOST") % left
+		hud.set_bomb_offer(false)
+		hud.show_lose(offer, reason, note)
 
 
 # --- Rescues -------------------------------------------------------------------------
@@ -924,6 +961,16 @@ func _on_offer_accepted(kind: String, with_ad: bool) -> void:
 	var grant := func():
 		Progress.add_item(kind)
 		_on_rescue(kind)
+	if kind == "bomb_time":
+		grant = func():
+			var id := _urgent_bomb()
+			if id < 0:
+				return
+			Analytics.design("rescue:bomb_time:%s" % ("ad" if with_ad else "coins"))
+			_bomb_boosted[id] = true
+			_rescued = true
+			session.add_bomb_time(id, int(Economy.value("bomb_time")))
+			Sfx.play("unlock", -2.0, 1.2, 0.0)
 	if with_ad:
 		AdManager.show_rewarded(kind, grant)
 	elif Progress.spend_coins(Economy.price(kind), "rescue:" + kind):
@@ -984,25 +1031,116 @@ func _maybe_gift_crane() -> void:
 		hud.show_tutorial("CRANE_GIFT_TITLE", ["CRANE_GIFT_1", "CRANE_GIFT_2"])
 
 
+## The lose panel's rescue: rewind an explosion (once per level) or buy
+## extra moves; in Rush Hour, one continue per run (clear cars from a full
+## lot, a life, or a rewind). Empty when nothing can help.
 func _continue_offer() -> Dictionary:
-	if session.is_deadlocked_ignoring_moves():
+	_continue_kind = ""
+	var kind := ""
+	if Rush.playing:
+		if not _rush_continued:
+			match session.lose_reason:
+				"full": kind = "rush_clear"
+				"": kind = "rush_life"
+				_: kind = "rewind" if session.can_rewind() else ""
+	elif session.can_rewind():
+		kind = "rewind" if not _rewound else ""
+	elif not session.is_deadlocked_ignoring_moves():
+		kind = "continue"
+	if kind == "":
 		return {}
-	var price := Economy.price("continue")
-	return {"moves": int(Economy.value("continue_moves")), "price": price,
-		"can_afford": Progress.coins >= price, "ad_ok": AdManager.rewarded_available("continue")}
+	_continue_kind = kind
+	var placement := _continue_placement()
+	var price := Economy.price(placement)
+	Analytics.design("offer:" + kind)
+	return {"kind": kind, "moves": int(Economy.value("continue_moves")), "price": price,
+		"can_afford": Progress.coins >= price, "ad_ok": AdManager.rewarded_available(placement)}
+
+
+## Ad placement (and price) of the current lose-panel rescue.
+func _continue_placement() -> String:
+	if Rush.playing:
+		return "rush_continue"
+	return "rewind" if _continue_kind == "rewind" else "continue"
 
 
 func _on_continue(with_ad: bool) -> void:
+	var kind := _continue_kind
+	var placement := _continue_placement()
 	var resume := func():
-		Analytics.design("rescue:continue:%s" % ("ad" if with_ad else "coins"))
+		Analytics.design("rescue:%s:%s" % [kind, "ad" if with_ad else "coins"])
 		_rescued = true
-		session.add_mistakes(int(Economy.value("continue_moves")))
 		hud.hide_result()
+		match kind:
+			"continue":
+				session.add_mistakes(int(Economy.value("continue_moves")))
+			"rewind":
+				_rewound = true
+				_rush_continued = Rush.playing
+				session.rewind()
+			"rush_life":
+				_rush_continued = true
+				session.add_mistakes(1)
+			"rush_clear":
+				_rush_continued = true
+				_rush_clear(int(Economy.value("rush_continue_clears")))
 		_refresh_rescues()
 	if with_ad:
-		AdManager.show_rewarded("continue", resume)
-	elif Progress.spend_coins(Economy.price("continue"), "rescue:continue"):
+		AdManager.show_rewarded(placement, resume)
+	elif Progress.spend_coins(Economy.price(placement), "rescue:" + kind):
 		resume.call()
+
+
+## Rush continue on a full lot: the crane takes `count` cars away (the most
+## boxed-in first) and the run goes on with a breather before the next drop.
+func _rush_clear(count: int) -> void:
+	var ids: Array = session.board.vehicles.keys()
+	ids.sort_custom(func(a, b): return session.board.probe(a).free and not session.board.probe(b).free)
+	ids.reverse()
+	session.resume()
+	for id in ids.slice(0, count):
+		session.lift(id)
+	_rush_next = {}
+	if is_instance_valid(_rush_marker):
+		_rush_marker.queue_free()
+	_rush_timer = Rush.interval(_rush_arrived) + 1.5
+
+
+## Rewind rescue: the lot is rebuilt as it was before the fatal tap, with a
+## quick "tape rewinding" flash.
+func _on_rewound() -> void:
+	Engine.time_scale = 1.0
+	camera.reset_view()
+	hud.hide_banner()
+	for child in pieces.get_children() + effects.get_children():
+		child.queue_free()
+	vehicle_views.clear()
+	obstacle_views.clear()
+	_build_pieces()
+	for id in vehicle_views:
+		vehicle_views[id].pop_in(0.05)
+	hud.flash(Color(0.55, 0.8, 1.0, 0.6), 0.5)
+	Sfx.play("tire_squeal", -4.0, 1.6, 0.0)
+	_combo = 0
+
+
+## Views for every vehicle and obstacle on the board as it is now (gates
+## already opened and pits already filled stay away).
+func _build_pieces() -> void:
+	for id in session.board.vehicles:
+		var view := VehicleView.new()
+		pieces.add_child(view)
+		view.setup(board, session.board.vehicles[id], effects)
+		vehicle_views[id] = view
+	for e in session.level.obstacles:
+		if e.type == "gate" and not session.board.gates.has(e.cell):
+			continue
+		if e.type == "pit" and not session.board.pits.has(e.cell):
+			continue
+		var obstacle := ObstacleView.new()
+		pieces.add_child(obstacle)
+		obstacle.setup(board, e.type, e.cell, e.get("group", -1))
+		obstacle_views[e.cell] = obstacle
 
 
 func _on_vehicle_lifted(id: int, result: BoardState.MoveResult) -> void:

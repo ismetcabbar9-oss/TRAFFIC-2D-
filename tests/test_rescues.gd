@@ -60,3 +60,37 @@ func test_crane_lifts_blocked_car_and_opens_gate() -> void:
 	check_eq(r.opened, [Vector2i(3, 1)] as Array[Vector2i], "gate opened")
 	check(s.tap(0).free, "road open")
 	check_eq(s.state, GameSession.State.WON, "won")
+
+
+func test_rewind_after_explosion() -> void:
+	var s := GameSession.new(make_level(6, 6, [["sedan", 0, 0, "right"], ["tanker", 3, 0, "down"], ["sedan", 0, 4, "left"]]))
+	s.tap(2)
+	s.tap(0)
+	check_eq(s.lose_reason, "explosion", "blew up")
+	check(s.can_rewind(), "can rewind")
+	check(s.rewind(), "rewound")
+	check_eq(s.state, GameSession.State.PLAYING, "playing again")
+	check_eq(s.board.vehicles.size(), 2, "back to before the fatal tap, not to the start")
+	check(s.board.vehicles.has(0), "the car that crashed is back home")
+	check(not s.can_rewind(), "once")
+
+
+func test_no_rewind_without_explosion() -> void:
+	var s := GameSession.new(make_level(6, 6, [["sedan", 0, 0, "right"], ["sedan", 3, 0, "down"]], [], 1))
+	s.tap(0)
+	check_eq(s.state, GameSession.State.LOST, "out of moves")
+	check(not s.can_rewind(), "rewind is for explosions")
+
+
+func test_bomb_time() -> void:
+	var s := GameSession.new(make_level(6, 6, [["sedan", 0, 0, "right", {"bomb": 2}], ["sedan", 4, 0, "down"]]))
+	s.add_bomb_time(0, 3)
+	check_eq(s.board.vehicles[0].bomb, 5, "three more taps")
+
+
+func test_resume_after_full_lot() -> void:
+	var s := GameSession.new(make_level(4, 4, [["sedan", 0, 0, "right"]]))
+	s.endless = true
+	s.end("full")
+	s.resume()
+	check_eq(s.state, GameSession.State.PLAYING, "back in the run")

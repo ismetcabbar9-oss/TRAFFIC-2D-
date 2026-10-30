@@ -18,17 +18,23 @@
     "hint": 30,
     "undo": 50,
     "crane": 120,
-    "continue": 100
+    "continue": 100,
+    "rewind": 150,
+    "bomb_time": 60,
+    "rush_continue": 150
   },
   "free_hints_per_day": 3,
   "ad_limits_per_day": {
-    "total": 15,
-    "hint": 5,
-    "crane": 2,
-    "continue": 5,
-    "double_coins": 5,
+    "total": 30,
+    "hint": 8,
+    "crane": 4,
+    "continue": 6,
+    "double_coins": 8,
     "daily_gift": 1,
-    "free_coins": 3
+    "free_coins": 5,
+    "rewind": 4,
+    "bomb_time": 4,
+    "rush_continue": 5
   },
   "continue_moves": 2,
   "crane_gift_level": [
@@ -79,5 +85,7 @@
     "hard": 1,
     "daily": 2
   },
-  "rush_points_per_coin": 25
+  "rush_points_per_coin": 25,
+  "bomb_time": 3,
+  "rush_continue_clears": 5
 }
