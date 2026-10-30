@@ -11,6 +11,11 @@ signal ad_finished(placement: String, rewarded: bool)
 const PLACEHOLDER_SECONDS := 1.5
 
 var _busy := false
+# Interstitials (see InterstitialRules); counted per app session.
+var _levels_since := 0
+var _runs_since := 0
+var _last_shown := -1e9
+var _last_rewarded := -1e9
 
 
 func _ready() -> void:
@@ -44,6 +49,7 @@ func show_rewarded(placement: String, on_reward: Callable) -> void:
 
 func _finish(placement: String, rewarded: bool, on_reward: Callable) -> void:
 	_busy = false
+	_last_rewarded = _now()
 	Analytics.design("ad:rewarded:%s:%s" % [placement, "watched" if rewarded else "skipped"])
 	if rewarded:
 		Progress.count_ad(placement)
@@ -51,15 +57,47 @@ func _finish(placement: String, rewarded: bool, on_reward: Callable) -> void:
 	ad_finished.emit(placement, rewarded)
 
 
+## A level (or a Rush run) has been finished: counts toward the next
+## interstitial.
+func note_finished(context: String) -> void:
+	if context == "rush":
+		_runs_since += 1
+	else:
+		_levels_since += 1
+
+
+## Shows an interstitial if one is due (see InterstitialRules); awaits it.
+## `progress_level`: the player's level number across worlds.
+func maybe_interstitial(context: String, progress_level: int) -> void:
+	if _busy or Progress.ad_free or Progress.in_onboarding():
+		return
+	var state := {"levels": _levels_since, "runs": _runs_since, "last_shown": _last_shown,
+		"last_rewarded": _last_rewarded, "today": Progress.ads_watched("interstitial")}
+	if not InterstitialRules.due(Economy.value("interstitial"), state, _now(), context, progress_level):
+		return
+	_busy = true
+	Analytics.design("ad:interstitial:%s" % context)
+	await _placeholder(true)
+	_busy = false
+	_last_shown = _now()
+	_levels_since = 0
+	_runs_since = 0
+	Progress.count_ad("interstitial")
+
+
+func _now() -> float:
+	return Time.get_ticks_msec() / 1000.0
+
+
 ## Stand-in until the real ad SDK is connected: a dark screen for a moment.
-func _placeholder() -> void:
+func _placeholder(interstitial := false) -> void:
 	var veil := ColorRect.new()
 	veil.color = Color(0.05, 0.06, 0.1, 0.92)
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	veil.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(veil)
 	var label := Label.new()
-	label.text = tr("AD_PLACEHOLDER")
+	label.text = tr("AD_PLACEHOLDER_INTERSTITIAL" if interstitial else "AD_PLACEHOLDER")
 	label.add_theme_font_size_override("font_size", 36)
 	label.add_theme_color_override("font_color", Color.WHITE)
 	label.set_anchors_preset(Control.PRESET_CENTER)

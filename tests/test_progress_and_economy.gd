@@ -146,3 +146,33 @@ func test_daily_quests() -> void:
 	check(Quests.open_chest(p), "chest opens")
 	check(not Quests.open_chest(p), "once a day")
 	p.free()
+
+
+func test_star_chest() -> void:
+	var p: Node = ProgressScript.new()
+	p.levels = {}
+	for i in 6:
+		p.levels["0:%d" % i] = {"stars": 3}
+	check_eq(StarChest.progress_stars(p), 15, "18 stars: the first chest is full")
+	check(StarChest.ready(p), "ready")
+	var coins: int = p.coins
+	var got := StarChest.open(p, 2)
+	check_eq(p.coins - coins, int(got.coins), "coins paid")
+	check_eq(p.item_count(got.item), 2, "item doubled too")
+	check(not StarChest.ready(p), "next one needs 30 stars")
+	check_eq(StarChest.progress_stars(p), 3, "3 toward the next")
+	check(StarChest.open(p).is_empty(), "nothing to open")
+	p.free()
+
+
+func test_interstitial_rules() -> void:
+	var cfg: Dictionary = Economy.value("interstitial")
+	var state := {"levels": 3, "runs": 0, "last_shown": -1e9, "last_rewarded": -1e9, "today": 0}
+	check(InterstitialRules.due(cfg, state, 1000.0, "level", 20), "every third level")
+	check(not InterstitialRules.due(cfg, state, 1000.0, "level", 5), "never in the first levels")
+	check(not InterstitialRules.due(cfg, state.merged({"levels": 2}, true), 1000.0, "level", 20), "not every level")
+	check(not InterstitialRules.due(cfg, state.merged({"last_shown": 950.0}, true), 1000.0, "level", 20), "two minutes apart")
+	check(not InterstitialRules.due(cfg, state.merged({"last_rewarded": 980.0}, true), 1000.0, "level", 20), "not right after a rewarded ad")
+	check(not InterstitialRules.due(cfg, state.merged({"today": 99}, true), 1000.0, "level", 20), "daily cap")
+	check(InterstitialRules.due(cfg, state.merged({"runs": 2}, true), 1000.0, "rush", 999), "every second Rush run")
+	check(not InterstitialRules.due(cfg, state.merged({"runs": 1}, true), 1000.0, "rush", 999), "not after every run")

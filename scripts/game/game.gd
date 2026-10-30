@@ -76,8 +76,13 @@ var _last_out: VehicleView ## the car that most recently left the lot
 
 func _ready() -> void:
 	_adapt_lighting()
-	hud.restart_requested.connect(func(): Transition.cover(load_level.bind(level_index)))
-	hud.next_requested.connect(func(): Transition.cover(load_level.bind(level_index + 1)))
+	hud.restart_requested.connect(func():
+		if Rush.playing and session.state == GameSession.State.LOST:
+			await AdManager.maybe_interstitial("rush", 999) # between runs
+		Transition.cover(load_level.bind(level_index)))
+	hud.next_requested.connect(func():
+		await AdManager.maybe_interstitial("level", world_index * LevelGenerator.LEVELS_PER_WORLD + level_index)
+		Transition.cover(load_level.bind(level_index + 1)))
 	hud.menu_requested.connect(_to_menu)
 	hud.rescue_pressed.connect(_on_rescue)
 	_gestures.tapped.connect(_on_tap)
@@ -817,6 +822,8 @@ func _on_rush_over() -> void:
 	Progress.max_stat("rush_best", _rush_score)
 	Quests.report(Progress, "rush_score", _rush_score)
 	if not _rush_continued:
+		AdManager.note_finished("rush")
+	if not _rush_continued:
 		Progress.add_stat("rush_runs")
 	var per_coin := int(Economy.value("rush_points_per_coin"))
 	var coins := _rush_score / per_coin - _rush_paid / per_coin # a continued run pays only what is new
@@ -863,6 +870,7 @@ func _on_won() -> void:
 	}
 	if record.has("streak"):
 		result["streak"] = record.streak
+	AdManager.note_finished("level")
 	Quests.report(Progress, "level_won")
 	if stars == 3:
 		Quests.report(Progress, "perfect")

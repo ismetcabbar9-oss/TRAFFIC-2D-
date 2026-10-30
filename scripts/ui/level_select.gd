@@ -198,7 +198,15 @@ func _build_home() -> void:
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	page.add_child(subtitle)
 
-	page.add_child(_quests_card())
+	var cards := HBoxContainer.new()
+	cards.add_theme_constant_override("separation", 12)
+	page.add_child(cards)
+	var quests := _quests_card()
+	quests.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cards.add_child(quests)
+	var chest := _star_chest_card()
+	chest.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cards.add_child(chest)
 	page.add_child(_rush_card())
 	for w in LevelCatalog.world_count():
 		page.add_child(_world_card(w))
@@ -930,6 +938,98 @@ func _start_daily() -> void:
 	Transition.change_scene(GAME_SCENE)
 
 
+## Star chest card: stars toward the next chest on a bar; a glowing "open"
+## button once it is full.
+func _star_chest_card() -> Button:
+	var ready := StarChest.ready(Progress)
+	var card := Button.new()
+	card.theme_type_variation = "GoodButton" if ready else "IconButton"
+	card.custom_minimum_size = Vector2(0, 76)
+	card.focus_mode = Control.FOCUS_NONE
+	card.add_theme_font_size_override("font_size", 26)
+	card.pressed.connect(func():
+		_click()
+		if StarChest.ready(Progress):
+			_open_star_chest())
+	if ready:
+		card.text = tr("STAR_CHEST_OPEN")
+		_add_dot(card)
+		var pulse := card.create_tween().set_loops()
+		card.resized.connect(func(): card.pivot_offset = card.size * 0.5)
+		pulse.tween_property(card, "scale", Vector2.ONE * 1.04, 0.5).set_trans(Tween.TRANS_SINE)
+		pulse.tween_property(card, "scale", Vector2.ONE, 0.5).set_trans(Tween.TRANS_SINE)
+		return card
+	card.text = "%s  %d/%d" % [tr("STAR_CHEST_TITLE"), StarChest.progress_stars(Progress), StarChest.STARS]
+	card.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var bar := ProgressBar.new()
+	bar.max_value = StarChest.STARS
+	bar.value = StarChest.progress_stars(Progress)
+	bar.show_percentage = false
+	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	bar.offset_left = 22
+	bar.offset_right = -22
+	bar.offset_top = -20
+	bar.offset_bottom = -12
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var track := StyleBoxFlat.new()
+	track.bg_color = Color(UiStyle.INK, 0.12)
+	track.set_corner_radius_all(4)
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = Color("ffc93c")
+	fill.set_corner_radius_all(4)
+	bar.add_theme_stylebox_override("background", track)
+	bar.add_theme_stylebox_override("fill", fill)
+	card.add_child(bar)
+	return card
+
+
+## Chest pop-up: what is inside, open it (or open it twice over for an ad).
+func _open_star_chest() -> void:
+	var c := StarChest.contents(Progress)
+	var dim := ColorRect.new()
+	dim.color = Color(0.1, 0.12, 0.2, 0.6)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(520, 0)
+	center.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 16)
+	panel.add_child(box)
+	var title := _label(tr("STAR_CHEST_TITLE"), 50, UiStyle.INK)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var item_name := tr("RESCUE_" + str(c.item).to_upper())
+	var inside := _label(tr("STAR_CHEST_GOT") % [int(c.coins), 1, item_name], 30, UiStyle.ACCENT_DARK, true)
+	inside.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(inside)
+	var done := func(times: int):
+		var got := StarChest.open(Progress, times)
+		if got.is_empty():
+			return
+		Sfx.play("celebrate", -2.0, 1.0, 0.0)
+		add_child(Confetti.new())
+		_toast(tr("STAR_CHEST_GOT") % [int(got.coins), int(got.count), item_name])
+		dim.queue_free()
+		_show("home", false)
+	if AdManager.rewarded_available("star_chest"):
+		var double := _wide_button(tr("STAR_CHEST_DOUBLE"), Callable())
+		double.theme_type_variation = "GoodButton"
+		double.pressed.connect(func():
+			_click()
+			AdManager.show_rewarded("star_chest", done.bind(2)))
+		box.add_child(double)
+	var open := _wide_button(tr("STAR_CHEST_OPEN"), Callable())
+	open.theme_type_variation = ""
+	open.pressed.connect(func():
+		_click()
+		done.call(1))
+	box.add_child(open)
+
+
 ## Slim card above the modes: today's quests done and a dot when coins wait.
 func _quests_card() -> Button:
 	var quests := Quests.today(Progress)
@@ -938,8 +1038,8 @@ func _quests_card() -> Button:
 	card.theme_type_variation = "IconButton"
 	card.custom_minimum_size = Vector2(0, 76)
 	card.focus_mode = Control.FOCUS_NONE
-	card.text = "%s   %d/%d" % [tr("QUESTS_TITLE"), done, quests.size()]
-	card.add_theme_font_size_override("font_size", 28)
+	card.text = "%s  %d/%d" % [tr("QUESTS_TITLE"), done, quests.size()]
+	card.add_theme_font_size_override("font_size", 26)
 	card.pressed.connect(func():
 		_click()
 		_show("quests"))

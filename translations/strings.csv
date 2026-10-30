@@ -295,3 +295,8 @@ QUEST_CLAIM,Collect,Al
 QUEST_DOUBLE,x2 · ad,x2 · reklam
 QUEST_CHEST,Bonus chest · +%d coins,Bonus sandık · +%d jeton
 QUEST_CHEST_OPENED,Chest opened: see you tomorrow!,Sandık açıldı: yarın görüşürüz!
+AD_PLACEHOLDER_INTERSTITIAL,Ad (test) · between levels,Reklam (test) · bölüm arası
+STAR_CHEST_TITLE,Star chest,Yıldız sandığı
+STAR_CHEST_OPEN,Open the chest!,Sandığı aç!
+STAR_CHEST_GOT,"+%d coins and +%d %s","+%d jeton ve +%d %s"
+STAR_CHEST_DOUBLE,Open x2 · watch an ad,x2 aç · reklam izle

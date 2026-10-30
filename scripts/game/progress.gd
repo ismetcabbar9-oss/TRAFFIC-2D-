@@ -170,7 +170,8 @@ func use_wheel_free() -> void:
 func count_ad(placement: String) -> void:
 	var ads: Dictionary = _today().get_or_add("ads", {})
 	ads[placement] = int(ads.get(placement, 0)) + 1
-	ads["total"] = int(ads.get("total", 0)) + 1
+	if placement != "interstitial": # the daily cap of rewarded ads
+		ads["total"] = int(ads.get("total", 0)) + 1
 	save()
 
 
