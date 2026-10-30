@@ -640,6 +640,7 @@ func _build_settings() -> void:
 	_setting_row(rows, "SET_VIBRATION", tr("ON") if Progress.vibration_on else tr("OFF"),
 			func(): Progress.set_vibration(not Progress.vibration_on))
 	_setting_row(rows, "SET_SPEED", Progress.speed_label(), Progress.cycle_speed)
+	_setting_row(rows, "SET_GRAPHICS", tr("GFX_" + Progress.graphics.to_upper()), Progress.cycle_graphics)
 	_setting_row(rows, "SET_LANGUAGE", tr({"auto": "LANG_AUTO", "en": "LANG_EN", "tr": "LANG_TR"}[Progress.language]),
 			Progress.cycle_language)
 

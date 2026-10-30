@@ -1,6 +1,6 @@
 extends SceneTree
 ## Dev helper: opens a level and prints render statistics.
-## Usage (under xvfb-run): godot --path . --script res://tools/measure_perf.gd -- <level_number> [world_number]
+## Usage (under xvfb-run): godot --path . --script res://tools/measure_perf.gd -- <level_number> [world_number] [high|low]
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
@@ -8,6 +8,7 @@ func _initialize() -> void:
 	var progress := root.get_node("Progress")
 	progress.current_level = int(args[0]) - 1 if args.size() > 0 else 9
 	progress.current_world = int(args[1]) - 1 if args.size() > 1 else 0
+	progress.graphics = args[2] if args.size() > 2 else "high"
 	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB"]
 	root.add_child(load("res://scenes/game.tscn").instantiate())
 	for i in 30:

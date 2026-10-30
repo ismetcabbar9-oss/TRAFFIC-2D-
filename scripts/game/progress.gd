@@ -35,6 +35,7 @@ var sound_on := true
 var music_on := true
 var vibration_on := true
 var speed_level := 1 ## index into SPEEDS
+var graphics := "auto" ## "auto", "high" or "low" (see Quality)
 var language := "auto" ## one of LANGUAGES
 
 var current_world := 0
@@ -417,6 +418,12 @@ func speed_label() -> String:
 	return tr(SPEEDS[speed_level][0])
 
 
+## Steps auto -> high -> low -> auto.
+func cycle_graphics() -> void:
+	graphics = ["auto", "high", "low"][(["auto", "high", "low"].find(graphics) + 1) % 3]
+	_settings_changed()
+
+
 ## Steps auto -> English -> Türkçe -> auto.
 func cycle_language() -> void:
 	language = LANGUAGES[(LANGUAGES.find(language) + 1) % LANGUAGES.size()]
@@ -463,7 +470,7 @@ func save() -> void:
 		"tips": tips_seen,
 		"settings": {
 			"sound": sound_on, "music": music_on, "vibration": vibration_on,
-			"speed": speed_level, "language": language,
+			"speed": speed_level, "language": language, "graphics": graphics,
 		},
 	}
 	# Write to a temp file first so a crash mid-write never corrupts the save.
@@ -508,6 +515,9 @@ func _load() -> void:
 	music_on = bool(s.get("music", true))
 	vibration_on = bool(s.get("vibration", true))
 	speed_level = clampi(int(s.get("speed", 1)), 0, SPEEDS.size() - 1)
+	graphics = str(s.get("graphics", "auto"))
+	if not graphics in ["auto", "high", "low"]:
+		graphics = "auto"
 	language = s.get("language", "auto") if s.get("language", "auto") in LANGUAGES else "auto"
 	current_world = 0
 	current_level = next_open_level(0)

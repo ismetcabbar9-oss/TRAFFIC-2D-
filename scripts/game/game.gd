@@ -65,6 +65,8 @@ var _cinematic := false ## a cut scene is running (a tap skips it)
 var _skip := false
 var _follow: VehicleView ## car the camera follows during the finale
 var _last_out: VehicleView ## the car that most recently left the lot
+var _fps_frames := 0 ## auto graphics: frames counted early in a level
+var _fps_time := 0.0
 
 @onready var board: BoardView = $Board
 @onready var pieces: Node3D = $Vehicles
@@ -197,7 +199,11 @@ func load_level(index: int) -> void:
 		add_child(_headlights)
 	board.theme = world_theme.board
 	board.build(level.cols, level.rows)
-	scenery.build(board.view_half_extents(), board.theme.road_width * 0.5, level.cols * 31 + level.rows, world_theme)
+	scenery.build(board.view_half_extents(), board.theme.road_width * 0.5, level.cols * 31 + level.rows, world_theme,
+			Quality.is_low(Progress))
+	Quality.apply(Progress, $Sun, get_viewport())
+	_fps_frames = 0
+	_fps_time = 0.0
 	_build_pieces()
 	# Each level is a little later in the day: morning light to sunset.
 	var hour := TimeOfDay.hour_for_level(level_index, LevelCatalog.level_count(world_index))
@@ -347,6 +353,7 @@ func _process(delta: float) -> void:
 	if _paused:
 		return
 	_clock += delta
+	_measure_fps(delta)
 	if session != null:
 		_refresh_bomb_offer()
 	if is_instance_valid(_follow):
@@ -686,6 +693,22 @@ func _urgent_bomb() -> int:
 			if best < 0 or v.bomb < (session.board.vehicles[best] as VehicleState).bomb:
 				best = id
 	return best
+
+
+## Auto graphics: the average frame rate over the first seconds of a level
+## (after the intro); too slow switches to low quality right away.
+func _measure_fps(delta: float) -> void:
+	if _fps_time >= Quality.SAMPLE_SECONDS + 1.5 or Engine.time_scale != 1.0:
+		return
+	_fps_time += delta
+	if _fps_time < 1.5: # the intro glide and pop-in
+		return
+	_fps_frames += 1
+	if _fps_time >= Quality.SAMPLE_SECONDS + 1.5:
+		var fps := _fps_frames / Quality.SAMPLE_SECONDS
+		if Quality.report_fps(Progress, fps):
+			Quality.apply(Progress, $Sun, get_viewport())
+			Analytics.design("graphics:auto_low", fps)
 
 
 # --- Cut scenes --------------------------------------------------------------------

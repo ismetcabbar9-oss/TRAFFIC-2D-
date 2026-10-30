@@ -13,13 +13,16 @@ const GLOW_SHADER := preload("res://shaders/glow.gdshader")
 var _rng := RandomNumberGenerator.new()
 var _taken: Array[Rect2] = [] ## footprints already used (XZ)
 var _placements := {} ## model path -> Array[Transform3D]
+var _sparse := false
 var _theme: WorldTheme
 var _lamp_spots: Array[Vector3] = [] ## lamp heads, for the night glow
 
 
 ## `inner_half`: half extents of the outer pavement edge; nothing goes inside.
 ## `exit_half_width`: half width of the exit road running down from the ring.
-func build(inner_half: Vector2, exit_half_width: float, seed_value: int, theme: WorldTheme) -> void:
+## `sparse`: low graphics quality - fewer trees, one ring of houses, less snow.
+func build(inner_half: Vector2, exit_half_width: float, seed_value: int, theme: WorldTheme, sparse := false) -> void:
+	_sparse = sparse
 	for child in get_children():
 		child.queue_free()
 	_taken.clear()
@@ -68,7 +71,7 @@ func _add_lamps(inner_half: Vector2, exit_half_width: float) -> void:
 
 ## Trees and bushes just outside the pavement; bottom side gets bushes only.
 func _add_belt(inner_half: Vector2) -> void:
-	var attempts := 140
+	var attempts := 60 if _sparse else 140
 	for i in attempts:
 		var side := _rng.randi_range(0, 3)
 		var depth := _rng.randf_range(0.9, 4.5)
@@ -91,7 +94,7 @@ func _add_belt(inner_half: Vector2) -> void:
 ## Shops and houses in a ring further out, facing the road.
 func _add_houses(inner_half: Vector2) -> void:
 	var radius := _theme.building_radius
-	for ring in 2:
+	for ring in (1 if _sparse else 2):
 		var gap := 6.2 + ring * 8.0 + (radius - 3.6)
 		var outer := inner_half + Vector2.ONE * gap
 		for side in 4:
@@ -207,7 +210,7 @@ func _add_lamp_glow() -> void:
 ## Light snowfall over the board (soft white flakes drifting down).
 func _add_snowfall(inner_half: Vector2) -> void:
 	var flakes := CPUParticles3D.new()
-	flakes.amount = 260
+	flakes.amount = 110 if _sparse else 260
 	flakes.lifetime = 7.0
 	flakes.preprocess = 7.0
 	flakes.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX

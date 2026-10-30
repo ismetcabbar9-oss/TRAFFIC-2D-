@@ -300,3 +300,7 @@ STAR_CHEST_TITLE,Star chest,Yıldız sandığı
 STAR_CHEST_OPEN,Open the chest!,Sandığı aç!
 STAR_CHEST_GOT,"+%d coins and +%d %s","+%d jeton ve +%d %s"
 STAR_CHEST_DOUBLE,Open x2 · watch an ad,x2 aç · reklam izle
+SET_GRAPHICS,Graphics,Grafik
+GFX_AUTO,Auto,Otomatik
+GFX_HIGH,High,Yüksek
+GFX_LOW,Low (faster),Düşük (daha akıcı)
