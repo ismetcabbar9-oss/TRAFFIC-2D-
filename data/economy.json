@@ -20,8 +20,7 @@
     "crane": 120,
     "continue": 100,
     "rewind": 150,
-    "bomb_time": 60,
-    "rush_continue": 150
+    "bomb_time": 60
   },
   "free_hints_per_day": 3,
   "ad_limits_per_day": {
@@ -34,7 +33,6 @@
     "free_coins": 5,
     "rewind": 4,
     "bomb_time": 4,
-    "rush_continue": 5,
     "cosmetic": 10,
     "wheel": 3,
     "quest_double": 3,
@@ -89,13 +87,10 @@
     "hard": 1,
     "daily": 2
   },
-  "rush_points_per_coin": 25,
   "bomb_time": 3,
-  "rush_continue_clears": 5,
   "interstitial": {
     "from_level": 10,
     "every_levels": 3,
-    "rush_every_runs": 2,
     "min_gap_s": 120,
     "after_rewarded_gap_s": 60,
     "max_per_day": 20

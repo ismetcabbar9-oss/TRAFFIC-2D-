@@ -87,10 +87,3 @@ func test_bomb_time() -> void:
 	s.add_bomb_time(0, 3)
 	check_eq(s.board.vehicles[0].bomb, 5, "three more taps")
 
-
-func test_resume_after_full_lot() -> void:
-	var s := GameSession.new(make_level(4, 4, [["sedan", 0, 0, "right"]]))
-	s.endless = true
-	s.end("full")
-	s.resume()
-	check_eq(s.state, GameSession.State.PLAYING, "back in the run")

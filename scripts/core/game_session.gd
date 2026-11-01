@@ -13,7 +13,6 @@ signal vehicle_restored(id: int) ## undo of a pull-forward or turn
 signal vehicle_fell(id: int, result: BoardState.MoveResult) ## drove into a pit
 signal exploded(id: int, cell: Vector2i) ## tanker crash or bomb at zero: the level is lost
 signal bombs_ticked ## bomb counters changed (a tap, or an undo)
-signal vehicle_added(id: int) ## endless mode: a new car arrived
 signal rewound ## the board went back to before the fatal tap (rewind rescue)
 signal mistakes_changed(left: int)
 signal won
@@ -28,12 +27,10 @@ var state := State.PLAYING
 var taps := 0
 var crashes := 0 ## crashes that still count (undo takes one back)
 var falls := 0 ## vehicles lost in pits
-var lose_reason := "" ## "" (out of moves), "explosion" (tanker), "bomb" or "full" (endless)
-var endless := false ## endless mode: an empty board is not a win, cars keep arriving
+var lose_reason := "" ## "" (out of moves), "explosion" (tanker) or "bomb"
 
 ## Last tap that can be undone: {action, id, previous: VehicleState}, or empty.
 var _undoable := {}
-var _next_id := 0 ## endless mode: ids are never reused (views are keyed by id)
 var _before := {} ## the game as it was before the last tap (see rewind)
 
 
@@ -41,7 +38,6 @@ func _init(p_level: LevelData) -> void:
 	level = p_level
 	board = BoardState.from_level(level)
 	mistakes_left = level.mistakes
-	_next_id = level.vehicles.size()
 
 
 ## Handles a tap on a vehicle. Returns the move result, or null if ignored.
@@ -101,9 +97,9 @@ func tap(id: int) -> BoardState.MoveResult:
 	return result
 
 
-## Wins when the board is empty (never in endless mode). True if it won.
+## Wins when the board is empty. True if it won.
 func _check_cleared() -> bool:
-	if endless or not board.is_cleared():
+	if not board.is_cleared():
 		return false
 	state = State.WON
 	won.emit()
@@ -138,41 +134,6 @@ func add_bomb_time(id: int, amount: int) -> void:
 		return
 	(board.vehicles[id] as VehicleState).bomb += amount
 	bombs_ticked.emit()
-
-
-## Endless mode: back to playing after a full lot (the rush continue).
-func resume() -> void:
-	if state != State.LOST or lose_reason in ["explosion", "bomb"]:
-		return
-	lose_reason = ""
-	state = State.PLAYING
-
-
-## Endless mode: a new vehicle drives onto the board. Returns its id, or -1
-## if it does not fit.
-func add_vehicle(entry: Dictionary) -> int:
-	var id := 0
-	for k in board.vehicles:
-		id = maxi(id, k + 1)
-	id = maxi(id, _next_id)
-	var v := VehicleState.new(id, entry.type, entry.cell, entry.dir, VehicleCatalog.cells(entry.type))
-	v.cargo = entry.get("cargo", false)
-	v.bomb = entry.get("bomb", 0)
-	if state != State.PLAYING or not board.add_vehicle(v):
-		return -1
-	_next_id = id + 1
-	vehicle_added.emit(id)
-	return id
-
-
-## Ends the game from outside the rules (endless mode: the lot is full).
-func end(reason: String) -> void:
-	if state != State.PLAYING:
-		return
-	_undoable = {}
-	lose_reason = reason
-	state = State.LOST
-	lost.emit()
 
 
 func _explode(reason: String, id: int, cell: Vector2i) -> void:

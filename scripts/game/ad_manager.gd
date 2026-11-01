@@ -13,7 +13,6 @@ const PLACEHOLDER_SECONDS := 1.5
 var _busy := false
 # Interstitials (see InterstitialRules); counted per app session.
 var _levels_since := 0
-var _runs_since := 0
 var _last_shown := -1e9
 var _last_rewarded := -1e9
 
@@ -57,13 +56,9 @@ func _finish(placement: String, rewarded: bool, on_reward: Callable) -> void:
 	ad_finished.emit(placement, rewarded)
 
 
-## A level (or a Rush run) has been finished: counts toward the next
-## interstitial.
-func note_finished(context: String) -> void:
-	if context == "rush":
-		_runs_since += 1
-	else:
-		_levels_since += 1
+## A level has been finished: counts toward the next interstitial.
+func note_finished(_context: String) -> void:
+	_levels_since += 1
 
 
 ## Shows an interstitial if one is due (see InterstitialRules); awaits it.
@@ -71,7 +66,7 @@ func note_finished(context: String) -> void:
 func maybe_interstitial(context: String, progress_level: int) -> void:
 	if _busy or Progress.ad_free or Progress.in_onboarding():
 		return
-	var state := {"levels": _levels_since, "runs": _runs_since, "last_shown": _last_shown,
+	var state := {"levels": _levels_since, "last_shown": _last_shown,
 		"last_rewarded": _last_rewarded, "today": Progress.ads_watched("interstitial")}
 	if not InterstitialRules.due(Economy.value("interstitial"), state, _now(), context, progress_level):
 		return
@@ -81,7 +76,6 @@ func maybe_interstitial(context: String, progress_level: int) -> void:
 	_busy = false
 	_last_shown = _now()
 	_levels_since = 0
-	_runs_since = 0
 	Progress.count_ad("interstitial")
 
 

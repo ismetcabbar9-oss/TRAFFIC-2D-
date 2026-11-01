@@ -19,7 +19,7 @@ func _initialize() -> void:
 		TranslationServer.set_locale(args[1])
 	progress = root.get_node("Progress")
 	progress.tutorial_seen = true
-	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB", "RUSH"]
+	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB"]
 	for w in 5:
 		await _finale(w, 4, "c%d" % (w + 1))
 	await _finale(0, 9, "c6_hard")

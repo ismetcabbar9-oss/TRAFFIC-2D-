@@ -1,19 +1,18 @@
 class_name Quests
 ## Daily quests: three goals a day picked from a pool (only ones the player
-## can reach: no Rush Hour quest before it is unlocked and so on). Play
+## can reach: no bomb quest before the Snow world is open and so on). Play
 ## reports events; a finished quest's coins are collected by hand and can be
 ## doubled with an ad; all three collected opens a bonus chest.
 ## Kept in Progress.daily, so they start fresh every day.
 
 ## {id, event, goal, coins, [needs]}; "max" events keep the best value seen
-## (a combo, a Rush score) instead of adding up.
+## (a combo) instead of adding up.
 const POOL := [
 	{"id": "levels_3", "event": "level_won", "goal": 3, "coins": 40},
 	{"id": "perfect_2", "event": "perfect", "goal": 2, "coins": 60},
 	{"id": "cars_40", "event": "cars", "goal": 40, "coins": 40},
 	{"id": "combo_5", "event": "combo", "goal": 5, "coins": 50, "max": true},
 	{"id": "daily_1", "event": "daily", "goal": 1, "coins": 50},
-	{"id": "rush_300", "event": "rush_score", "goal": 300, "coins": 60, "max": true, "needs": "rush"},
 	{"id": "tanker_1", "event": "tanker_level", "goal": 1, "coins": 50, "needs": "tanker"},
 	{"id": "bomb_1", "event": "bomb_level", "goal": 1, "coins": 60, "needs": "bomb"},
 ]
@@ -91,8 +90,6 @@ static func open_chest(progress: Node) -> bool:
 
 static func _reachable(progress: Node, q: Dictionary) -> bool:
 	match q.get("needs", ""):
-		"rush":
-			return Rush.unlocked(progress)
 		"tanker":
 			return progress.levels.size() >= 20
 		"bomb":

@@ -1,6 +1,6 @@
 extends SceneTree
 ## Dev helper: screenshots of the ad / coin rescues - rewind after an
-## explosion, "Bomb +3", the Rush Hour continue and the "so close" note.
+## explosion, "Bomb +3" and the "so close" note.
 ## Usage (under xvfb-run, see capture.gd):
 ##   godot --path . --rendering-method forward_plus --resolution 720x1280 \
 ##     --script res://tools/offers_demo.gd -- <out_dir> [locale]
@@ -18,7 +18,7 @@ func _initialize() -> void:
 		TranslationServer.set_locale(args[1])
 	progress = root.get_node("Progress")
 	progress.tutorial_seen = true
-	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB", "RUSH"]
+	progress.tips_seen = ["CARGO", "TURN", "LOCK", "GATE", "PIT", "TANKER", "BOMB"]
 
 	var g := await _open(0, 20) # tanker
 	for id in g.session.board.vehicles.keys():
@@ -45,16 +45,6 @@ func _initialize() -> void:
 	await _shot("o4_bomb_offer")
 	g.queue_free()
 
-	Rush.start(0)
-	g = await _open(0, 0)
-	g._rush_score = 520
-	g._rush_best_before = 600
-	g.session.end("full")
-	await _panel(g)
-	await _shot("o5_rush_continue")
-	Rush.stop()
-	g.queue_free()
-
 	g = await _open(0, 15) # out of moves with three cars left
 	var ids: Array = g.session.board.vehicles.keys()
 	for id in ids.slice(0, ids.size() - 3):
@@ -65,7 +55,7 @@ func _initialize() -> void:
 		if not g.session.board.probe(id).free and g.session.state == GameSession.State.PLAYING:
 			g.session.tap(id)
 	await _panel(g)
-	await _shot("o6_so_close")
+	await _shot("o5_so_close")
 	quit()
 
 

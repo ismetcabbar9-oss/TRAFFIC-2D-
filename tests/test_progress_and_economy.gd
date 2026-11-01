@@ -103,7 +103,7 @@ func test_wheel_odds() -> void:
 		var k := Wheel.pick(rng)
 		hits[k] = hits.get(k, 0) + 1
 	var jackpot := Wheel.PRIZES.find(Wheel.PRIZES.filter(func(p): return p.get("jackpot", false))[0])
-	check(hits.get(jackpot, 0) > 100 and hits.get(jackpot, 0) < 320, "jackpot about 2% (%d)" % hits.get(jackpot, 0))
+	check(hits.get(jackpot, 0) > 100 and hits.get(jackpot, 0) < 320, "jackpot about 2%% (%d)" % hits.get(jackpot, 0))
 	check_eq(hits.size(), Wheel.PRIZES.size(), "every slice can come up")
 
 
@@ -167,12 +167,10 @@ func test_star_chest() -> void:
 
 func test_interstitial_rules() -> void:
 	var cfg: Dictionary = Economy.value("interstitial")
-	var state := {"levels": 3, "runs": 0, "last_shown": -1e9, "last_rewarded": -1e9, "today": 0}
+	var state := {"levels": 3, "last_shown": -1e9, "last_rewarded": -1e9, "today": 0}
 	check(InterstitialRules.due(cfg, state, 1000.0, "level", 20), "every third level")
 	check(not InterstitialRules.due(cfg, state, 1000.0, "level", 5), "never in the first levels")
 	check(not InterstitialRules.due(cfg, state.merged({"levels": 2}, true), 1000.0, "level", 20), "not every level")
 	check(not InterstitialRules.due(cfg, state.merged({"last_shown": 950.0}, true), 1000.0, "level", 20), "two minutes apart")
 	check(not InterstitialRules.due(cfg, state.merged({"last_rewarded": 980.0}, true), 1000.0, "level", 20), "not right after a rewarded ad")
 	check(not InterstitialRules.due(cfg, state.merged({"today": 99}, true), 1000.0, "level", 20), "daily cap")
-	check(InterstitialRules.due(cfg, state.merged({"runs": 2}, true), 1000.0, "rush", 999), "every second Rush run")
-	check(not InterstitialRules.due(cfg, state.merged({"runs": 1}, true), 1000.0, "rush", 999), "not after every run")
