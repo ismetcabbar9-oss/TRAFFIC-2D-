@@ -21,6 +21,12 @@ const CREDITS := [
 
 var _pages := {} ## name -> Control
 var _current := ""
+# Finger scrolling of the menu pages (see _input).
+const DRAG_START := 14.0 ## canvas pixels of vertical travel before a touch becomes a scroll
+var _drag := {} ## {scroll, start, dragging, speed} while a finger is down
+var _fling := 0.0 ## pixels per second still gliding after the finger lifts
+var _fling_scroll: ScrollContainer
+var _cancelling := false
 var _coin_label: Label
 var _world := 0 ## world shown on the world page
 ## Set by the game so leaving a level lands on that world's level grid.
@@ -103,7 +109,7 @@ func _page() -> VBoxContainer:
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.scroll_deadzone = 12 # a tap that wobbles a little is still a tap
+	scroll.scroll_deadzone = 100000 # finger drags are handled in _input; wheel and bar still work
 	scroll.visible = false
 	add_child(scroll)
 	var margin := MarginContainer.new()
@@ -146,6 +152,66 @@ func _show(page: String, animate := true) -> void:
 	_current = page
 	if is_instance_valid(_tab_bar):
 		_tab_bar.visible = page == "home"
+
+
+## Finger scrolling, handled here before any button sees the touch so it
+## works the same on every device and in both orientations: once a finger
+## has moved DRAG_START pixels up or down it scrolls the page (the card or
+## button it started on is let go without being pressed); lifting it leaves
+## the page gliding for a moment. Taps are untouched.
+func _input(event: InputEvent) -> void:
+	if _cancelling:
+		return
+	if event is InputEventScreenTouch and event.index == 0:
+		if event.pressed:
+			_fling = 0.0
+			var scroll := _current_scroll()
+			_drag = {} if scroll == null else {"scroll": scroll, "start": event.position, "dragging": false, "speed": 0.0}
+		else:
+			if _drag.get("dragging", false):
+				get_viewport().set_input_as_handled()
+				_fling = _drag.speed
+				_fling_scroll = _drag.scroll
+			_drag = {}
+	elif event is InputEventScreenDrag and event.index == 0 and not _drag.is_empty():
+		var travel: Vector2 = event.position - _drag.start
+		if not _drag.dragging and absf(travel.y) > DRAG_START and absf(travel.y) > absf(travel.x):
+			_drag.dragging = true
+			_cancel_press(event.position)
+		if _drag.dragging:
+			var scroll: ScrollContainer = _drag.scroll
+			scroll.scroll_vertical -= int(roundf(event.relative.y))
+			var dt := maxf(get_process_delta_time(), 0.001)
+			_drag.speed = lerpf(_drag.speed, -event.relative.y / dt, 0.4)
+			get_viewport().set_input_as_handled()
+	elif _drag.get("dragging", false) and (event is InputEventMouseMotion or event is InputEventMouseButton):
+		get_viewport().set_input_as_handled() # the mouse twin of a scrolling touch
+
+
+func _process(delta: float) -> void:
+	if _fling == 0.0 or not is_instance_valid(_fling_scroll):
+		return
+	_fling_scroll.scroll_vertical += int(roundf(_fling * delta))
+	_fling = move_toward(_fling, 0.0, absf(_fling) * 4.0 * delta + 60.0 * delta)
+
+
+## Lets go of whatever control the finger went down on, without pressing it.
+func _cancel_press(at: Vector2) -> void:
+	_cancelling = true
+	for e in [InputEventScreenTouch.new(), InputEventMouseButton.new()]:
+		e.position = at
+		e.pressed = false
+		e.canceled = true
+		if e is InputEventMouseButton:
+			e.button_index = MOUSE_BUTTON_LEFT
+		get_viewport().push_input(e)
+	_cancelling = false
+
+
+func _current_scroll() -> ScrollContainer:
+	if not _pages.has(_current):
+		return null
+	return (_pages[_current] as Control).get_parent().get_parent() as ScrollContainer
 
 
 ## Lets a drag that starts on a card or button scroll the page: controls
