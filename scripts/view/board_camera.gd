@@ -10,6 +10,9 @@ extends Camera3D
 @export var top_reserve := 0.12
 @export var top_reserve_landscape := 0.18
 @export var bottom_reserve := 0.13 ## rescue bar
+## Landscape phones are short: the view frames just the parking lot (the ring
+## road and exit peek in at the edges); the rescue bar sits in the corner.
+@export var bottom_reserve_landscape := 0.05
 
 @export var max_zoom := 2.6 ## 1 = whole board
 
@@ -17,6 +20,9 @@ extends Camera3D
 @export var shake_max_offset := 0.35 ## world units at full trauma
 
 var _half_extents := Vector2(6, 6)
+var _wide_half := Vector2(6, 6) ## portrait framing: lot, ring road and exit
+var _wide_center_z := 0.0
+var _lot_half := Vector2.ZERO ## landscape framing: the parking lot only
 var _center_z := 0.0
 var _trauma := 0.0
 var _shake_time := 0.0
@@ -62,10 +68,12 @@ func play_intro(duration := 0.8) -> void:
 
 
 ## Frames the board (centered half extents) plus `extra_bottom` world units
-## below it, e.g. the exit barrier.
-func frame_board(half_extents: Vector2, extra_bottom := 0.0) -> void:
-	_half_extents = half_extents + Vector2(0.0, extra_bottom * 0.5) + Vector2.ONE * margin
-	_center_z = extra_bottom * 0.5
+## below it, e.g. the exit barrier. `lot_half`: half size of the parking lot
+## itself, framed tightly in landscape.
+func frame_board(half_extents: Vector2, extra_bottom := 0.0, lot_half := Vector2.ZERO) -> void:
+	_wide_half = half_extents + Vector2(0.0, extra_bottom * 0.5) + Vector2.ONE * margin
+	_wide_center_z = extra_bottom * 0.5
+	_lot_half = lot_half
 	_refit()
 
 
@@ -74,9 +82,17 @@ func _refit() -> void:
 	if vp.y <= 0.0:
 		return
 	var aspect := vp.x / vp.y
+	var landscape := aspect > 1.0
+	if landscape and _lot_half != Vector2.ZERO:
+		_half_extents = _lot_half + Vector2.ONE * margin
+		_center_z = 0.0
+	else:
+		_half_extents = _wide_half
+		_center_z = _wide_center_z
 	var tilt := deg_to_rad(tilt_degrees)
-	var top := top_reserve_landscape if aspect > 1.0 else top_reserve
-	var usable := 1.0 - top - bottom_reserve
+	var top := top_reserve_landscape if landscape else top_reserve
+	var bottom := bottom_reserve_landscape if landscape else bottom_reserve
+	var usable := 1.0 - top - bottom
 	var tan_v := tan(deg_to_rad(fov) * 0.5)
 	var tan_h := tan_v * aspect
 
@@ -89,7 +105,7 @@ func _refit() -> void:
 	var basis := Basis.from_euler(Vector3(-PI * 0.5 + tilt, 0.0, 0.0))
 	var forward := -basis.z
 	# Shift the look-at point so the board sits between the HUD reserves.
-	var shift := (top - bottom_reserve) * 0.5 * 2.0 * tan_v * dist
+	var shift := (top - bottom) * 0.5 * 2.0 * tan_v * dist
 	var target := Vector3(0.0, 0.0, _center_z - shift * cos(tilt))
 	_fit = Transform3D(basis, target - forward * dist)
 	_fit_target = target

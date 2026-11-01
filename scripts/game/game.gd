@@ -219,7 +219,8 @@ func load_level(index: int) -> void:
 	else:
 		TimeOfDay.apply(hour, $Sun, env, _sun_scale, _ambient_scale)
 	# Keep the exit barrier in view below the board.
-	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y)
+	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y,
+			board.lot_size() * 0.5 + Vector2.ONE * 0.35)
 	camera.reset_view()
 	camera.play_intro()
 	# Cars pop in one after another, row by row.

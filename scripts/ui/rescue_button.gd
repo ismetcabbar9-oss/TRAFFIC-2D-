@@ -60,8 +60,9 @@ func _draw() -> void:
 	var font := UiStyle.font(700)
 	var label := tr("RESCUE_" + kind.to_upper())
 	var width := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 21).x
-	draw_string(font, Vector2((size.x - width) * 0.5, size.y - 4.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 21,
-			UiStyle.INK if not disabled else UiStyle.MUTED)
+	var at := Vector2((size.x - width) * 0.5, size.y - 4.0)
+	draw_string_outline(font, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 21, 8, Color(1, 1, 1, 0.85)) # readable over the board
+	draw_string(font, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 21, UiStyle.INK if not disabled else UiStyle.MUTED)
 	if badge != "":
 		_draw_badge()
 

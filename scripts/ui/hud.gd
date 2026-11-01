@@ -54,6 +54,8 @@ var _earned := 0
 var _hand: TapHand
 var _rescue_bar: Control
 var _rescue_backdrop: Control
+var _top_backdrop: Control
+var _onboarding := false
 var _menu_button: Button
 
 
@@ -70,6 +72,8 @@ func _ready() -> void:
 	_hand = TapHand.new()
 	_hand.visible = false
 	root.add_child(_hand)
+	get_viewport().size_changed.connect(_fit_orientation)
+	_fit_orientation.call_deferred()
 	_build_result(root)
 
 
@@ -307,9 +311,19 @@ func show_toast(title: String, text: String) -> void:
 
 ## First session: no menu button, no rescue bar; nothing but the board.
 func set_onboarding(on: bool) -> void:
+	_onboarding = on
 	_menu_button.visible = not on
 	_rescue_bar.visible = not on
-	_rescue_backdrop.visible = not on
+	_fit_orientation()
+
+
+## Landscape: the board fills the height, so the white fades behind the top
+## bar and the rescue bar shrink away (the rescue bar sits in the corner).
+func _fit_orientation() -> void:
+	var size := get_viewport().get_visible_rect().size
+	var landscape := size.x > size.y
+	_rescue_backdrop.visible = not _onboarding and not landscape
+	_top_backdrop.offset_bottom = (110.0 if landscape else 190.0) + get_node("/root/ScreenFit").safe_insets().y
 
 
 ## Pause panel: resume, restart, sound and music switches, back to the menu.
@@ -840,6 +854,7 @@ func _build_top_bar(root: Control) -> void:
 	backdrop.offset_bottom = 190 + get_node("/root/ScreenFit").safe_insets().y
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(backdrop)
+	_top_backdrop = backdrop
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -874,11 +889,25 @@ func _build_top_bar(root: Control) -> void:
 		restart_requested.emit())
 	bar.add_child(_retry_button)
 
+	# A soft white pill keeps the line readable over the road (landscape has
+	# no white fade behind the top bar).
+	var pill := PanelContainer.new()
+	var pill_style := StyleBoxFlat.new()
+	pill_style.bg_color = Color(1, 1, 1, 0.72)
+	pill_style.set_corner_radius_all(22)
+	pill_style.content_margin_left = 18
+	pill_style.content_margin_right = 18
+	pill_style.content_margin_top = 2
+	pill_style.content_margin_bottom = 2
+	pill.add_theme_stylebox_override("panel", pill_style)
+	pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rows.add_child(pill)
 	var meter_row := HBoxContainer.new()
 	meter_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	meter_row.add_theme_constant_override("separation", 12)
 	meter_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rows.add_child(meter_row)
+	pill.add_child(meter_row)
 	_time_label = Label.new()
 	_time_label.add_theme_font_size_override("font_size", 24)
 	_time_label.add_theme_color_override("font_color", UiStyle.ACCENT_DARK)

@@ -103,6 +103,7 @@ func _page() -> VBoxContainer:
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.scroll_deadzone = 12 # a tap that wobbles a little is still a tap
 	scroll.visible = false
 	add_child(scroll)
 	var margin := MarginContainer.new()
@@ -135,6 +136,7 @@ func _show(page: String, animate := true) -> void:
 		"events": _build_events()
 		"wheel": _build_wheel()
 		"quests": _build_quests()
+	_pass_touches(_pages[page])
 	for name in _pages:
 		(_pages[name] as Control).get_parent().get_parent().visible = name == page
 	var shown: Control = (_pages[page] as Control).get_parent().get_parent()
@@ -144,6 +146,16 @@ func _show(page: String, animate := true) -> void:
 	_current = page
 	if is_instance_valid(_tab_bar):
 		_tab_bar.visible = page == "home"
+
+
+## Lets a drag that starts on a card or button scroll the page: controls
+## that would swallow the touch pass it on to the scroll container (a plain
+## tap still presses them; a drag scrolls instead).
+static func _pass_touches(node: Node) -> void:
+	for child in node.get_children():
+		if child is Control and (child as Control).mouse_filter == Control.MOUSE_FILTER_STOP:
+			(child as Control).mouse_filter = Control.MOUSE_FILTER_PASS
+		_pass_touches(child)
 
 
 static func _clear(page: Control) -> void:
@@ -211,7 +223,7 @@ func _build_home() -> void:
 	for w in LevelCatalog.world_count():
 		page.add_child(_world_card(w))
 	var room := Control.new() # keeps the last card clear of the bottom bar
-	room.custom_minimum_size.y = 210
+	room.custom_minimum_size.y = 260
 	page.add_child(room)
 	_build_tab_bar()
 	_refresh_coins()
