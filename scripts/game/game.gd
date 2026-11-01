@@ -74,6 +74,7 @@ func _ready() -> void:
 	hud.menu_requested.connect(_to_menu)
 	hud.rescue_pressed.connect(_on_rescue)
 	_gestures.tapped.connect(_on_tap)
+	get_viewport().size_changed.connect(func(): board.set_turned.call_deferred(camera.is_turned()))
 	_gestures.panned.connect(func(delta: Vector2): camera.pan_by(delta))
 	_gestures.pinched.connect(func(factor: float, center: Vector2):
 		camera.zoom_at(factor, center)
@@ -188,6 +189,7 @@ func load_level(index: int) -> void:
 	# Keep the exit barrier in view below the board.
 	camera.frame_board(board.view_half_extents(), board.exit_gate_z() + 1.0 - board.view_half_extents().y,
 			board.lot_size() * 0.5 + Vector2.ONE * 0.35)
+	board.set_turned(camera.is_turned())
 	camera.reset_view()
 	camera.play_intro()
 	# Cars pop in one after another, row by row.
@@ -704,7 +706,8 @@ func _zoom_tutorial() -> void:
 		if not _zoom_tut:
 			break
 		# A finger dragging left slides the view to the right.
-		camera.cinematic_to(Vector3(board.view_half_extents().x * 0.35, 0.0, 0.0), 1.8, 1.1)
+		var screen_right := BoardCamera._ground(camera.global_basis.x) # the view may be turned
+		camera.cinematic_to(screen_right * board.view_half_extents().x * 0.35, 1.8, 1.1)
 		await _move_fingers(guide, func(t: float) -> Array[Vector2]:
 			return [center + Vector2(lerpf(150.0, -150.0, t), 60.0)], 0.0, 1.0, 1.1)
 		await _guide_pause(0.3)

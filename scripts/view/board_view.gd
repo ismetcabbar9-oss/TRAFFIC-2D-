@@ -225,6 +225,17 @@ func _add_exit_label(road_outer: Vector2) -> void:
 	label.rotation_degrees.x = -90.0
 	label.position = Vector3(0, 0.016, road_outer.y + theme.outer_sidewalk_width + 1.0)
 	add_child(label)
+	_exit_label = label
+
+
+var _exit_label: Label3D
+
+
+## Landscape turns the camera a quarter (the exit points right): the road
+## label turns with it so it still reads left to right.
+func set_turned(turned: bool) -> void:
+	if is_instance_valid(_exit_label):
+		_exit_label.rotation_degrees.y = -90.0 if turned else 0.0
 
 
 ## Frame of four boxes between two centered rectangles (half extents), with an

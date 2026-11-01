@@ -23,6 +23,9 @@ var _half_extents := Vector2(6, 6)
 var _wide_half := Vector2(6, 6) ## portrait framing: lot, ring road and exit
 var _wide_center_z := 0.0
 var _lot_half := Vector2.ZERO ## landscape framing: the parking lot only
+## Landscape turns the view a quarter: the exit road (world +Z) points to the
+## right of the screen, where the wide screen has room for it.
+var _turned := false
 var _center_z := 0.0
 var _trauma := 0.0
 var _shake_time := 0.0
@@ -83,12 +86,14 @@ func _refit() -> void:
 		return
 	var aspect := vp.x / vp.y
 	var landscape := aspect > 1.0
-	if landscape and _lot_half != Vector2.ZERO:
-		_half_extents = _lot_half + Vector2.ONE * margin
-		_center_z = 0.0
+	_turned = landscape and _lot_half != Vector2.ZERO
+	_center_z = _wide_center_z
+	if _turned:
+		# Screen width: the lot, ring road and the exit (along world Z);
+		# screen height: just the lot (along world X).
+		_half_extents = Vector2(_wide_half.y, _lot_half.x + margin)
 	else:
 		_half_extents = _wide_half
-		_center_z = _wide_center_z
 	var tilt := deg_to_rad(tilt_degrees)
 	var top := top_reserve_landscape if landscape else top_reserve
 	var bottom := bottom_reserve_landscape if landscape else bottom_reserve
@@ -103,10 +108,12 @@ func _refit() -> void:
 	var dist := maxf(dist_w, dist_d)
 
 	var basis := Basis.from_euler(Vector3(-PI * 0.5 + tilt, 0.0, 0.0))
+	if _turned:
+		basis = Basis(Vector3.UP, -PI * 0.5) * basis
 	var forward := -basis.z
 	# Shift the look-at point so the board sits between the HUD reserves.
 	var shift := (top - bottom) * 0.5 * 2.0 * tan_v * dist
-	var target := Vector3(0.0, 0.0, _center_z - shift * cos(tilt))
+	var target := Vector3(0.0, 0.0, _center_z) + _ground(basis.y) * shift * cos(tilt)
 	_fit = Transform3D(basis, target - forward * dist)
 	_fit_target = target
 	_fit_dist = dist
@@ -146,7 +153,9 @@ func pan_by(delta: Vector2) -> void:
 		return
 	var vp := get_viewport().get_visible_rect().size
 	var per_pixel := 2.0 * tan(deg_to_rad(fov) * 0.5) * (_fit_dist / zoom) / vp.y
-	pan -= Vector2(delta.x, delta.y / cos(deg_to_rad(tilt_degrees))) * per_pixel
+	# Screen right and down as directions on the ground (the view may be turned).
+	var move := _ground(_fit.basis.x) * delta.x - _ground(_fit.basis.y) * delta.y / cos(deg_to_rad(tilt_degrees))
+	pan -= Vector2(move.x, move.z) * per_pixel
 	_clamp_pan()
 	_apply_pose()
 
@@ -214,8 +223,18 @@ func _tween_view(to_pan: Vector2, to_zoom: float, duration: float) -> void:
 func _clamp_pan() -> void:
 	if _cinematic:
 		return
-	var room := _half_extents * (1.0 - 1.0 / zoom)
+	var world_half := Vector2(_half_extents.y, _half_extents.x) if _turned else _half_extents
+	var room := world_half * (1.0 - 1.0 / zoom)
 	pan = pan.clamp(-room, room)
+
+
+## Direction `v` flattened onto the ground.
+static func _ground(v: Vector3) -> Vector3:
+	return Vector3(v.x, 0.0, v.z).normalized()
+
+
+func is_turned() -> bool:
+	return _turned
 
 
 func _apply_pose() -> void:
